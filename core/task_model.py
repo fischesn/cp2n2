@@ -31,6 +31,19 @@ class OutputPreference(str, Enum):
     TELEMETRY_AWARE_RESULT = "telemetry_aware_result"
 
 
+class SelectionPolicy(str, Enum):
+    """Reproducible policies for ranking resources that passed hard checks."""
+
+    LEXICOGRAPHIC = "lexicographic"
+    LATENCY_FIRST = "latency_first"
+    SAFETY_FRESHNESS_FIRST = "safety_freshness_first"
+    LOCALITY_COST_FIRST = "locality_cost_first"
+    WEIGHTED_COMPARISON = "weighted_comparison"
+    STATIC_PRIORITY = "static_priority"
+    CONSTRAINT_BASED = "constraint_based"
+    RANDOM_ADMISSIBLE = "random_admissible"
+
+
 class TaskRequest(BaseModel):
     """A normalized task request submitted to the phys-MCP orchestrator."""
 
@@ -63,6 +76,23 @@ class TaskRequest(BaseModel):
         default=1000.0,
         gt=0.0,
         description="Maximum acceptable end-to-end latency in milliseconds.",
+    )
+    max_estimated_cost: float | None = Field(
+        default=None,
+        ge=0.0,
+        description="Optional hard cost ceiling for one invocation.",
+    )
+    cost_currency: str | None = Field(
+        default=None,
+        description="Currency required when max_estimated_cost is set.",
+    )
+    selection_policy: SelectionPolicy = Field(
+        default=SelectionPolicy.LEXICOGRAPHIC,
+        description="Policy used only after admission and feasibility checks pass.",
+    )
+    selection_seed: int = Field(
+        default=7,
+        description="Seed used by the reproducible random-admissible baseline.",
     )
     min_confidence: float = Field(
         default=0.0,
@@ -180,6 +210,16 @@ class TaskRequest(BaseModel):
             raise ValueError("optional identifiers must not be empty when provided.")
         return stripped
 
+    @field_validator("cost_currency")
+    @classmethod
+    def validate_cost_currency(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        stripped = value.strip().upper()
+        if not stripped:
+            raise ValueError("cost_currency must not be empty when provided.")
+        return stripped
+
     @field_validator("direct_backend_id")
     @classmethod
     def validate_direct_backend_id(cls, value: str | None) -> str | None:
@@ -221,6 +261,8 @@ class TaskRequest(BaseModel):
             raise ValueError("lease_id requires direct_backend_id.")
         if self.expected_lease_version is not None and self.lease_id is None:
             raise ValueError("expected_lease_version requires lease_id.")
+        if self.max_estimated_cost is not None and self.cost_currency is None:
+            raise ValueError("max_estimated_cost requires cost_currency.")
         return self
 
     def normalized_task_type(self) -> str:

@@ -8,6 +8,9 @@ from evaluation.evaluate_matching import evaluate as evaluate_matching
 from evaluation.evaluate_matching_baselines import evaluate as evaluate_matching_baselines
 from evaluation.evaluate_overhead import evaluate as evaluate_overhead
 from evaluation.evaluate_portability import evaluate as evaluate_portability
+from evaluation.evaluate_selection_robustness import (
+    evaluate as evaluate_selection_robustness,
+)
 
 
 def main() -> None:
@@ -15,6 +18,7 @@ def main() -> None:
     evaluate_portability()
     evaluate_matching()
     evaluate_matching_baselines()
+    evaluate_selection_robustness()
     evaluate_failure_campaign()
     evaluate_externalized_backend()
     print("All evaluation artefacts refreshed.")

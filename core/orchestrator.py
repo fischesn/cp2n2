@@ -28,6 +28,7 @@ from descriptors.capability_schema import ResetMode
 from descriptors.resource_contract import (
     ContractAdmissionResult,
     ResourceLifecycleState,
+    RuntimeKind,
     assess_contract_admission,
 )
 
@@ -131,7 +132,7 @@ class PhysMCPOrchestrator:
         ]
 
     def plan_task(self, task: TaskRequest) -> MatchReport:
-        """Rank all known backends for the given task request."""
+        """Run admission, feasibility, and selection for the task."""
         descriptors = self._registry.list_descriptors()
         if task.direct_backend_id is not None:
             descriptors = [
@@ -139,12 +140,80 @@ class PhysMCPOrchestrator:
                 for descriptor in descriptors
                 if descriptor.backend_id == task.direct_backend_id
             ]
-        runtime_state = self._registry.telemetry_snapshot()
+        runtime_state = self._selection_runtime_snapshot(task)
         return self._matcher.rank_backends(
             task=task,
             descriptors=descriptors,
             runtime_state=runtime_state,
         )
+
+    def _selection_runtime_snapshot(
+        self,
+        task: TaskRequest,
+    ) -> dict[str, dict[str, float | int | str | bool | None]]:
+        """Overlay lifecycle, lease, safety, and cost facts for A3 decisions."""
+        runtime_state: dict[
+            str,
+            dict[str, float | int | str | bool | None],
+        ] = {}
+        for backend_id in self._registry.list_backend_ids():
+            runtime: dict[str, float | int | str | bool | None] = {}
+            snapshot = self._registry.lifecycle_store.snapshot(backend_id)
+            lease = self._registry.lease_store.current(backend_id)
+            contract = self._registry.resource_contract_for(backend_id)
+            for name, observation in contract.telemetry.items():
+                value = observation.value
+                if value is None or isinstance(value, (float, int, str, bool)):
+                    runtime[name] = value
+
+            runtime["control_plane_lifecycle"] = str(snapshot.state)
+            runtime["control_plane_state_version"] = snapshot.version
+            runtime["reservable"] = lease is None or (
+                task.lease_id is not None
+                and lease.lease_id == task.lease_id
+                and lease.owner_id == task.client_id
+            )
+
+            safety_reasons = self._contract_safety_violations(contract)
+            runtime["contract_safety_admissible"] = not safety_reasons
+            runtime["contract_safety_reason"] = (
+                None if not safety_reasons else "; ".join(safety_reasons)
+            )
+
+            if contract.cost is not None and contract.cost.estimated_cost is not None:
+                value = contract.cost.estimated_cost.value
+                if isinstance(value, (int, float)) and not isinstance(value, bool):
+                    runtime["estimated_cost"] = float(value)
+                    runtime["cost_currency"] = contract.cost.currency
+            runtime_state[backend_id] = runtime
+        return runtime_state
+
+    @staticmethod
+    def _contract_safety_violations(contract) -> list[str]:
+        """Return only admission/safety violations, not dynamic feasibility."""
+        reasons: list[str] = []
+        if contract.evidence.runtime_kind == RuntimeKind.UNKNOWN:
+            reasons.append("runtime kind is not attested")
+        if contract.safety is None:
+            return reasons + ["safety contract is missing"]
+        if "invoke" not in contract.safety.permitted_operations:
+            reasons.append("operation 'invoke' is not explicitly permitted")
+        if contract.safety.human_supervision_required is None:
+            reasons.append("human supervision requirement is unknown")
+        if contract.safety.exclusive_access_required is None:
+            reasons.append("exclusive-access requirement is unknown")
+        if contract.evidence.runtime_kind == RuntimeKind.PHYSICAL_HARDWARE:
+            if not contract.identity.hardware_id:
+                reasons.append("physical hardware identity is missing")
+            if contract.evidence.attested_at is None:
+                reasons.append("physical runtime attestation is missing")
+            if not contract.safety.hard_limits:
+                reasons.append("physical hardware has no declared hard limits")
+            if contract.safety.emergency_stop_supported is None:
+                reasons.append("physical emergency-stop support is unknown")
+            if contract.safety.operator_acknowledgement_required is None:
+                reasons.append("operator acknowledgement is unknown")
+        return reasons
 
     def execute_task(self, task: TaskRequest) -> OrchestrationRunResult:
         """Execute one task with idempotency, a lease, and bounded phases."""
@@ -210,6 +279,13 @@ class PhysMCPOrchestrator:
         accepted_candidates = report.accepted_candidates()
 
         if not accepted_candidates:
+            early_admission: ContractAdmissionResult | None = None
+            safety_violations = [
+                violation.split(":", 1)[1].strip()
+                for candidate in report.candidates
+                for violation in candidate.admission.violations
+                if violation.startswith("resource_contract_safety:")
+            ]
             if task.direct_backend_id and not self._registry.has_backend(
                 task.direct_backend_id
             ):
@@ -217,6 +293,30 @@ class PhysMCPOrchestrator:
                     code=ControlPlaneErrorCode.RESOURCE_NOT_FOUND,
                     message=(
                         f"Directed backend '{task.direct_backend_id}' is not registered."
+                    ),
+                )
+            elif any(
+                any(
+                    violation.startswith("resource_reservable:")
+                    for violation in candidate.feasibility.violations
+                )
+                for candidate in report.candidates
+            ):
+                error = ControlPlaneError(
+                    code=ControlPlaneErrorCode.RESOURCE_BUSY,
+                    message="All otherwise admissible resources are currently reserved.",
+                    retryable=True,
+                )
+            elif safety_violations:
+                early_admission = ContractAdmissionResult(
+                    admissible=False,
+                    reasons=safety_violations,
+                )
+                error = ControlPlaneError(
+                    code=ControlPlaneErrorCode.INADMISSIBLE,
+                    message=(
+                        "No resource passed contract safety admission: "
+                        + "; ".join(safety_violations)
                     ),
                 )
             else:
@@ -228,6 +328,7 @@ class PhysMCPOrchestrator:
             return OrchestrationRunResult(
                 decision=decision,
                 correlation_id=correlation_id,
+                contract_admission=early_admission,
                 error=error,
                 failure_reason=self._format_error(error),
             )

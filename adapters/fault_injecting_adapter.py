@@ -33,8 +33,16 @@ class FaultInjectingAdapter(BaseAdapter):
         return self._wrapped.describe()
 
     def resource_contract(self) -> PhysicalNeuralResourceContract:
-        """Preserve the wrapped adapter's evidence instead of relabelling it."""
-        return self._wrapped.resource_contract()
+        """Preserve evidence while publishing the injected runtime telemetry."""
+        injected = super().resource_contract()
+        wrapped = self._wrapped.resource_contract()
+        return wrapped.model_copy(
+            update={
+                "published_at": injected.published_at,
+                "state": injected.state,
+                "telemetry": injected.telemetry,
+            }
+        )
 
     def configure(self, fault_profile: FaultProfile) -> None:
         self._fault_profile = fault_profile

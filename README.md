@@ -52,6 +52,12 @@ exclusive time-bounded reservations, state-version checks, client-scoped
 idempotency, independent phase timeouts, explicit abort, provider
 reconciliation, and typed error codes.
 
+Resource choice follows a documented
+[admission, feasibility, and selection protocol](docs/admission-feasibility-selection.md).
+The default is a non-compensatory lexicographic policy. Latency-, safety- and
+locality-oriented profiles, an explicit weighted comparison, and three
+reproducible baselines operate only on resources that passed all hard checks.
+
 ---
 
 ## 2. High-level architecture
@@ -116,7 +122,11 @@ Tasks can be routed in two ways:
 - **capability-driven**: let the matcher select the best compatible backend
 - **directed**: explicitly target a backend such as `cortical-labs-backend`
 
-Matching is based on descriptor compatibility and runtime signals rather than on mere endpoint presence.
+Matching first separates hard admission constraints from dynamic feasibility.
+Only admitted and currently feasible resources are ranked. Every exclusion
+names its violated constraint, and every selected resource carries a
+machine-readable policy, rank key, normalized criteria, and comparison-weight
+breakdown.
 
 ### 3.3 Execute tasks with telemetry-aware control
 A task execution can include:
@@ -228,6 +238,7 @@ phys-mcp/
     evaluate_gemini_agent.py
     evaluate_matching.py
     evaluate_matching_baselines.py
+    evaluate_selection_robustness.py
     evaluate_overhead.py
     evaluate_portability.py
     plots.py
