@@ -27,7 +27,6 @@ from __future__ import annotations
 import csv
 import json
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -40,8 +39,7 @@ def bootstrap_project_root() -> Path:
 
 
 PROJECT_ROOT = bootstrap_project_root()
-RESULTS_DIR = PROJECT_ROOT / "evaluation" / "results"
-RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+from evaluation.common import RESULTS_DIR  # noqa: E402
 
 from agent.gemini_agent import PhysMCPGeminiAgent  # noqa: E402
 
@@ -106,6 +104,8 @@ def summarize_agent_result(user_goal: str, result) -> dict[str, Any]:
         "health_before": telemetry_before.get("health_status"),
         "readiness_after": telemetry_after.get("readiness_state"),
         "health_after": telemetry_after.get("health_status"),
+        "runtime_kind": telemetry_after.get("runtime_kind"),
+        "telemetry_source": telemetry_after.get("telemetry_source"),
         "channel_count": telemetry_after.get("channel_count"),
         "fps": telemetry_after.get("fps"),
         "drift_score": telemetry_after.get("drift_score"),
@@ -116,9 +116,8 @@ def summarize_agent_result(user_goal: str, result) -> dict[str, Any]:
 
 
 def write_results(rows: list[dict[str, Any]]) -> tuple[Path, Path]:
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    json_path = RESULTS_DIR / f"gemini_agent_results_{timestamp}.json"
-    csv_path = RESULTS_DIR / f"gemini_agent_results_{timestamp}.csv"
+    json_path = RESULTS_DIR / "gemini_agent_results.json"
+    csv_path = RESULTS_DIR / "gemini_agent_results.csv"
 
     json_path.write_text(json.dumps(rows, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -142,6 +141,8 @@ def write_results(rows: list[dict[str, Any]]) -> tuple[Path, Path]:
         "health_before",
         "readiness_after",
         "health_after",
+        "runtime_kind",
+        "telemetry_source",
         "channel_count",
         "fps",
         "drift_score",

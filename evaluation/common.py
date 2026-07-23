@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -18,7 +20,15 @@ def bootstrap_project_root() -> Path:
 
 
 PROJECT_ROOT = bootstrap_project_root()
-RESULTS_DIR = PROJECT_ROOT / "evaluation" / "results"
+_configured_results_dir = os.getenv("PHYSMCP_RESULTS_DIR")
+RESULTS_DIR = (
+    Path(_configured_results_dir).expanduser().resolve()
+    if _configured_results_dir
+    else PROJECT_ROOT
+    / "evaluation"
+    / "results"
+    / f"run-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+)
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 from adapters.chemical_adapter import ChemicalAdapter

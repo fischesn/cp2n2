@@ -13,6 +13,7 @@ from core.matcher import BackendMatcher, MatchCandidate, MatchReport
 from core.task_model import TaskRequest
 from core.twin_registry import TwinRegistry
 from descriptors.capability_schema import ResetMode
+from descriptors.resource_contract import ContractAdmissionResult, assess_contract_admission
 
 
 class OrchestrationDecision(BaseModel):
@@ -38,6 +39,7 @@ class OrchestrationRunResult(BaseModel):
     invocation: AdapterInvocationResult | None = None
     telemetry_before: dict[str, float | int | str | bool | None] = Field(default_factory=dict)
     telemetry_after: dict[str, float | int | str | bool | None] = Field(default_factory=dict)
+    contract_admission: ContractAdmissionResult | None = None
     recovery_actions: list[str] = Field(default_factory=list)
     validation_failures: list[str] = Field(default_factory=list)
     success: bool = False
@@ -67,6 +69,13 @@ class PhysMCPOrchestrator:
     def discover_backends(self) -> list[dict]:
         """Return published descriptors for all known backends."""
         return [descriptor.to_public_dict() for descriptor in self._registry.list_descriptors()]
+
+    def discover_resource_contracts(self) -> list[dict]:
+        """Return versioned resource contracts for all known backends."""
+        return [
+            contract.model_dump(mode="json")
+            for contract in self._registry.list_resource_contracts()
+        ]
 
     def plan_task(self, task: TaskRequest) -> MatchReport:
         """Rank all known backends for the given task request."""
@@ -142,6 +151,27 @@ class PhysMCPOrchestrator:
                     )
                 continue
 
+            contract_admission = assess_contract_admission(
+                adapter.resource_contract(),
+                operation="invoke",
+            )
+            if not contract_admission.admissible:
+                last_failure_reason = (
+                    f"INADMISSIBLE backend '{candidate.backend_id}': "
+                    + "; ".join(contract_admission.reasons)
+                )
+                decision.notes.append(last_failure_reason)
+                if not task.allow_fallback:
+                    return OrchestrationRunResult(
+                        decision=decision,
+                        preparation=preparation,
+                        telemetry_before=telemetry_before,
+                        contract_admission=contract_admission,
+                        success=False,
+                        failure_reason=last_failure_reason,
+                    )
+                continue
+
             try:
                 invocation = adapter.invoke(task)
             except Exception as exc:  # pragma: no cover - defensive path for prototype robustness
@@ -154,6 +184,7 @@ class PhysMCPOrchestrator:
                         decision=decision,
                         preparation=preparation,
                         telemetry_before=telemetry_before,
+                        contract_admission=contract_admission,
                         success=False,
                         failure_reason=last_failure_reason,
                     )
@@ -176,6 +207,7 @@ class PhysMCPOrchestrator:
                         invocation=invocation,
                         telemetry_before=telemetry_before,
                         telemetry_after=telemetry_after,
+                        contract_admission=contract_admission,
                         recovery_actions=recovery_actions,
                         validation_failures=validation_failures,
                         success=False,
@@ -189,6 +221,7 @@ class PhysMCPOrchestrator:
                 invocation=invocation,
                 telemetry_before=telemetry_before,
                 telemetry_after=telemetry_after,
+                contract_admission=contract_admission,
                 recovery_actions=recovery_actions,
                 validation_failures=validation_failures,
                 success=True,

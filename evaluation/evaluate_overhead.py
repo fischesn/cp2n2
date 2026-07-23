@@ -5,8 +5,8 @@ from __future__ import annotations
 from statistics import mean, pstdev
 from time import perf_counter
 
-from common import RESULTS_DIR, save_csv, save_json
-from plots import save_grouped_bar_chart
+from evaluation.common import RESULTS_DIR, save_csv, save_json
+from evaluation.plots import save_grouped_bar_chart
 
 from adapters.chemical_adapter import ChemicalAdapter
 from adapters.edge_adapter import EdgeAdapter

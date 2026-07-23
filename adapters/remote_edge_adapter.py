@@ -8,6 +8,7 @@ from urllib.request import Request, urlopen
 from adapters.base_adapter import AdapterInvocationResult, AdapterPreparationResult, BaseAdapter
 from core.task_model import TaskRequest
 from descriptors.capability_schema import ResetMode, SubstrateDescriptor
+from descriptors.resource_contract import ObservationSource, RuntimeKind
 
 
 class RemoteEdgeAdapter(BaseAdapter):
@@ -17,7 +18,13 @@ class RemoteEdgeAdapter(BaseAdapter):
         self._base_url = base_url.rstrip("/")
         descriptor_payload = self._request_json("GET", "/describe")
         descriptor = SubstrateDescriptor.model_validate(descriptor_payload)
-        super().__init__(descriptor=descriptor)
+        super().__init__(
+            descriptor=descriptor,
+            runtime_kind=RuntimeKind.SAME_HOST_SERVICE,
+            provider_id="phys-mcp-remote-edge-service",
+            attestation_method="http_same_host_service_descriptor",
+            telemetry_source=ObservationSource.PROVIDER_REPORTED,
+        )
 
     def describe(self) -> SubstrateDescriptor:
         return self.descriptor

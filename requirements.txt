@@ -2,6 +2,7 @@ python-dotenv
 cl-sdk
 pytest
 requests
+pydantic>=2,<3
 jupyterlab
 ipywidgets
 google-genai

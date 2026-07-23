@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from adapters.base_adapter import AdapterInvocationResult, AdapterPreparationResult, BaseAdapter
 from core.task_model import TaskRequest
 from descriptors.capability_schema import ResetMode, SubstrateDescriptor
+from descriptors.resource_contract import PhysicalNeuralResourceContract
 
 
 @dataclass
@@ -30,6 +31,10 @@ class FaultInjectingAdapter(BaseAdapter):
 
     def describe(self) -> SubstrateDescriptor:
         return self._wrapped.describe()
+
+    def resource_contract(self) -> PhysicalNeuralResourceContract:
+        """Preserve the wrapped adapter's evidence instead of relabelling it."""
+        return self._wrapped.resource_contract()
 
     def configure(self, fault_profile: FaultProfile) -> None:
         self._fault_profile = fault_profile

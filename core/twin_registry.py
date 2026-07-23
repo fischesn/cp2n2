@@ -6,6 +6,7 @@ from typing import Iterable
 
 from adapters.base_adapter import BaseAdapter
 from descriptors.capability_schema import SubstrateDescriptor
+from descriptors.resource_contract import PhysicalNeuralResourceContract
 
 
 class TwinRegistry:
@@ -49,6 +50,10 @@ class TwinRegistry:
     def list_descriptors(self) -> list[SubstrateDescriptor]:
         """Return descriptors for all registered backends."""
         return [adapter.describe() for adapter in self.list_adapters()]
+
+    def list_resource_contracts(self) -> list[PhysicalNeuralResourceContract]:
+        """Return versioned resource contracts for all registered backends."""
+        return [adapter.resource_contract() for adapter in self.list_adapters()]
 
     def iter_adapters(self) -> Iterable[BaseAdapter]:
         """Yield all adapters in stable backend-id order."""

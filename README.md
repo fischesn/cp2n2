@@ -1,4 +1,7 @@
-# phys-MCP v3.0
+# phys-MCP
+
+This branch develops the accepted post-v3.0 master plan. The immutable `v3.0`
+tag remains the reproducible baseline.
 
 `phys-MCP` is a substrate-aware control-plane prototype for exposing heterogeneous **physical neural network (PNN)** resources as discoverable, invocable, and monitorable software-visible backends.
 
@@ -9,7 +12,7 @@ This repository contains:
 - a Python reference implementation of the `phys-MCP` control plane
 - representative local prototype backends for chemical, wetware, and fast edge-style execution
 - an externalized remote edge backend path
-- a real API-backed integration path for **Cortical Labs**
+- an attested integration path for the **Cortical Labs CL API / CL SDK**
 - minimal **Gemini-based** and **Ollama-based** agents that plan and execute tasks through `phys-MCP`
 - demos, tests, and evaluation scripts
 
@@ -35,6 +38,13 @@ The prototype treats physical AI resources as **managed backends** rather than o
 - Can an agent or orchestrator choose among them in a principled way?
 
 `phys-MCP` answers these questions through a substrate-aware descriptor model, a matcher, an orchestrator, and backend-specific adapters.
+
+The post-v3.0 development line also publishes a versioned, substrate-neutral
+[Physical Neural Resource Contract](docs/physical-neural-resource-contract-v1.0.md).
+It preserves the legacy capability descriptor while adding runtime evidence,
+telemetry provenance and freshness, safety constraints, access, cost, and data
+governance. Missing safety-relevant information produces an explicit
+`INADMISSIBLE` decision before invocation.
 
 ---
 
@@ -68,7 +78,7 @@ The data-plane side is implemented through adapters and backend-specific client 
 
 - local synthetic backends for representative substrate regimes
 - a remote edge path via HTTP
-- a real API-backed path via the Cortical Labs CL SDK / simulator
+- an explicitly attested Cortical Labs path, currently exercised with the CL SDK Simulator
 - a foundation for additional future integrations
 
 ---
@@ -77,6 +87,9 @@ The data-plane side is implemented through adapters and backend-specific client 
 
 ### 3.1 Discover heterogeneous backends
 The orchestrator can enumerate backends described through a shared descriptor model.
+
+For compatibility, `discover_backends()` returns the v3.0 descriptors.
+`discover_resource_contracts()` returns the complete v1.0 resource contracts.
 
 Each backend publishes information such as:
 
@@ -119,8 +132,8 @@ These are not intended as faithful physical simulators. Their role is to exercis
 ### 3.5 Use an externalized backend path
 The remote edge path demonstrates that the same control-plane logic also works across an explicit service boundary.
 
-### 3.6 Use a real Cortical Labs path
-The repository includes a real adapter and client path for the **Cortical Labs CL API / CL SDK simulator**.
+### 3.6 Use an attested Cortical Labs path
+The repository includes an adapter and client path for the **Cortical Labs CL API / CL SDK**. The adapter attests the active runtime as `sdk_simulator`, `physical_hardware`, or `unknown`; verified v3.0 results use `sdk_simulator`.
 
 Through this path, `phys-MCP` can:
 
@@ -128,7 +141,7 @@ Through this path, `phys-MCP` can:
 - submit a simple stimulation/recording task
 - collect normalized result data
 - capture structured recording artifact metadata
-- expose readiness, health, backend latency, observation latency, and recording path as telemetry
+- expose session readiness, runtime kind, latency, recording-path metadata, and explicitly sourced telemetry
 
 ### 3.7 Use LLM-based agents
 The repository also includes:
@@ -279,6 +292,7 @@ cl-sdk
 google-genai
 requests
 pytest
+pydantic>=2,<3
 ```
 
 Optional but useful:
@@ -290,7 +304,7 @@ ipywidgets
 
 ### 5.3 Runtime configuration
 
-Create a `.env` file in the project root. A typical starting point is:
+Copy `.env.example` to an untracked `.env` file in the project root. Do not commit credentials. A typical starting point is:
 
 ```dotenv
 # Cortical Labs SDK / Simulator
@@ -391,7 +405,9 @@ Typical result fields include:
 Typical telemetry includes:
 
 - `readiness_state`
-- `health_status`
+- `health_status` (only provider-reported; otherwise `unknown`)
+- `runtime_kind`
+- `telemetry_source`
 - `backend_latency_ms`
 - `observation_latency_ms`
 - `recording_path`
@@ -408,13 +424,13 @@ Typical telemetry includes:
 python -m evaluation.run_all_evaluations
 ```
 
-### 8.2 Real Cortical runtime evaluation
+### 8.2 Cortical runtime evaluation — explicit execution gate
 
 ```bash
 python -m evaluation.evaluate_cortical_runtime
 ```
 
-This performs several directed runs against the Cortical Labs integration path and stores JSON/CSV results under `evaluation/results/`.
+This performs directed stimulation/recording runs. It is **not** part of the default test suite and must only be run after confirming the active runtime and obtaining the appropriate hardware-safety approval. Its results must state `runtime_kind` and may not be presented as physical-hardware evidence when the SDK Simulator is active. Evaluation outputs are written to a fresh `evaluation/results/run-<UTC timestamp>/` directory by default; set `PHYSMCP_RESULTS_DIR` to select another location.
 
 ### 8.3 Gemini agent evaluation
 
@@ -528,7 +544,17 @@ For the Cortical Labs adapter specifically:
 pytest tests/test_cortical_labs_adapter.py -q
 ```
 
-The tests validate descriptor structure, adapter behavior, and integration assumptions. They complement, but do not replace, the real simulator runs.
+The tests validate descriptor structure, adapter behaviour, and integration assumptions. `pytest.ini` restricts default collection to `tests/`; scripts capable of stimulation are deliberately excluded.
+
+### 10.1 Resource-contract validation
+
+```bash
+python scripts/validate_resource_contract.py examples/resource-contract-v1.0/valid-chemical-synthetic-twin.json
+```
+
+The canonical Draft 2020-12 JSON Schema is stored under `schemas/`, with
+cross-substrate valid, invalid, and conservatively inadmissible examples under
+`examples/resource-contract-v1.0/`.
 
 ---
 
@@ -541,7 +567,7 @@ This is the low-level client wrapper around the CL SDK. It handles:
 
 - session open/close
 - simple stimulation/recording cycles
-- health/readiness retrieval
+- session readiness and runtime-kind attestation
 - recording artifact normalization
 
 ### `adapters/cortical_labs_adapter.py`
@@ -621,7 +647,7 @@ This repository is a research prototype and should be interpreted accordingly.
 - task matching and directed execution
 - telemetry-aware control
 - an externalized remote backend path
-- a real API-backed Cortical Labs integration path
+- an attested Cortical Labs integration path, currently demonstrated with the CL SDK Simulator
 - working Gemini- and Ollama-based agents on top of `phys-MCP`
 
 ### What it does not claim
@@ -632,8 +658,8 @@ This repository is a research prototype and should be interpreted accordingly.
 - complete support for all physical substrate classes
 
 The Cortical Labs integration should currently be understood as:
-- a real wetware-facing API path
-- successfully exercised end to end
+- an API-compatible E3 CL SDK Simulator path in the verified v3.0 evidence
+- capable of targeting physical hardware only when that runtime is explicitly attested
 - useful for research and demonstration
 - still narrow in scope
 
@@ -680,8 +706,8 @@ Check:
 Its current strengths are:
 
 - coherent substrate-aware control semantics
-- a working real API-backed Cortical Labs path
-- reproducible runtime evaluation of that path
+- an attested Cortical Labs CL SDK integration path
+- reproducible SDK Simulator evaluation of that path
 - and minimal but functional Gemini- and Ollama-based agents on top of the same control plane
 
 That makes the repository useful both as:

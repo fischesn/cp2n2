@@ -52,6 +52,10 @@ class _FakeContextManager:
 
 class _FakeCLModule:
     @staticmethod
+    def is_simulator() -> bool:
+        return True
+
+    @staticmethod
     def open(*, take_control=True, wait_until_recordable=True):
         return _FakeContextManager()
 
@@ -63,6 +67,7 @@ class _FakeCLModule:
 def _install_fake_cl(monkeypatch: pytest.MonkeyPatch) -> None:
     fake_module = types.ModuleType("cl")
     fake_module.open = _FakeCLModule.open
+    fake_module.is_simulator = _FakeCLModule.is_simulator
     fake_module.get_system_attributes = _FakeCLModule.get_system_attributes
     monkeypatch.setitem(sys.modules, "cl", fake_module)
 
@@ -74,12 +79,14 @@ def test_cortical_descriptor_structure_is_present() -> None:
     assert descriptor.backend_id == "cortical-labs-backend"
     assert descriptor.display_name == "Cortical Labs CL API Backend"
     assert str(descriptor.policy.locality) == "lab"
-    assert descriptor.telemetry.supports_health_status is True
+    assert descriptor.telemetry.supports_health_status is False
 
     metric_names = {m.name for m in descriptor.telemetry.metrics}
     assert "backend_latency_ms" in metric_names
     assert "readiness_state" in metric_names
     assert "health_status" in metric_names
+    assert "runtime_kind" in metric_names
+    assert descriptor.custom_metadata["expected_runtime_kind"] == "sdk_simulator"
 
 
 def test_cortical_prepare_reports_unavailable_without_sdk() -> None:
@@ -107,14 +114,16 @@ def test_cortical_prepare_invoke_and_telemetry_with_fake_sdk(monkeypatch: pytest
     inv = adapter.invoke(task)
     assert inv.backend_id == "cortical-labs-backend"
     assert inv.backend_state == "ready"
-    assert inv.confidence == 0.75
+    assert inv.confidence is None
     assert inv.output_payload["response_fingerprint"] == "recording_completed"
     assert inv.output_payload["stim_channel"] == 1
     assert "recording_artifact" in inv.output_payload
 
     tel = adapter.collect_telemetry()
     assert tel["readiness_state"] == "ready"
-    assert tel["health_status"] == "healthy"
+    assert tel["health_status"] == "unknown"
+    assert tel["runtime_kind"] == "sdk_simulator"
+    assert tel["drift_score"] is None
     assert "backend_latency_ms" in tel
     assert "channel_count" in tel
     assert "fps" in tel
@@ -134,3 +143,15 @@ def test_cortical_prepare_rejects_without_supervision(monkeypatch: pytest.Monkey
     prep = adapter.prepare(task)
     assert prep.prepared is False
     assert "requires human supervision" in prep.details.lower()
+
+
+def test_cortical_prepare_rejects_runtime_kind_mismatch(monkeypatch: pytest.MonkeyPatch) -> None:
+    _install_fake_cl(monkeypatch)
+
+    adapter = CorticalLabsAdapter(use_simulator=False)
+    adapter._client = adapter._client.__class__(use_simulator=False)
+
+    prep = adapter.prepare(make_cortical_task())
+
+    assert prep.prepared is False
+    assert "runtime mismatch" in prep.details.lower()

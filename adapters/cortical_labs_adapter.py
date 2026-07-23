@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from datetime import datetime, timezone
 
 from adapters.base_adapter import AdapterInvocationResult, AdapterPreparationResult, BaseAdapter
 from backends.cortical.cl_client import (
@@ -31,11 +32,30 @@ from descriptors.capability_schema import (
     TrainingMode,
     TwinBinding,
 )
+from descriptors.resource_contract import (
+    EXPECTED_EVIDENCE_LEVEL,
+    EvidenceLevel,
+    ObservationSource,
+    RuntimeKind,
+)
 
 
 class CorticalLabsAdapter(BaseAdapter):
-    def __init__(self, backend_id: str = "cortical-labs-backend") -> None:
-        self._client = CLClient()
+    def __init__(
+        self,
+        backend_id: str = "cortical-labs-backend",
+        *,
+        use_simulator: bool | None = True,
+    ) -> None:
+        self._client = CLClient(use_simulator=use_simulator)
+        self._expected_runtime_kind = (
+            "sdk_simulator"
+            if use_simulator is True
+            else "physical_hardware"
+            if use_simulator is False
+            else "unknown"
+        )
+        self._last_runtime_kind: str = "unknown"
         self._session_open = False
         self._last_backend_latency_ms: float | None = None
         self._last_observation_latency_ms: float | None = None
@@ -46,9 +66,19 @@ class CorticalLabsAdapter(BaseAdapter):
         self._last_fps: float | None = None
         self._last_age_of_information_ms: float | None = None
         self._last_prepare_timestamp: float | None = None
+        self._last_attested_at: datetime | None = None
 
-        descriptor = self._build_descriptor(backend_id=backend_id)
-        super().__init__(descriptor=descriptor)
+        descriptor = self._build_descriptor(
+            backend_id=backend_id,
+            expected_runtime_kind=self._expected_runtime_kind,
+        )
+        super().__init__(
+            descriptor=descriptor,
+            runtime_kind=RuntimeKind.UNKNOWN,
+            provider_id="cortical-labs",
+            attestation_method="cl_sdk_is_simulator",
+            telemetry_source=ObservationSource.OBSERVED,
+        )
 
     def describe(self) -> SubstrateDescriptor:
         return self.descriptor
@@ -82,10 +112,11 @@ class CorticalLabsAdapter(BaseAdapter):
 
         self._session_open = True
         self._last_readiness_state = "ready"
-        self._last_health_status = "healthy"
+        self._last_health_status = "unknown"
+        self._last_runtime_kind = info.runtime_kind
+        self._last_attested_at = datetime.now(timezone.utc)
         self._last_channel_count = info.channel_count
         self._last_fps = info.fps
-        self._last_age_of_information_ms = 0.0
         self._last_prepare_timestamp = time.perf_counter()
 
         details = "Cortical Labs session opened successfully."
@@ -135,9 +166,9 @@ class CorticalLabsAdapter(BaseAdapter):
         self._last_backend_latency_ms = result.backend_latency_ms
         self._last_observation_latency_ms = result.observation_latency_ms
         self._last_recording_artifact = result.recording_artifact
-        self._last_health_status = "healthy"
+        self._last_health_status = "unknown"
         self._last_readiness_state = "ready"
-        self._last_age_of_information_ms = 0.0
+        self._last_runtime_kind = self._client.runtime_kind()
 
         output_payload = {
             "response_fingerprint": result.response_summary.get(
@@ -151,7 +182,10 @@ class CorticalLabsAdapter(BaseAdapter):
             "raw_backend_metadata": result.raw_backend_metadata,
         }
 
-        notes = "Cortical Labs stimulation/recording cycle completed."
+        notes = (
+            "Cortical Labs stimulation/recording cycle completed "
+            f"on {self._last_runtime_kind}."
+        )
         if result.recording_artifact and result.recording_artifact.get("path"):
             notes += f" recording_path={result.recording_artifact['path']}"
 
@@ -159,7 +193,7 @@ class CorticalLabsAdapter(BaseAdapter):
             backend_id=self.backend_id(),
             task_id=task.task_id,
             output_payload=output_payload,
-            confidence=0.75 if result.success else 0.0,
+            confidence=None,
             execution_latency_ms=result.backend_latency_ms,
             backend_state="ready",
             notes=notes,
@@ -172,6 +206,10 @@ class CorticalLabsAdapter(BaseAdapter):
         channel_count = health.get("channel_count", self._last_channel_count)
         fps = health.get("fps", self._last_fps)
 
+        age_of_information_ms = None
+        if self._last_prepare_timestamp is not None:
+            age_of_information_ms = (time.perf_counter() - self._last_prepare_timestamp) * 1000.0
+
         telemetry = {
             "readiness_state": readiness_state,
             "health_status": health_status,
@@ -179,8 +217,10 @@ class CorticalLabsAdapter(BaseAdapter):
             "observation_latency_ms": self._last_observation_latency_ms,
             "channel_count": channel_count,
             "fps": fps,
-            "drift_score": 0.0 if self._session_open else None,
-            "age_of_information_ms": self._last_age_of_information_ms,
+            "runtime_kind": health.get("runtime_kind", self._last_runtime_kind),
+            "drift_score": None,
+            "age_of_information_ms": age_of_information_ms,
+            "telemetry_source": "local_session_observation",
             "sdk_available": self._client.is_available(),
         }
 
@@ -198,6 +238,8 @@ class CorticalLabsAdapter(BaseAdapter):
         self._last_observation_latency_ms = None
         self._last_recording_artifact = None
         self._last_age_of_information_ms = None
+        self._last_runtime_kind = "unknown"
+        self._last_attested_at = None
         return True
 
     def recalibrate(self) -> bool:
@@ -213,12 +255,33 @@ class CorticalLabsAdapter(BaseAdapter):
             return False
         self._session_open = True
         self._last_readiness_state = "ready"
-        self._last_health_status = "healthy"
+        self._last_health_status = "unknown"
+        self._last_runtime_kind = info.runtime_kind
+        self._last_attested_at = datetime.now(timezone.utc)
         self._last_channel_count = info.channel_count
         self._last_fps = info.fps
-        self._last_age_of_information_ms = 0.0
         self._last_prepare_timestamp = time.perf_counter()
         return True
+
+    def _resource_contract_runtime_evidence(
+        self,
+    ) -> tuple[RuntimeKind, EvidenceLevel, str, datetime | None, dict]:
+        try:
+            runtime_kind = RuntimeKind(self._last_runtime_kind)
+        except ValueError:
+            runtime_kind = RuntimeKind.UNKNOWN
+        method = (
+            "cl_sdk_is_simulator"
+            if runtime_kind != RuntimeKind.UNKNOWN
+            else "runtime_not_yet_attested"
+        )
+        return (
+            runtime_kind,
+            EXPECTED_EVIDENCE_LEVEL[runtime_kind],
+            method,
+            self._last_attested_at,
+            {"configured_expectation": self._expected_runtime_kind},
+        )
 
     @staticmethod
     def _extract_stimulation(task: TaskRequest) -> tuple[int, float]:
@@ -252,15 +315,18 @@ class CorticalLabsAdapter(BaseAdapter):
             return 20
 
     @staticmethod
-    def _build_descriptor(backend_id: str) -> SubstrateDescriptor:
+    def _build_descriptor(
+        backend_id: str,
+        expected_runtime_kind: str,
+    ) -> SubstrateDescriptor:
         return SubstrateDescriptor(
             backend_id=backend_id,
             display_name="Cortical Labs CL API Backend",
             version="0.1.1",
             description=(
                 "Optional adapter targeting the public Cortical Labs CL API / "
-                "CL SDK Simulator for stimulation, recording, and closed-loop "
-                "wetware interaction."
+                "CL SDK. The active runtime is attested as simulator, physical "
+                "hardware, or unknown before a session is opened."
             ),
             input_contracts=[
                 IOContract(
@@ -322,7 +388,7 @@ class CorticalLabsAdapter(BaseAdapter):
                     TelemetryField(
                         name="health_status",
                         units="state",
-                        description="Current wetware/session health status exposed by the adapter.",
+                        description="Provider health status when available; otherwise unknown.",
                         lower_is_better=None,
                     ),
                     TelemetryField(
@@ -344,28 +410,37 @@ class CorticalLabsAdapter(BaseAdapter):
                         lower_is_better=None,
                     ),
                     TelemetryField(
-                        name="drift_score",
-                        units="fraction",
-                        description="Lightweight wetware drift/readiness proxy.",
-                        lower_is_better=True,
+                        name="runtime_kind",
+                        units="kind",
+                        description="Attested CL runtime: sdk_simulator, physical_hardware, or unknown.",
+                        lower_is_better=None,
                     ),
                     TelemetryField(
                         name="age_of_information_ms",
                         units="ms",
-                        description="Approximate age of the current telemetry snapshot.",
+                        description="Elapsed time since local session attributes were observed.",
                         lower_is_better=True,
                     ),
+                    TelemetryField(
+                        name="telemetry_source",
+                        units="source",
+                        description="Provenance of the reported telemetry snapshot.",
+                        lower_is_better=None,
+                    ),
                 ],
-                supports_health_status=True,
+                supports_health_status=False,
                 supports_confidence=False,
-                supports_drift_reporting=True,
+                supports_drift_reporting=False,
                 supports_age_of_information=True,
             ),
             twin_binding=TwinBinding(
-                twin_kind="external_api_or_simulator",
-                fidelity_level="api_targeted",
-                calibration_confidence=0.75,
-                twin_notes="Targets the public CL API and its simulator; not part of the reported quantitative evaluation.",
+                twin_kind=expected_runtime_kind,
+                fidelity_level="interface_compatibility_only",
+                calibration_confidence=0.0,
+                twin_notes=(
+                    "No substrate calibration confidence is inferred by this adapter. "
+                    "The active runtime is attested at session open."
+                ),
             ),
             policy=PolicyConstraints(
                 locality=Locality.LAB,
@@ -388,5 +463,7 @@ class CorticalLabsAdapter(BaseAdapter):
             custom_metadata={
                 "paper_role": "existing wetware API integration target",
                 "sdk_package": "cl-sdk",
+                "expected_runtime_kind": expected_runtime_kind,
+                "evidence_level": "E3" if expected_runtime_kind == "sdk_simulator" else "unattested",
             },
         )

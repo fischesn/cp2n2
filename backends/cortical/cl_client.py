@@ -26,6 +26,7 @@ class CLSessionInfo:
     fps: Optional[float] = None
     frame_duration_us: Optional[int] = None
     metadata: Optional[Dict[str, Any]] = None
+    runtime_kind: str = "unknown"
 
 
 @dataclass
@@ -51,7 +52,7 @@ class CLClient:
 
     def __init__(
         self,
-        use_simulator: bool = True,
+        use_simulator: bool | None = True,
         take_control: bool = True,
         wait_until_recordable: bool = True,
     ) -> None:
@@ -73,6 +74,31 @@ class CLClient:
     def is_available(self) -> bool:
         return self._cl is not None
 
+    def runtime_kind(self) -> str:
+        """Return the observed CL runtime kind without guessing from names."""
+        if self._cl is None:
+            return "unknown"
+        try:
+            is_simulator = self._cl.is_simulator()
+        except Exception:
+            return "unknown"
+        return "sdk_simulator" if is_simulator else "physical_hardware"
+
+    def _validate_runtime_expectation(self, runtime_kind: str) -> None:
+        if self.use_simulator is None:
+            return
+        expected = "sdk_simulator" if self.use_simulator else "physical_hardware"
+        if runtime_kind == "unknown":
+            raise CorticalLabsUnavailableError(
+                "Unable to attest whether the active Cortical Labs runtime is a "
+                "simulator or physical hardware."
+            )
+        if runtime_kind != expected:
+            raise CorticalLabsUnavailableError(
+                f"Cortical Labs runtime mismatch: expected {expected}, observed "
+                f"{runtime_kind}."
+            )
+
     def open_session(self) -> CLSessionInfo:
         if self._cl is None:
             raise CorticalLabsUnavailableError(
@@ -80,6 +106,8 @@ class CLClient:
             )
 
         try:
+            runtime_kind = self.runtime_kind()
+            self._validate_runtime_expectation(runtime_kind)
             self._ctx = self._cl.open(
                 take_control=self.take_control,
                 wait_until_recordable=self.wait_until_recordable,
@@ -103,6 +131,7 @@ class CLClient:
                 fps=fps,
                 frame_duration_us=frame_duration_us,
                 metadata=attrs,
+                runtime_kind=runtime_kind,
             )
             self._last_session_info = info
             return info
@@ -130,7 +159,9 @@ class CLClient:
 
         return {
             "readiness_state": "ready",
-            "health_status": "healthy",
+            # A successfully opened CL session is not a provider health signal.
+            "health_status": "unknown",
+            "runtime_kind": self.runtime_kind(),
             "channel_count": self._safe_call(self._neurons, "get_channel_count"),
             "fps": self._safe_call(self._neurons, "get_frames_per_second"),
         }

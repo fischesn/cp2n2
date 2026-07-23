@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from common import PROJECT_ROOT, RESULTS_DIR, save_csv, save_json
+from evaluation.common import PROJECT_ROOT, RESULTS_DIR, save_csv, save_json
 
 from adapters.chemical_adapter import ChemicalAdapter
 from adapters.edge_adapter import EdgeAdapter
