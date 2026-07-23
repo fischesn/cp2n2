@@ -1,6 +1,10 @@
-"""Main control-plane orchestrator for the phys-MCP prototype."""
+"""Lifecycle-, lease-, and evidence-aware phys-MCP orchestrator."""
 
 from __future__ import annotations
+
+import hashlib
+import json
+from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -9,11 +13,33 @@ from adapters.base_adapter import (
     AdapterPreparationResult,
     BaseAdapter,
 )
+from core.errors import (
+    ControlPlaneError,
+    ControlPlaneErrorCode,
+    ControlPlaneException,
+)
+from core.execution import run_with_timeout
+from core.leases import ResourceLease
+from core.lifecycle import LifecycleSnapshot, LifecycleTransition
 from core.matcher import BackendMatcher, MatchCandidate, MatchReport
 from core.task_model import TaskRequest
 from core.twin_registry import TwinRegistry
 from descriptors.capability_schema import ResetMode
-from descriptors.resource_contract import ContractAdmissionResult, assess_contract_admission
+from descriptors.resource_contract import (
+    ContractAdmissionResult,
+    ResourceLifecycleState,
+    assess_contract_admission,
+)
+
+
+ACTIVE_STATES = {
+    ResourceLifecycleState.RESERVED,
+    ResourceLifecycleState.PREPARING,
+    ResourceLifecycleState.RUNNING,
+    ResourceLifecycleState.VALIDATING,
+    ResourceLifecycleState.COOLDOWN,
+    ResourceLifecycleState.DEGRADED,
+}
 
 
 class OrchestrationDecision(BaseModel):
@@ -30,24 +56,48 @@ class OrchestrationDecision(BaseModel):
 
 
 class OrchestrationRunResult(BaseModel):
-    """End-to-end result of an orchestrated task execution."""
+    """End-to-end result of a lifecycle-managed task execution."""
 
     model_config = ConfigDict(extra="forbid")
 
     decision: OrchestrationDecision
+    correlation_id: str | None = None
     preparation: AdapterPreparationResult | None = None
     invocation: AdapterInvocationResult | None = None
-    telemetry_before: dict[str, float | int | str | bool | None] = Field(default_factory=dict)
-    telemetry_after: dict[str, float | int | str | bool | None] = Field(default_factory=dict)
+    telemetry_before: dict[str, float | int | str | bool | None] = Field(
+        default_factory=dict
+    )
+    telemetry_after: dict[str, float | int | str | bool | None] = Field(
+        default_factory=dict
+    )
     contract_admission: ContractAdmissionResult | None = None
+    lease: ResourceLease | None = None
+    lifecycle_history: list[LifecycleTransition] = Field(default_factory=list)
+    final_lifecycle: LifecycleSnapshot | None = None
     recovery_actions: list[str] = Field(default_factory=list)
     validation_failures: list[str] = Field(default_factory=list)
+    error: ControlPlaneError | None = None
+    idempotent_replay: bool = False
     success: bool = False
     failure_reason: str | None = None
 
 
+class ControlPlaneActionResult(BaseModel):
+    """Result of an explicit abort or reconciliation request."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    resource_id: str
+    correlation_id: str
+    success: bool
+    lease: ResourceLease | None = None
+    final_lifecycle: LifecycleSnapshot | None = None
+    actions: list[str] = Field(default_factory=list)
+    error: ControlPlaneError | None = None
+
+
 class PhysMCPOrchestrator:
-    """Coordinates discovery, matching, invocation, and recovery."""
+    """Coordinates discovery, leases, lifecycle, invocation, and recovery."""
 
     def __init__(
         self,
@@ -67,11 +117,14 @@ class PhysMCPOrchestrator:
         self._registry.register(adapter=adapter, overwrite=overwrite)
 
     def discover_backends(self) -> list[dict]:
-        """Return published descriptors for all known backends."""
-        return [descriptor.to_public_dict() for descriptor in self._registry.list_descriptors()]
+        """Return v3.0-compatible descriptors for all known backends."""
+        return [
+            descriptor.to_public_dict()
+            for descriptor in self._registry.list_descriptors()
+        ]
 
     def discover_resource_contracts(self) -> list[dict]:
-        """Return versioned resource contracts for all known backends."""
+        """Return contracts overlaid with control-plane lifecycle state."""
         return [
             contract.model_dump(mode="json")
             for contract in self._registry.list_resource_contracts()
@@ -81,7 +134,11 @@ class PhysMCPOrchestrator:
         """Rank all known backends for the given task request."""
         descriptors = self._registry.list_descriptors()
         if task.direct_backend_id is not None:
-            descriptors = [descriptor for descriptor in descriptors if descriptor.backend_id == task.direct_backend_id]
+            descriptors = [
+                descriptor
+                for descriptor in descriptors
+                if descriptor.backend_id == task.direct_backend_id
+            ]
         runtime_state = self._registry.telemetry_snapshot()
         return self._matcher.rank_backends(
             task=task,
@@ -90,158 +147,1195 @@ class PhysMCPOrchestrator:
         )
 
     def execute_task(self, task: TaskRequest) -> OrchestrationRunResult:
-        """Execute one task through the selected backend.
+        """Execute one task with idempotency, a lease, and bounded phases."""
 
-        If allowed by the task request, the orchestrator may fall back to the next
-        accepted candidate when preparation, invocation, or postcondition checks fail.
-        """
+        correlation_id = task.correlation_id or str(uuid4())
+        fingerprint = self._request_fingerprint(task)
+        if task.idempotency_key is not None:
+            try:
+                cached = self._registry.idempotency_store.begin(
+                    task.client_id,
+                    task.idempotency_key,
+                    fingerprint,
+                )
+            except ControlPlaneException as exc:
+                return self._early_error_result(task, correlation_id, exc.error)
+            if cached is not None:
+                replay = cached.model_copy(deep=True)
+                replay.idempotent_replay = True
+                replay.decision.notes.append(
+                    f"Replayed completed request for idempotency key "
+                    f"'{task.idempotency_key}'."
+                )
+                return replay
+
+        try:
+            result = self._execute_task_once(task, correlation_id)
+        except Exception:
+            if task.idempotency_key is not None:
+                self._registry.idempotency_store.abandon(
+                    task.client_id,
+                    task.idempotency_key,
+                )
+            raise
+
+        if task.idempotency_key is not None:
+            if (
+                result.lease is None
+                and result.error is not None
+                and result.error.retryable
+            ):
+                self._registry.idempotency_store.abandon(
+                    task.client_id,
+                    task.idempotency_key,
+                )
+            else:
+                self._registry.idempotency_store.complete(
+                    task.client_id,
+                    task.idempotency_key,
+                    result,
+                )
+        return result
+
+    def _execute_task_once(
+        self,
+        task: TaskRequest,
+        correlation_id: str,
+    ) -> OrchestrationRunResult:
         report = self.plan_task(task)
         decision = OrchestrationDecision(
             task_id=task.task_id,
             ranked_candidates=report.candidates,
-            notes=[],
         )
-
         accepted_candidates = report.accepted_candidates()
+
         if not accepted_candidates:
-            if task.direct_backend_id and not self._registry.has_backend(task.direct_backend_id):
-                decision.notes.append(f"Directed backend '{task.direct_backend_id}' is not registered.")
-                failure_reason = f"Directed backend '{task.direct_backend_id}' not found."
+            if task.direct_backend_id and not self._registry.has_backend(
+                task.direct_backend_id
+            ):
+                error = ControlPlaneError(
+                    code=ControlPlaneErrorCode.RESOURCE_NOT_FOUND,
+                    message=(
+                        f"Directed backend '{task.direct_backend_id}' is not registered."
+                    ),
+                )
             else:
-                decision.notes.append("No accepted backend candidates were found.")
-                failure_reason = "No compatible backend found."
+                error = ControlPlaneError(
+                    code=ControlPlaneErrorCode.POLICY_DENIED,
+                    message="No compatible backend passed matching and policy checks.",
+                )
+            decision.notes.append(error.message)
             return OrchestrationRunResult(
                 decision=decision,
-                success=False,
-                failure_reason=failure_reason,
+                correlation_id=correlation_id,
+                error=error,
+                failure_reason=self._format_error(error),
             )
 
-        candidate_queue = accepted_candidates
-        last_failure_reason: str | None = None
-
-        for index, candidate in enumerate(candidate_queue):
-            adapter = self._registry.get_adapter(candidate.backend_id)
+        last_result: OrchestrationRunResult | None = None
+        for index, candidate in enumerate(accepted_candidates):
             decision.selected_backend_id = candidate.backend_id
             decision.selected_score = candidate.score
             decision.used_fallback = index > 0
-
-            if decision.used_fallback:
+            if index:
                 decision.notes.append(
-                    f"Using fallback candidate '{candidate.backend_id}' after earlier failure."
+                    f"Trying fallback candidate '{candidate.backend_id}'."
                 )
             else:
                 decision.notes.append(
                     f"Selected primary candidate '{candidate.backend_id}'."
                 )
 
-            telemetry_before = adapter.collect_telemetry()
-            preparation = adapter.prepare(task)
-            if not preparation.prepared:
-                last_failure_reason = (
-                    f"Preparation failed for backend '{candidate.backend_id}': {preparation.details}"
-                )
-                decision.notes.append(last_failure_reason)
-                if not task.allow_fallback:
-                    return OrchestrationRunResult(
-                        decision=decision,
-                        preparation=preparation,
-                        telemetry_before=telemetry_before,
-                        success=False,
-                        failure_reason=last_failure_reason,
-                    )
-                continue
+            result = self._execute_candidate(
+                task,
+                candidate,
+                decision,
+                correlation_id,
+            )
+            if result.success:
+                return result
+            last_result = result
+            if not task.allow_fallback:
+                return result
 
-            contract_admission = assess_contract_admission(
+        assert last_result is not None
+        return last_result
+
+    def _execute_candidate(
+        self,
+        task: TaskRequest,
+        candidate: MatchCandidate,
+        decision: OrchestrationDecision,
+        correlation_id: str,
+    ) -> OrchestrationRunResult:
+        backend_id = candidate.backend_id
+        adapter = self._registry.get_adapter(backend_id)
+        owner_id = task.client_id
+        lease: ResourceLease | None = None
+        telemetry_before: dict[str, float | int | str | bool | None] = {}
+        preparation: AdapterPreparationResult | None = None
+        admission: ContractAdmissionResult | None = None
+
+        try:
+            snapshot = self._registry.lifecycle_store.snapshot(backend_id)
+            if (
+                task.expected_resource_state_version is not None
+                and snapshot.version != task.expected_resource_state_version
+            ):
+                raise ControlPlaneException(
+                    ControlPlaneErrorCode.STATE_VERSION_CONFLICT,
+                    (
+                        f"Resource '{backend_id}' is at state version "
+                        f"{snapshot.version}, expected "
+                        f"{task.expected_resource_state_version}."
+                    ),
+                    retryable=True,
+                )
+            if task.lease_id is not None:
+                if (
+                    ResourceLifecycleState(snapshot.state)
+                    != ResourceLifecycleState.RESERVED
+                ):
+                    raise ControlPlaneException(
+                        ControlPlaneErrorCode.INVALID_STATE_TRANSITION,
+                        (
+                            f"Pre-acquired lease requires '{backend_id}' to be "
+                            f"reserved, but it is '{snapshot.state}'."
+                        ),
+                    )
+                lease = self._registry.lease_store.validate(
+                    task.lease_id,
+                    backend_id,
+                    owner_id,
+                    expected_version=task.expected_lease_version,
+                )
+            else:
+                if (
+                    ResourceLifecycleState(snapshot.state)
+                    != ResourceLifecycleState.READY
+                ):
+                    raise ControlPlaneException(
+                        ControlPlaneErrorCode.RESOURCE_BUSY,
+                        (
+                            f"Resource '{backend_id}' is in lifecycle state "
+                            f"'{snapshot.state}', not 'ready'."
+                        ),
+                        retryable=True,
+                    )
+                lease = self._registry.lease_store.acquire(
+                    backend_id,
+                    owner_id,
+                    ttl_ms=task.lease_ttl_ms,
+                    idempotency_key=task.idempotency_key,
+                )
+                self._registry.lifecycle_store.transition(
+                    backend_id,
+                    ResourceLifecycleState.RESERVED,
+                    expected_version=snapshot.version,
+                    reason=f"exclusive lease {lease.lease_id} acquired",
+                    correlation_id=correlation_id,
+                )
+        except ControlPlaneException as exc:
+            if lease is not None:
+                self._release_lease_safely(lease, owner_id)
+            decision.notes.append(exc.error.message)
+            return self._candidate_error_result(
+                decision,
+                correlation_id,
+                exc.error,
+                backend_id=backend_id,
+                lease=lease,
+            )
+
+        telemetry_outcome = run_with_timeout(
+            adapter.collect_telemetry,
+            task.preparation_timeout_ms,
+        )
+        if telemetry_outcome.timed_out:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.TELEMETRY_STALE,
+                    message=(
+                        f"Pre-execution telemetry timed out for '{backend_id}'."
+                    ),
+                    retryable=True,
+                ),
+                uncertain=True,
+            )
+        if telemetry_outcome.error is not None:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.TELEMETRY_STALE,
+                    message=(
+                        f"Pre-execution telemetry failed for '{backend_id}': "
+                        f"{telemetry_outcome.error}"
+                    ),
+                    retryable=True,
+                ),
+                uncertain=True,
+            )
+        telemetry_before = telemetry_outcome.value or {}
+        self._transition(
+            backend_id,
+            ResourceLifecycleState.PREPARING,
+            correlation_id,
+            "backend preparation started",
+        )
+        preparation_outcome = run_with_timeout(
+            lambda: adapter.prepare(task),
+            task.preparation_timeout_ms,
+        )
+        if preparation_outcome.timed_out:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.PREPARATION_TIMEOUT,
+                    message=(
+                        f"Preparation timed out after "
+                        f"{task.preparation_timeout_ms:.0f} ms for '{backend_id}'."
+                    ),
+                    retryable=True,
+                    details={"provider_status": "unknown"},
+                ),
+                telemetry_before=telemetry_before,
+                uncertain=True,
+            )
+        if preparation_outcome.error is not None:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.PREPARATION_FAILED,
+                    message=(
+                        f"Preparation raised for '{backend_id}': "
+                        f"{preparation_outcome.error}"
+                    ),
+                    retryable=True,
+                ),
+                telemetry_before=telemetry_before,
+            )
+
+        preparation = preparation_outcome.value
+        assert preparation is not None
+        if not preparation.prepared:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.PREPARATION_FAILED,
+                    message=(
+                        f"Preparation failed for '{backend_id}': "
+                        f"{preparation.details}"
+                    ),
+                    retryable=True,
+                ),
+                preparation=preparation,
+                telemetry_before=telemetry_before,
+            )
+
+        try:
+            self._registry.lease_store.validate(
+                lease.lease_id,
+                backend_id,
+                owner_id,
+                expected_version=lease.version,
+            )
+        except ControlPlaneException as exc:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                exc.error,
+                preparation=preparation,
+                telemetry_before=telemetry_before,
+            )
+
+        admission_outcome = run_with_timeout(
+            lambda: assess_contract_admission(
                 adapter.resource_contract(),
                 operation="invoke",
+            ),
+            task.validation_timeout_ms,
+        )
+        if admission_outcome.timed_out:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.TELEMETRY_STALE,
+                    message=f"Contract admission timed out for '{backend_id}'.",
+                    retryable=True,
+                ),
+                preparation=preparation,
+                telemetry_before=telemetry_before,
+                uncertain=True,
             )
-            if not contract_admission.admissible:
-                last_failure_reason = (
-                    f"INADMISSIBLE backend '{candidate.backend_id}': "
-                    + "; ".join(contract_admission.reasons)
+        if admission_outcome.error is not None:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.INADMISSIBLE,
+                    message=(
+                        f"Contract admission failed for '{backend_id}': "
+                        f"{admission_outcome.error}"
+                    ),
+                ),
+                preparation=preparation,
+                telemetry_before=telemetry_before,
+            )
+        admission = admission_outcome.value
+        assert admission is not None
+        if not admission.admissible:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.INADMISSIBLE,
+                    message=(
+                        f"Backend '{backend_id}' is inadmissible: "
+                        + "; ".join(admission.reasons)
+                    ),
+                    details={"reasons": admission.reasons},
+                ),
+                preparation=preparation,
+                telemetry_before=telemetry_before,
+                contract_admission=admission,
+            )
+
+        self._transition(
+            backend_id,
+            ResourceLifecycleState.RUNNING,
+            correlation_id,
+            "substrate invocation started",
+        )
+        invocation_outcome = run_with_timeout(
+            lambda: adapter.invoke(task),
+            task.invocation_timeout_ms,
+        )
+        if invocation_outcome.timed_out:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.EXECUTION_STATUS_UNKNOWN,
+                    message=(
+                        f"Invocation exceeded {task.invocation_timeout_ms:.0f} ms "
+                        f"for '{backend_id}'; completion status is unknown."
+                    ),
+                    retryable=False,
+                ),
+                preparation=preparation,
+                telemetry_before=telemetry_before,
+                contract_admission=admission,
+                uncertain=True,
+            )
+        if invocation_outcome.error is not None:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.INVOCATION_FAILED,
+                    message=(
+                        f"Invocation failed for '{backend_id}': "
+                        f"{invocation_outcome.error}"
+                    ),
+                    retryable=False,
+                    details={"provider_status": "uncertain"},
+                ),
+                preparation=preparation,
+                telemetry_before=telemetry_before,
+                contract_admission=admission,
+                uncertain=True,
+            )
+
+        invocation = invocation_outcome.value
+        assert invocation is not None
+        try:
+            self._registry.lease_store.validate(
+                lease.lease_id,
+                backend_id,
+                owner_id,
+                expected_version=lease.version,
+            )
+        except ControlPlaneException as exc:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                exc.error,
+                preparation=preparation,
+                invocation=invocation,
+                telemetry_before=telemetry_before,
+                contract_admission=admission,
+            )
+
+        self._transition(
+            backend_id,
+            ResourceLifecycleState.VALIDATING,
+            correlation_id,
+            "postcondition validation started",
+        )
+
+        def validate() -> tuple[
+            dict[str, float | int | str | bool | None],
+            list[str],
+        ]:
+            telemetry = adapter.collect_telemetry()
+            return telemetry, self._validate_postconditions(
+                task,
+                invocation,
+                telemetry,
+            )
+
+        validation_outcome = run_with_timeout(validate, task.validation_timeout_ms)
+        if validation_outcome.timed_out:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.VALIDATION_TIMEOUT,
+                    message=(
+                        f"Postcondition validation exceeded "
+                        f"{task.validation_timeout_ms:.0f} ms for '{backend_id}'."
+                    ),
+                    retryable=False,
+                ),
+                preparation=preparation,
+                invocation=invocation,
+                telemetry_before=telemetry_before,
+                contract_admission=admission,
+            )
+        if validation_outcome.error is not None:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.POSTCONDITION_FAILED,
+                    message=(
+                        f"Postcondition validation raised for '{backend_id}': "
+                        f"{validation_outcome.error}"
+                    ),
+                ),
+                preparation=preparation,
+                invocation=invocation,
+                telemetry_before=telemetry_before,
+                contract_admission=admission,
+            )
+
+        telemetry_after, validation_failures = validation_outcome.value
+        validation_error: ControlPlaneError | None = None
+        if validation_failures:
+            error_code = (
+                ControlPlaneErrorCode.TELEMETRY_STALE
+                if any(
+                    "age_of_information" in failure
+                    for failure in validation_failures
                 )
-                decision.notes.append(last_failure_reason)
-                if not task.allow_fallback:
-                    return OrchestrationRunResult(
-                        decision=decision,
-                        preparation=preparation,
-                        telemetry_before=telemetry_before,
-                        contract_admission=contract_admission,
-                        success=False,
-                        failure_reason=last_failure_reason,
-                    )
-                continue
-
-            try:
-                invocation = adapter.invoke(task)
-            except Exception as exc:  # pragma: no cover - defensive path for prototype robustness
-                last_failure_reason = (
-                    f"Invocation failed for backend '{candidate.backend_id}': {exc}"
-                )
-                decision.notes.append(last_failure_reason)
-                if not task.allow_fallback:
-                    return OrchestrationRunResult(
-                        decision=decision,
-                        preparation=preparation,
-                        telemetry_before=telemetry_before,
-                        contract_admission=contract_admission,
-                        success=False,
-                        failure_reason=last_failure_reason,
-                    )
-                continue
-
-            telemetry_after = adapter.collect_telemetry()
-            validation_failures = self._validate_postconditions(task, invocation, telemetry_after)
-            recovery_actions = self._maybe_recover(adapter, telemetry_after)
-
-            if validation_failures:
-                last_failure_reason = (
-                    f"Postcondition validation failed for backend '{candidate.backend_id}': "
+                else ControlPlaneErrorCode.POSTCONDITION_FAILED
+            )
+            validation_error = ControlPlaneError(
+                code=error_code,
+                message=(
+                    f"Postcondition validation failed for '{backend_id}': "
                     + "; ".join(validation_failures)
-                )
-                decision.notes.append(last_failure_reason)
-                if not task.allow_fallback:
-                    return OrchestrationRunResult(
-                        decision=decision,
-                        preparation=preparation,
-                        invocation=invocation,
-                        telemetry_before=telemetry_before,
-                        telemetry_after=telemetry_after,
-                        contract_admission=contract_admission,
-                        recovery_actions=recovery_actions,
-                        validation_failures=validation_failures,
-                        success=False,
-                        failure_reason=last_failure_reason,
-                    )
-                continue
+                ),
+                details={"failures": validation_failures},
+            )
 
-            return OrchestrationRunResult(
-                decision=decision,
+        self._transition(
+            backend_id,
+            ResourceLifecycleState.COOLDOWN,
+            correlation_id,
+            "execution completed; cooldown started",
+        )
+        recovery_outcome = run_with_timeout(
+            lambda: self._maybe_recover(adapter, telemetry_after),
+            task.cooldown_timeout_ms,
+        )
+        if recovery_outcome.timed_out:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.EXECUTION_STATUS_UNKNOWN,
+                    message=(
+                        f"Cooldown exceeded {task.cooldown_timeout_ms:.0f} ms "
+                        f"for '{backend_id}'."
+                    ),
+                ),
                 preparation=preparation,
                 invocation=invocation,
                 telemetry_before=telemetry_before,
                 telemetry_after=telemetry_after,
-                contract_admission=contract_admission,
+                contract_admission=admission,
+                validation_failures=validation_failures,
+                uncertain=True,
+            )
+        if recovery_outcome.error is not None:
+            return self._fail_active_candidate(
+                task,
+                decision,
+                correlation_id,
+                adapter,
+                lease,
+                ControlPlaneError(
+                    code=ControlPlaneErrorCode.RECONCILIATION_FAILED,
+                    message=(
+                        f"Cooldown/recovery failed for '{backend_id}': "
+                        f"{recovery_outcome.error}"
+                    ),
+                ),
+                preparation=preparation,
+                invocation=invocation,
+                telemetry_before=telemetry_before,
+                telemetry_after=telemetry_after,
+                contract_admission=admission,
+                validation_failures=validation_failures,
+            )
+
+        recovery_actions = recovery_outcome.value or []
+        final_lifecycle = self._transition(
+            backend_id,
+            ResourceLifecycleState.READY,
+            correlation_id,
+            "cooldown completed",
+        )
+        self._release_lease_safely(lease, owner_id)
+
+        if validation_error is not None:
+            decision.notes.append(validation_error.message)
+            return OrchestrationRunResult(
+                decision=decision,
+                correlation_id=correlation_id,
+                preparation=preparation,
+                invocation=invocation,
+                telemetry_before=telemetry_before,
+                telemetry_after=telemetry_after,
+                contract_admission=admission,
+                lease=lease,
+                lifecycle_history=self._history(correlation_id),
+                final_lifecycle=final_lifecycle,
                 recovery_actions=recovery_actions,
                 validation_failures=validation_failures,
-                success=True,
+                error=validation_error,
+                failure_reason=self._format_error(validation_error),
             )
 
         return OrchestrationRunResult(
             decision=decision,
-            success=False,
-            failure_reason=last_failure_reason or "All accepted candidates failed.",
+            correlation_id=correlation_id,
+            preparation=preparation,
+            invocation=invocation,
+            telemetry_before=telemetry_before,
+            telemetry_after=telemetry_after,
+            contract_admission=admission,
+            lease=lease,
+            lifecycle_history=self._history(correlation_id),
+            final_lifecycle=final_lifecycle,
+            recovery_actions=recovery_actions,
+            success=True,
         )
 
+    def reserve_backend(
+        self,
+        backend_id: str,
+        *,
+        owner_id: str,
+        ttl_ms: float = 60_000.0,
+        expected_state_version: int | None = None,
+        idempotency_key: str | None = None,
+        correlation_id: str | None = None,
+    ) -> ControlPlaneActionResult:
+        """Acquire an exclusive lease and move READY to RESERVED."""
+
+        correlation = correlation_id or str(uuid4())
+        lease: ResourceLease | None = None
+        try:
+            self._registry.get_adapter(backend_id)
+            current = self._registry.lifecycle_store.snapshot(backend_id)
+            if (
+                expected_state_version is not None
+                and current.version != expected_state_version
+            ):
+                raise ControlPlaneException(
+                    ControlPlaneErrorCode.STATE_VERSION_CONFLICT,
+                    (
+                        f"Resource '{backend_id}' is at version {current.version}, "
+                        f"expected {expected_state_version}."
+                    ),
+                    retryable=True,
+                )
+            if ResourceLifecycleState(current.state) != ResourceLifecycleState.READY:
+                raise ControlPlaneException(
+                    ControlPlaneErrorCode.RESOURCE_BUSY,
+                    f"Resource '{backend_id}' is not ready for reservation.",
+                    retryable=True,
+                )
+            lease = self._registry.lease_store.acquire(
+                backend_id,
+                owner_id,
+                ttl_ms=ttl_ms,
+                idempotency_key=idempotency_key,
+            )
+            final = self._registry.lifecycle_store.transition(
+                backend_id,
+                ResourceLifecycleState.RESERVED,
+                expected_version=current.version,
+                reason=f"explicit lease {lease.lease_id} acquired",
+                correlation_id=correlation,
+            )
+            return ControlPlaneActionResult(
+                resource_id=backend_id,
+                correlation_id=correlation,
+                success=True,
+                lease=lease,
+                final_lifecycle=final,
+                actions=["Exclusive lease acquired."],
+            )
+        except ControlPlaneException as exc:
+            if lease is not None:
+                self._release_lease_safely(lease, owner_id)
+            return ControlPlaneActionResult(
+                resource_id=backend_id,
+                correlation_id=correlation,
+                success=False,
+                error=exc.error,
+            )
+        except KeyError:
+            return ControlPlaneActionResult(
+                resource_id=backend_id,
+                correlation_id=correlation,
+                success=False,
+                error=ControlPlaneError(
+                    code=ControlPlaneErrorCode.RESOURCE_NOT_FOUND,
+                    message=f"Backend '{backend_id}' is not registered.",
+                ),
+            )
+
+    def renew_lease(
+        self,
+        backend_id: str,
+        *,
+        lease_id: str,
+        owner_id: str,
+        ttl_ms: float,
+        expected_lease_version: int | None = None,
+        correlation_id: str | None = None,
+    ) -> ControlPlaneActionResult:
+        """Renew a lease with ownership and version checks."""
+
+        correlation = correlation_id or str(uuid4())
+        try:
+            renewed = self._registry.lease_store.renew(
+                lease_id,
+                backend_id,
+                owner_id,
+                ttl_ms=ttl_ms,
+                expected_version=expected_lease_version,
+            )
+            return ControlPlaneActionResult(
+                resource_id=backend_id,
+                correlation_id=correlation,
+                success=True,
+                lease=renewed,
+                final_lifecycle=self._registry.lifecycle_store.snapshot(backend_id),
+                actions=[f"Lease renewed to version {renewed.version}."],
+            )
+        except ControlPlaneException as exc:
+            return ControlPlaneActionResult(
+                resource_id=backend_id,
+                correlation_id=correlation,
+                success=False,
+                error=exc.error,
+            )
+
+    def release_lease(
+        self,
+        backend_id: str,
+        *,
+        lease_id: str,
+        owner_id: str,
+        expected_state_version: int | None = None,
+        correlation_id: str | None = None,
+    ) -> ControlPlaneActionResult:
+        """Release an unused RESERVED lease; active work requires abort."""
+
+        correlation = correlation_id or str(uuid4())
+        try:
+            lease = self._registry.lease_store.validate(
+                lease_id,
+                backend_id,
+                owner_id,
+            )
+            current = self._registry.lifecycle_store.snapshot(backend_id)
+            if (
+                expected_state_version is not None
+                and current.version != expected_state_version
+            ):
+                raise ControlPlaneException(
+                    ControlPlaneErrorCode.STATE_VERSION_CONFLICT,
+                    (
+                        f"Resource '{backend_id}' is at version {current.version}, "
+                        f"expected {expected_state_version}."
+                    ),
+                    retryable=True,
+                )
+            if (
+                ResourceLifecycleState(current.state)
+                != ResourceLifecycleState.RESERVED
+            ):
+                raise ControlPlaneException(
+                    ControlPlaneErrorCode.POLICY_DENIED,
+                    "Only an unused RESERVED lease may be released; abort active work.",
+                )
+            final = self._registry.lifecycle_store.transition(
+                backend_id,
+                ResourceLifecycleState.READY,
+                expected_version=current.version,
+                reason=f"unused lease {lease_id} released",
+                correlation_id=correlation,
+            )
+            self._registry.lease_store.release(
+                lease_id,
+                backend_id,
+                owner_id,
+            )
+            return ControlPlaneActionResult(
+                resource_id=backend_id,
+                correlation_id=correlation,
+                success=True,
+                lease=lease,
+                final_lifecycle=final,
+                actions=["Unused lease released."],
+            )
+        except ControlPlaneException as exc:
+            return ControlPlaneActionResult(
+                resource_id=backend_id,
+                correlation_id=correlation,
+                success=False,
+                error=exc.error,
+            )
+
+    def abort_backend(
+        self,
+        backend_id: str,
+        *,
+        lease_id: str,
+        owner_id: str,
+        correlation_id: str | None = None,
+        timeout_ms: float = 5_000.0,
+    ) -> ControlPlaneActionResult:
+        """Explicitly abort one leased active backend."""
+
+        correlation = correlation_id or str(uuid4())
+        try:
+            lease = self._registry.lease_store.validate(
+                lease_id,
+                backend_id,
+                owner_id,
+            )
+            adapter = self._registry.get_adapter(backend_id)
+            actions, final = self._abort_and_reconcile(
+                adapter,
+                lease,
+                owner_id,
+                correlation,
+                timeout_ms=timeout_ms,
+                uncertain=True,
+            )
+            success = ResourceLifecycleState(final.state) in {
+                ResourceLifecycleState.READY,
+                ResourceLifecycleState.DEGRADED,
+            }
+            error = None
+            if not success:
+                error = ControlPlaneError(
+                    code=ControlPlaneErrorCode.ABORT_FAILED,
+                    message=(
+                        f"Abort did not restore '{backend_id}' to a usable state."
+                    ),
+                    details={"final_state": final.state},
+                )
+            return ControlPlaneActionResult(
+                resource_id=backend_id,
+                correlation_id=correlation,
+                success=success,
+                lease=lease,
+                final_lifecycle=final,
+                actions=actions,
+                error=error,
+            )
+        except ControlPlaneException as exc:
+            return ControlPlaneActionResult(
+                resource_id=backend_id,
+                correlation_id=correlation,
+                success=False,
+                error=exc.error,
+            )
+
+    def reconcile_backend(
+        self,
+        backend_id: str,
+        *,
+        expected_state_version: int | None = None,
+        correlation_id: str | None = None,
+        timeout_ms: float = 5_000.0,
+    ) -> ControlPlaneActionResult:
+        """Reconcile control-plane state with current provider telemetry."""
+
+        correlation = correlation_id or str(uuid4())
+        try:
+            current = self._registry.lifecycle_store.snapshot(backend_id)
+            active_lease = self._registry.lease_store.current(backend_id)
+            if active_lease is not None:
+                raise ControlPlaneException(
+                    ControlPlaneErrorCode.RESOURCE_BUSY,
+                    (
+                        f"Resource '{backend_id}' has active lease "
+                        f"'{active_lease.lease_id}'; abort it before reconciliation."
+                    ),
+                    retryable=True,
+                )
+            if (
+                expected_state_version is not None
+                and current.version != expected_state_version
+            ):
+                raise ControlPlaneException(
+                    ControlPlaneErrorCode.STATE_VERSION_CONFLICT,
+                    (
+                        f"Resource '{backend_id}' is at version {current.version}, "
+                        f"expected {expected_state_version}."
+                    ),
+                    retryable=True,
+                )
+            adapter = self._registry.get_adapter(backend_id)
+            outcome = run_with_timeout(adapter.collect_telemetry, timeout_ms)
+            if outcome.timed_out:
+                raise ControlPlaneException(
+                    ControlPlaneErrorCode.TELEMETRY_STALE,
+                    f"Provider telemetry timed out for '{backend_id}'.",
+                    retryable=True,
+                )
+            if outcome.error is not None:
+                raise ControlPlaneException(
+                    ControlPlaneErrorCode.RECONCILIATION_FAILED,
+                    f"Provider telemetry failed for '{backend_id}': {outcome.error}",
+                    retryable=True,
+                )
+            telemetry = outcome.value or {}
+            target = self._provider_state_target(telemetry, current)
+            if (
+                ResourceLifecycleState(current.state) in ACTIVE_STATES
+                and ResourceLifecycleState(current.state)
+                != ResourceLifecycleState.ABORTING
+            ):
+                current = self._registry.lifecycle_store.transition(
+                    backend_id,
+                    ResourceLifecycleState.ABORTING,
+                    expected_version=current.version,
+                    reason="provider reconciliation after active-state uncertainty",
+                    correlation_id=correlation,
+                )
+            final = self._registry.lifecycle_store.transition(
+                backend_id,
+                target,
+                expected_version=current.version,
+                reason="control-plane state reconciled with provider telemetry",
+                correlation_id=correlation,
+            )
+            return ControlPlaneActionResult(
+                resource_id=backend_id,
+                correlation_id=correlation,
+                success=True,
+                final_lifecycle=final,
+                actions=[f"Reconciled provider state to {target.value}."],
+            )
+        except ControlPlaneException as exc:
+            return ControlPlaneActionResult(
+                resource_id=backend_id,
+                correlation_id=correlation,
+                success=False,
+                error=exc.error,
+            )
+
     def reset_backend(self, backend_id: str, mode: ResetMode | None = None) -> bool:
-        """Reset one backend through its adapter."""
+        """Reset one unleased backend through its adapter."""
+        if self._registry.lease_store.current(backend_id) is not None:
+            return False
         adapter = self._registry.get_adapter(backend_id)
-        return adapter.reset(mode=mode)
+        result = adapter.reset(mode=mode)
+        if result:
+            self.reconcile_backend(backend_id)
+        return result
 
     def recalibrate_backend(self, backend_id: str) -> bool:
-        """Recalibrate one backend through its adapter."""
+        """Recalibrate one unleased backend through its adapter."""
+        if self._registry.lease_store.current(backend_id) is not None:
+            return False
         adapter = self._registry.get_adapter(backend_id)
-        return adapter.recalibrate()
+        result = adapter.recalibrate()
+        if result:
+            self.reconcile_backend(backend_id)
+        return result
+
+    def _fail_active_candidate(
+        self,
+        task: TaskRequest,
+        decision: OrchestrationDecision,
+        correlation_id: str,
+        adapter: BaseAdapter,
+        lease: ResourceLease,
+        error: ControlPlaneError,
+        *,
+        preparation: AdapterPreparationResult | None = None,
+        invocation: AdapterInvocationResult | None = None,
+        telemetry_before: dict[str, float | int | str | bool | None] | None = None,
+        telemetry_after: dict[str, float | int | str | bool | None] | None = None,
+        contract_admission: ContractAdmissionResult | None = None,
+        validation_failures: list[str] | None = None,
+        uncertain: bool = False,
+    ) -> OrchestrationRunResult:
+        actions, final = self._abort_and_reconcile(
+            adapter,
+            lease,
+            task.client_id,
+            correlation_id,
+            timeout_ms=task.abort_timeout_ms,
+            uncertain=uncertain,
+        )
+        decision.notes.append(error.message)
+        return OrchestrationRunResult(
+            decision=decision,
+            correlation_id=correlation_id,
+            preparation=preparation,
+            invocation=invocation,
+            telemetry_before=telemetry_before or {},
+            telemetry_after=telemetry_after or {},
+            contract_admission=contract_admission,
+            lease=lease,
+            lifecycle_history=self._history(correlation_id),
+            final_lifecycle=final,
+            recovery_actions=actions,
+            validation_failures=validation_failures or [],
+            error=error,
+            failure_reason=self._format_error(error),
+        )
+
+    def _abort_and_reconcile(
+        self,
+        adapter: BaseAdapter,
+        lease: ResourceLease,
+        owner_id: str,
+        correlation_id: str,
+        *,
+        timeout_ms: float,
+        uncertain: bool,
+    ) -> tuple[list[str], LifecycleSnapshot]:
+        backend_id = lease.resource_id
+        actions: list[str] = []
+        current = self._registry.lifecycle_store.snapshot(backend_id)
+        if ResourceLifecycleState(current.state) != ResourceLifecycleState.ABORTING:
+            current = self._registry.lifecycle_store.transition(
+                backend_id,
+                ResourceLifecycleState.ABORTING,
+                expected_version=current.version,
+                reason="abort requested after incomplete execution phase",
+                correlation_id=correlation_id,
+            )
+        abort_outcome = run_with_timeout(adapter.abort, timeout_ms)
+        abort_succeeded = (
+            not abort_outcome.timed_out
+            and abort_outcome.error is None
+            and abort_outcome.value is True
+        )
+        if abort_outcome.timed_out:
+            actions.append("Abort timed out; provider status remains uncertain.")
+        elif abort_outcome.error is not None:
+            actions.append(f"Abort raised: {abort_outcome.error}")
+        elif abort_succeeded:
+            actions.append("Provider acknowledged abort.")
+        else:
+            actions.append("Provider does not confirm abort support.")
+
+        if uncertain and not abort_succeeded:
+            target = ResourceLifecycleState.UNREACHABLE
+        else:
+            telemetry_outcome = run_with_timeout(
+                adapter.collect_telemetry,
+                timeout_ms,
+            )
+            if (
+                telemetry_outcome.timed_out
+                or telemetry_outcome.error is not None
+            ):
+                target = ResourceLifecycleState.UNREACHABLE
+            else:
+                target = self._provider_state_target(
+                    telemetry_outcome.value or {},
+                    current,
+                )
+
+        final = self._registry.lifecycle_store.transition(
+            backend_id,
+            target,
+            expected_version=current.version,
+            reason="provider state reconciled after abort",
+            correlation_id=correlation_id,
+        )
+        self._release_lease_safely(lease, owner_id)
+        actions.append(f"Lease released; lifecycle is {target.value}.")
+        return actions, final
+
+    def _transition(
+        self,
+        backend_id: str,
+        state: ResourceLifecycleState,
+        correlation_id: str,
+        reason: str,
+    ) -> LifecycleSnapshot:
+        current = self._registry.lifecycle_store.snapshot(backend_id)
+        return self._registry.lifecycle_store.transition(
+            backend_id,
+            state,
+            expected_version=current.version,
+            reason=reason,
+            correlation_id=correlation_id,
+        )
+
+    def _release_lease_safely(self, lease: ResourceLease, owner_id: str) -> None:
+        try:
+            self._registry.lease_store.release(
+                lease.lease_id,
+                lease.resource_id,
+                owner_id,
+            )
+        except ControlPlaneException:
+            pass
+
+    def _candidate_error_result(
+        self,
+        decision: OrchestrationDecision,
+        correlation_id: str,
+        error: ControlPlaneError,
+        *,
+        backend_id: str,
+        lease: ResourceLease | None,
+    ) -> OrchestrationRunResult:
+        final = self._registry.lifecycle_store.snapshot(backend_id)
+        return OrchestrationRunResult(
+            decision=decision,
+            correlation_id=correlation_id,
+            lease=lease,
+            lifecycle_history=self._history(correlation_id),
+            final_lifecycle=final,
+            error=error,
+            failure_reason=self._format_error(error),
+        )
+
+    @staticmethod
+    def _early_error_result(
+        task: TaskRequest,
+        correlation_id: str,
+        error: ControlPlaneError,
+    ) -> OrchestrationRunResult:
+        return OrchestrationRunResult(
+            decision=OrchestrationDecision(
+                task_id=task.task_id,
+                notes=[error.message],
+            ),
+            correlation_id=correlation_id,
+            error=error,
+            failure_reason=PhysMCPOrchestrator._format_error(error),
+        )
+
+    def _history(self, correlation_id: str) -> list[LifecycleTransition]:
+        return self._registry.lifecycle_store.history(correlation_id=correlation_id)
+
+    @staticmethod
+    def _request_fingerprint(task: TaskRequest) -> str:
+        payload = task.model_dump(
+            mode="json",
+            exclude={"correlation_id"},
+        )
+        encoded = json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
+
+    @staticmethod
+    def _format_error(error: ControlPlaneError) -> str:
+        return f"{error.code}: {error.message}"
+
+    @staticmethod
+    def _provider_state_target(
+        telemetry: dict[str, float | int | str | bool | None],
+        current: LifecycleSnapshot,
+    ) -> ResourceLifecycleState:
+        readiness = str(telemetry.get("readiness_state", "")).strip().lower()
+        health = str(telemetry.get("health_status", "")).strip().lower()
+        if readiness in {"unavailable", "offline", "unreachable"} or health in {
+            "offline",
+            "unreachable",
+        }:
+            return ResourceLifecycleState.UNREACHABLE
+        if health in {"degraded", "warning"}:
+            return ResourceLifecycleState.DEGRADED
+        if readiness == "ready" or health in {"ready", "healthy"}:
+            return ResourceLifecycleState.READY
+        if ResourceLifecycleState(current.state) == ResourceLifecycleState.READY:
+            return ResourceLifecycleState.READY
+        return ResourceLifecycleState.FAILED
 
     @staticmethod
     def _validate_postconditions(
@@ -251,17 +1345,25 @@ class PhysMCPOrchestrator:
     ) -> list[str]:
         failures: list[str] = []
 
-        if invocation.confidence is not None and invocation.confidence < task.min_confidence:
+        if (
+            invocation.confidence is not None
+            and invocation.confidence < task.min_confidence
+        ):
             failures.append(
-                f"confidence {invocation.confidence:.3f} is below required threshold {task.min_confidence:.3f}"
+                f"confidence {invocation.confidence:.3f} is below required "
+                f"threshold {task.min_confidence:.3f}"
             )
 
         if task.required_telemetry_fields:
             missing = sorted(
-                field for field in task.required_telemetry_fields if field not in telemetry_after
+                field
+                for field in task.required_telemetry_fields
+                if field not in telemetry_after
             )
             if missing:
-                failures.append("missing required telemetry fields: " + ", ".join(missing))
+                failures.append(
+                    "missing required telemetry fields: " + ", ".join(missing)
+                )
 
         if task.max_twin_age_ms is not None:
             age = telemetry_after.get("age_of_information_ms")
@@ -269,11 +1371,17 @@ class PhysMCPOrchestrator:
                 failures.append("age_of_information_ms is required but missing")
             elif age > task.max_twin_age_ms:
                 failures.append(
-                    f"age_of_information_ms {age:.2f} exceeds bound {task.max_twin_age_ms:.2f}"
+                    f"age_of_information_ms {age:.2f} exceeds bound "
+                    f"{task.max_twin_age_ms:.2f}"
                 )
 
-        if task.continuous_monitoring_required and "health_status" not in telemetry_after:
-            failures.append("continuous monitoring required but health_status is missing")
+        if (
+            task.continuous_monitoring_required
+            and "health_status" not in telemetry_after
+        ):
+            failures.append(
+                "continuous monitoring required but health_status is missing"
+            )
 
         if telemetry_after.get("health_status") == "offline":
             failures.append("backend transitioned to offline state")
@@ -285,11 +1393,6 @@ class PhysMCPOrchestrator:
         adapter: BaseAdapter,
         telemetry_after: dict[str, float | int | str | bool | None],
     ) -> list[str]:
-        """Trigger lightweight recovery actions based on telemetry hints.
-
-        This logic is intentionally small and heuristic-based. It only demonstrates
-        that the control plane can react to backend state.
-        """
         actions: list[str] = []
 
         drift_score = telemetry_after.get("drift_score")

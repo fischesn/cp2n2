@@ -263,6 +263,13 @@ class CorticalLabsAdapter(BaseAdapter):
         self._last_prepare_timestamp = time.perf_counter()
         return True
 
+    def abort(self) -> bool:
+        """Close the active CL session without issuing further stimulation."""
+        return self.reset(mode=ResetMode.SOFT_RESET)
+
+    def abort_supported(self) -> bool:
+        return True
+
     def _resource_contract_runtime_evidence(
         self,
     ) -> tuple[RuntimeKind, EvidenceLevel, str, datetime | None, dict]:

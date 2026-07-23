@@ -46,6 +46,12 @@ telemetry provenance and freshness, safety constraints, access, cost, and data
 governance. Missing safety-relevant information produces an explicit
 `INADMISSIBLE` decision before invocation.
 
+It also implements a
+[lifecycle and lease protocol](docs/lifecycle-leases-and-errors.md) with
+exclusive time-bounded reservations, state-version checks, client-scoped
+idempotency, independent phase timeouts, explicit abort, provider
+reconciliation, and typed error codes.
+
 ---
 
 ## 2. High-level architecture
@@ -90,6 +96,8 @@ The orchestrator can enumerate backends described through a shared descriptor mo
 
 For compatibility, `discover_backends()` returns the v3.0 descriptors.
 `discover_resource_contracts()` returns the complete v1.0 resource contracts.
+The latter includes the current control-plane lifecycle and its version, not
+only provider telemetry.
 
 Each backend publishes information such as:
 

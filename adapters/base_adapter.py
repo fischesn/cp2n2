@@ -244,6 +244,8 @@ class BaseAdapter(ABC):
             operations.append("reset")
         if self.descriptor.lifecycle.recalibration_supported:
             operations.append("recalibrate")
+        if self.abort_supported():
+            operations.append("abort")
         return operations
 
     @staticmethod
@@ -316,3 +318,18 @@ class BaseAdapter(ABC):
     def recalibrate(self) -> bool:
         """Trigger backend recalibration if supported."""
         raise NotImplementedError
+
+    def abort(self) -> bool:
+        """Attempt to stop an uncertain or active operation.
+
+        Adapters must override this method only when their provider API offers
+        a meaningful abort or session-close operation. Returning ``False`` is
+        conservative: the control plane will not infer successful cancellation.
+        """
+
+        return False
+
+    def abort_supported(self) -> bool:
+        """Return whether ``abort()`` has provider-level semantics."""
+
+        return False

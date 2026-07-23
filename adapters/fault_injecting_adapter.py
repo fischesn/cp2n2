@@ -76,6 +76,12 @@ class FaultInjectingAdapter(BaseAdapter):
     def recalibrate(self) -> bool:
         return self._wrapped.recalibrate()
 
+    def abort(self) -> bool:
+        return self._wrapped.abort()
+
+    def abort_supported(self) -> bool:
+        return self._wrapped.abort_supported()
+
     def _consume_one_shot_if_needed(self) -> None:
         if self._fault_profile.one_shot:
             self.clear_faults()

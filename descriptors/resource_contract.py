@@ -76,6 +76,7 @@ class ResourceLifecycleState(str, Enum):
     RUNNING = "running"
     VALIDATING = "validating"
     COOLDOWN = "cooldown"
+    ABORTING = "aborting"
     DEGRADED = "degraded"
     FAILED = "failed"
     UNREACHABLE = "unreachable"
