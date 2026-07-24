@@ -37,6 +37,7 @@ CORE_EVALUATION_BACKEND_MATRIX: dict[str, frozenset[str]] = {
         {"chemical-backend", "wetware-backend", "edge-backend"}
     ),
     "evaluate_externalized_backend": frozenset({"remote-edge-backend"}),
+    "evaluate_distributed_testbed": frozenset({"remote-edge-backend"}),
 }
 
 

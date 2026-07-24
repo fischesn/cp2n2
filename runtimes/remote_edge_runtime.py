@@ -16,6 +16,7 @@ from core.task_model import TaskRequest
 from descriptors.capability_schema import ResetMode
 from descriptors.resource_contract import RuntimeKind
 from runtimes.base_runtime import SubstrateRuntime
+from testbed.context import propagation_headers
 
 
 class RemoteEdgeRuntime(SubstrateRuntime):
@@ -82,7 +83,10 @@ class RemoteEdgeRuntime(SubstrateRuntime):
             self.base_url + path,
             data=body,
             method=method,
-            headers={"Content-Type": "application/json"},
+            headers={
+                "Content-Type": "application/json",
+                **propagation_headers(),
+            },
         )
         with urlopen(request, timeout=5.0) as response:
             return json.loads(response.read().decode("utf-8"))

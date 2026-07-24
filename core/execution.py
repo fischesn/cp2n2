@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextvars import copy_context
 from dataclasses import dataclass
 from queue import Queue
 from threading import Thread
@@ -29,10 +30,11 @@ def run_with_timeout(call: Callable[[], T], timeout_ms: float) -> PhaseOutcome[T
     """
 
     results: Queue[tuple[str, object]] = Queue(maxsize=1)
+    context = copy_context()
 
     def target() -> None:
         try:
-            results.put(("value", call()))
+            results.put(("value", context.run(call)))
         except Exception as exc:  # pragma: no cover - exercised through callers
             results.put(("error", exc))
 

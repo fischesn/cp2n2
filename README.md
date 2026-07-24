@@ -177,7 +177,16 @@ Through this path, `phys-MCP` can:
 - capture structured recording artifact metadata
 - expose session readiness, runtime kind, latency, recording-path metadata, and explicitly sourced telemetry
 
-### 3.7 Use LLM-based agents
+### 3.7 Evaluate a distributed control path
+
+The A6 testbed isolates the agent load generator, gateway, control plane, and
+adapter runtime in four operating-system processes. Versioned profiles cover
+latency, jitter, request loss, partitions, and stale telemetry. Runs propagate
+one trace identifier across all services and archive raw JSONL spans, request
+tables, summaries, figures, exact configuration copies, and SHA-256 checksums.
+The testbed is generic and uses the non-CL remote edge integration.
+
+### 3.8 Use LLM-based agents
 The repository also includes:
 
 - a **Gemini-based agent**
@@ -500,6 +509,7 @@ and is not part of the default test suite.
 
 The repository also contains dedicated scripts for:
 
+- `evaluation.evaluate_distributed_testbed`
 - `evaluation.evaluate_externalized_backend`
 - `evaluation.evaluate_failure_campaign`
 - `evaluation.evaluate_matching`
@@ -508,6 +518,18 @@ The repository also contains dedicated scripts for:
 - `evaluation.evaluate_portability`
 
 These scripts can be run individually from the project root with `python -m ...`.
+
+### 8.5 Distributed RQ2 campaign
+
+```bash
+python -m evaluation.evaluate_distributed_testbed
+```
+
+The committed campaign uses 1, 2, 4, 8, 16, and 32 competing clients across
+five versioned network/fault profiles. For a short local installation check,
+add `--quick`. The complete method, archive layout, interpretation boundary,
+and figure-regeneration command are documented in
+`docs/distributed-testbed.md`.
 
 ---
 
@@ -634,7 +656,18 @@ same-host HTTP backend, the optional CL simulator path, capability
 declarations, and operation without any CL module. Core evaluations publish a
 versioned backend matrix and each retains at least one non-CL backend.
 
-### 10.1 Resource-contract validation
+### 10.3 Distributed-testbed validation
+
+```bash
+pytest tests/test_distributed_testbed.py -q
+```
+
+These tests validate the versioned topology and profile matrix, seeded fault
+decisions, trace propagation through bounded worker threads, metric
+aggregation, and a real four-process smoke campaign with manifest checksum
+verification.
+
+### 10.4 Resource-contract validation
 
 ```bash
 python scripts/validate_resource_contract.py examples/resource-contract-v1.0/valid-chemical-synthetic-twin.json

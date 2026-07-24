@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from evaluation.evaluate_externalized_backend import evaluate as evaluate_externalized_backend
+from evaluation.evaluate_distributed_testbed import evaluate as evaluate_distributed_testbed
 from evaluation.evaluate_failure_campaign import evaluate as evaluate_failure_campaign
 from evaluation.evaluate_matching import evaluate as evaluate_matching
 from evaluation.evaluate_matching_baselines import evaluate as evaluate_matching_baselines
@@ -21,6 +22,7 @@ def main() -> None:
     evaluate_selection_robustness()
     evaluate_failure_campaign()
     evaluate_externalized_backend()
+    evaluate_distributed_testbed()
     print("All evaluation artefacts refreshed.")
 
 
