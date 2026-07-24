@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Iterable
 
 from adapters.base_adapter import BaseAdapter
+from adapters.contracts import AdapterCapabilityDeclaration
 from core.errors import ControlPlaneErrorCode, ControlPlaneException
 from core.idempotency import IdempotencyStore
 from core.leases import InMemoryLeaseStore
@@ -44,6 +45,7 @@ class TwinRegistry:
 
     def register(self, adapter: BaseAdapter, *, overwrite: bool = False) -> None:
         """Register one backend adapter."""
+        adapter.validate_conformance()
         backend_id = adapter.backend_id()
         if backend_id in self._adapters and not overwrite:
             raise ValueError(f"Backend '{backend_id}' is already registered.")
@@ -110,6 +112,24 @@ class TwinRegistry:
             self.resource_contract_for(adapter.backend_id())
             for adapter in self.list_adapters()
         ]
+
+    def list_adapter_capability_declarations(
+        self,
+    ) -> list[AdapterCapabilityDeclaration]:
+        """Return A5 control/runtime declarations in stable backend order."""
+
+        return [
+            adapter.capability_declaration
+            for adapter in self.list_adapters()
+        ]
+
+    def adapter_capability_for(
+        self,
+        backend_id: str,
+    ) -> AdapterCapabilityDeclaration:
+        """Return one adapter's explicit A5 capability declaration."""
+
+        return self.get_adapter(backend_id).capability_declaration
 
     def resource_contract_for(
         self,

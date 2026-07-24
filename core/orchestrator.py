@@ -131,6 +131,16 @@ class PhysMCPOrchestrator:
             for contract in self._registry.list_resource_contracts()
         ]
 
+    def discover_adapter_capabilities(self) -> list[dict]:
+        """Return A5 control-adapter and substrate-runtime declarations."""
+
+        return [
+            declaration.model_dump(mode="json")
+            for declaration in (
+                self._registry.list_adapter_capability_declarations()
+            )
+        ]
+
     def plan_task(self, task: TaskRequest) -> MatchReport:
         """Run admission, feasibility, and selection for the task."""
         descriptors = self._registry.list_descriptors()

@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-import time
-from datetime import datetime, timezone
+from datetime import datetime
 
 from adapters.base_adapter import AdapterInvocationResult, AdapterPreparationResult, BaseAdapter
-from backends.cortical.cl_client import (
-    CLClient,
-    CorticalLabsInvocationError,
-    CorticalLabsUnavailableError,
+from adapters.contracts import (
+    DeploymentMode,
+    ReservationMode,
+    make_adapter_capability_declaration,
 )
+from backends.cortical.cl_client import CLClient
 from core.task_model import TaskRequest
 from descriptors.capability_schema import (
     CapabilityDescriptor,
@@ -38,6 +38,7 @@ from descriptors.resource_contract import (
     ObservationSource,
     RuntimeKind,
 )
+from runtimes.cortical_labs_runtime import CorticalLabsRuntime
 
 
 class CorticalLabsAdapter(BaseAdapter):
@@ -47,7 +48,6 @@ class CorticalLabsAdapter(BaseAdapter):
         *,
         use_simulator: bool | None = True,
     ) -> None:
-        self._client = CLClient(use_simulator=use_simulator)
         self._expected_runtime_kind = (
             "sdk_simulator"
             if use_simulator is True
@@ -55,226 +55,85 @@ class CorticalLabsAdapter(BaseAdapter):
             if use_simulator is False
             else "unknown"
         )
-        self._last_runtime_kind: str = "unknown"
-        self._session_open = False
-        self._last_backend_latency_ms: float | None = None
-        self._last_observation_latency_ms: float | None = None
-        self._last_recording_artifact: dict | None = None
-        self._last_health_status: str = "unknown"
-        self._last_readiness_state: str = "unavailable"
-        self._last_channel_count: int | None = None
-        self._last_fps: float | None = None
-        self._last_age_of_information_ms: float | None = None
-        self._last_prepare_timestamp: float | None = None
-        self._last_attested_at: datetime | None = None
-
         descriptor = self._build_descriptor(
             backend_id=backend_id,
             expected_runtime_kind=self._expected_runtime_kind,
         )
+        runtime = CorticalLabsRuntime(
+            backend_id,
+            use_simulator=use_simulator,
+        )
+        evidence_ceiling = (
+            EvidenceLevel.E3_SDK_SIMULATOR
+            if use_simulator is True
+            else EvidenceLevel.E5_PHYSICAL_HARDWARE
+            if use_simulator is False
+            else EvidenceLevel.E0_MOCK
+        )
         super().__init__(
             descriptor=descriptor,
+            runtime=runtime,
+            capability_declaration=make_adapter_capability_declaration(
+                adapter_id=f"{self.__class__.__module__}.{self.__class__.__qualname__}",
+                descriptor=descriptor,
+                runtime=runtime.capabilities,
+                evidence_ceiling=evidence_ceiling,
+                reservation_mode=ReservationMode.CONTROL_PLANE_LEASE,
+                deployment_mode=DeploymentMode.PROVIDER_MANAGED,
+                notes=(
+                    "Optional CL SDK control adapter; simulator and physical "
+                    "runtime evidence remain explicitly distinguished."
+                ),
+            ),
             runtime_kind=RuntimeKind.UNKNOWN,
             provider_id="cortical-labs",
             attestation_method="cl_sdk_is_simulator",
             telemetry_source=ObservationSource.OBSERVED,
         )
 
+    @property
+    def _cl_runtime(self) -> CorticalLabsRuntime:
+        return self.runtime  # type: ignore[return-value]
+
+    @property
+    def _client(self) -> CLClient:
+        """Compatibility seam retained for existing tests and demos."""
+        return self._cl_runtime.client
+
+    @_client.setter
+    def _client(self, value: CLClient) -> None:
+        self._cl_runtime.client = value
+
     def describe(self) -> SubstrateDescriptor:
         return self.descriptor
 
     def prepare(self, task: TaskRequest) -> AdapterPreparationResult:
-        human_supervision_available = getattr(task, "human_supervision_available", True)
-        if not human_supervision_available:
-            self._last_readiness_state = "rejected"
-            self._last_health_status = "unknown"
-            return AdapterPreparationResult(
-                prepared=False,
-                details="Cortical Labs backend requires human supervision.",
-            )
-
-        if not self._client.is_available():
-            self._session_open = False
-            self._last_readiness_state = "unavailable"
-            self._last_health_status = "unknown"
-            return AdapterPreparationResult(
-                prepared=False,
-                details="Cortical Labs SDK is not installed or importable.",
-            )
-
-        try:
-            info = self._client.open_session()
-        except CorticalLabsUnavailableError as exc:
-            self._session_open = False
-            self._last_readiness_state = "unavailable"
-            self._last_health_status = "unknown"
-            return AdapterPreparationResult(prepared=False, details=str(exc))
-
-        self._session_open = True
-        self._last_readiness_state = "ready"
-        self._last_health_status = "unknown"
-        self._last_runtime_kind = info.runtime_kind
-        self._last_attested_at = datetime.now(timezone.utc)
-        self._last_channel_count = info.channel_count
-        self._last_fps = info.fps
-        self._last_prepare_timestamp = time.perf_counter()
-
-        details = "Cortical Labs session opened successfully."
-        if info.channel_count is not None:
-            details += f" channels={info.channel_count}"
-        if info.fps is not None:
-            details += f", fps={info.fps}"
-
-        return AdapterPreparationResult(prepared=True, details=details)
+        return super().prepare(task)
 
     def invoke(self, task: TaskRequest) -> AdapterInvocationResult:
-        if not self._session_open:
-            return AdapterInvocationResult(
-                backend_id=self.backend_id(),
-                task_id=task.task_id,
-                output_payload={},
-                confidence=None,
-                execution_latency_ms=0.0,
-                backend_state="unavailable",
-                notes="Cortical Labs session is not open; call prepare() first.",
-            )
-
-        channel, amplitude_ua = self._extract_stimulation(task)
-        observation_window_ms = self._extract_observation_window(task)
-        pre_delay_ms = self._extract_pre_delay(task)
-
-        try:
-            result = self._client.stimulate_and_record(
-                channel=channel,
-                amplitude_ua=amplitude_ua,
-                observation_window_ms=observation_window_ms,
-                pre_delay_ms=pre_delay_ms,
-            )
-        except CorticalLabsInvocationError as exc:
-            self._last_health_status = "degraded"
-            self._last_readiness_state = "ready"
-            return AdapterInvocationResult(
-                backend_id=self.backend_id(),
-                task_id=task.task_id,
-                output_payload={},
-                confidence=None,
-                execution_latency_ms=0.0,
-                backend_state="error",
-                notes=str(exc),
-            )
-
-        self._last_backend_latency_ms = result.backend_latency_ms
-        self._last_observation_latency_ms = result.observation_latency_ms
-        self._last_recording_artifact = result.recording_artifact
-        self._last_health_status = "unknown"
-        self._last_readiness_state = "ready"
-        self._last_runtime_kind = self._client.runtime_kind()
-
-        output_payload = {
-            "response_fingerprint": result.response_summary.get(
-                "response_fingerprint",
-                "recording_completed",
-            ),
-            "observation_window_ms": observation_window_ms,
-            "stim_channel": channel,
-            "stim_amplitude_ua": amplitude_ua,
-            "recording_artifact": result.recording_artifact,
-            "raw_backend_metadata": result.raw_backend_metadata,
-        }
-
-        notes = (
-            "Cortical Labs stimulation/recording cycle completed "
-            f"on {self._last_runtime_kind}."
-        )
-        if result.recording_artifact and result.recording_artifact.get("path"):
-            notes += f" recording_path={result.recording_artifact['path']}"
-
-        return AdapterInvocationResult(
-            backend_id=self.backend_id(),
-            task_id=task.task_id,
-            output_payload=output_payload,
-            confidence=None,
-            execution_latency_ms=result.backend_latency_ms,
-            backend_state="ready",
-            notes=notes,
-        )
+        return super().invoke(task)
 
     def collect_telemetry(self) -> dict[str, float | int | str | bool | None]:
-        health = self._client.get_health_status()
-        readiness_state = str(health.get("readiness_state", self._last_readiness_state))
-        health_status = str(health.get("health_status", self._last_health_status))
-        channel_count = health.get("channel_count", self._last_channel_count)
-        fps = health.get("fps", self._last_fps)
-
-        age_of_information_ms = None
-        if self._last_prepare_timestamp is not None:
-            age_of_information_ms = (time.perf_counter() - self._last_prepare_timestamp) * 1000.0
-
-        telemetry = {
-            "readiness_state": readiness_state,
-            "health_status": health_status,
-            "backend_latency_ms": self._last_backend_latency_ms,
-            "observation_latency_ms": self._last_observation_latency_ms,
-            "channel_count": channel_count,
-            "fps": fps,
-            "runtime_kind": health.get("runtime_kind", self._last_runtime_kind),
-            "drift_score": None,
-            "age_of_information_ms": age_of_information_ms,
-            "telemetry_source": "local_session_observation",
-            "sdk_available": self._client.is_available(),
-        }
-
-        if self._last_recording_artifact and self._last_recording_artifact.get("path"):
-            telemetry["recording_path"] = self._last_recording_artifact["path"]
-
-        return telemetry
+        return super().collect_telemetry()
 
     def reset(self, mode: ResetMode | None = None) -> bool:
-        self._client.close_session()
-        self._session_open = False
-        self._last_readiness_state = "unavailable"
-        self._last_health_status = "unknown"
-        self._last_backend_latency_ms = None
-        self._last_observation_latency_ms = None
-        self._last_recording_artifact = None
-        self._last_age_of_information_ms = None
-        self._last_runtime_kind = "unknown"
-        self._last_attested_at = None
-        return True
+        return super().reset(mode=mode)
 
     def recalibrate(self) -> bool:
-        self._client.close_session()
-        self._session_open = False
-        self._last_readiness_state = "unavailable"
-        self._last_health_status = "unknown"
-        if not self._client.is_available():
-            return False
-        try:
-            info = self._client.open_session()
-        except CorticalLabsUnavailableError:
-            return False
-        self._session_open = True
-        self._last_readiness_state = "ready"
-        self._last_health_status = "unknown"
-        self._last_runtime_kind = info.runtime_kind
-        self._last_attested_at = datetime.now(timezone.utc)
-        self._last_channel_count = info.channel_count
-        self._last_fps = info.fps
-        self._last_prepare_timestamp = time.perf_counter()
-        return True
+        return super().recalibrate()
 
     def abort(self) -> bool:
         """Close the active CL session without issuing further stimulation."""
-        return self.reset(mode=ResetMode.SOFT_RESET)
+        return super().abort()
 
     def abort_supported(self) -> bool:
-        return True
+        return super().abort_supported()
 
     def _resource_contract_runtime_evidence(
         self,
     ) -> tuple[RuntimeKind, EvidenceLevel, str, datetime | None, dict]:
         try:
-            runtime_kind = RuntimeKind(self._last_runtime_kind)
+            runtime_kind = RuntimeKind(self._cl_runtime.last_runtime_kind)
         except ValueError:
             runtime_kind = RuntimeKind.UNKNOWN
         method = (
@@ -286,40 +145,9 @@ class CorticalLabsAdapter(BaseAdapter):
             runtime_kind,
             EXPECTED_EVIDENCE_LEVEL[runtime_kind],
             method,
-            self._last_attested_at,
+            self._cl_runtime.last_attested_at,
             {"configured_expectation": self._expected_runtime_kind},
         )
-
-    @staticmethod
-    def _extract_stimulation(task: TaskRequest) -> tuple[int, float]:
-        pattern = task.metadata.get("stimulation_pattern", {})
-        channels = pattern.get("channels", [1])
-        amplitude = pattern.get("amplitude", 0.4)
-        try:
-            channel = int(channels[0]) if channels else 1
-        except (TypeError, ValueError, IndexError):
-            channel = 1
-        try:
-            amplitude_ua = float(amplitude)
-        except (TypeError, ValueError):
-            amplitude_ua = 0.4
-        return channel, amplitude_ua
-
-    @staticmethod
-    def _extract_observation_window(task: TaskRequest) -> int:
-        raw_value = task.metadata.get("observation_window_ms", 100)
-        try:
-            return int(raw_value)
-        except (TypeError, ValueError):
-            return 100
-
-    @staticmethod
-    def _extract_pre_delay(task: TaskRequest) -> int:
-        raw_value = task.metadata.get("pre_delay_ms", 20)
-        try:
-            return int(raw_value)
-        except (TypeError, ValueError):
-            return 20
 
     @staticmethod
     def _build_descriptor(

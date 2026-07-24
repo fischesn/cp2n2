@@ -58,6 +58,14 @@ The default is a non-compensatory lexicographic policy. Latency-, safety- and
 locality-oriented profiles, an explicit weighted comparison, and three
 reproducible baselines operate only on resources that passed all hard checks.
 
+Backend integrations follow a versioned
+[general adapter architecture](docs/general-adapter-architecture.md). Every
+control adapter publishes reservation, deployment, state, abort, artifact,
+runtime-location, and evidence-ceiling capabilities and delegates
+time-critical work to a separate substrate runtime. The CL SDK Simulator is
+one optional E3 target; generic chemical, wetware, edge, and service-backed
+integrations do not depend on it.
+
 ---
 
 ## 2. High-level architecture
@@ -74,6 +82,9 @@ The control plane is responsible for:
 - validation and fallback handling
 - collection of normalized result and telemetry information
 
+Every integration exposes a small control adapter here. Provider-specific
+execution is not implemented in the orchestrator.
+
 ### Twin / runtime state
 The prototype keeps state that is relevant for runtime decisions, such as:
 
@@ -86,12 +97,17 @@ The prototype keeps state that is relevant for runtime decisions, such as:
 This is not a full digital twin framework, but it is enough to make runtime state visible to the control logic.
 
 ### Data / backend integration layer
-The data-plane side is implemented through adapters and backend-specific client logic:
+The data-plane side is implemented through separate substrate runtimes and
+backend-specific client logic:
 
 - local synthetic backends for representative substrate regimes
 - a remote edge path via HTTP
 - an explicitly attested Cortical Labs path, currently exercised with the CL SDK Simulator
 - a foundation for additional future integrations
+
+The compatibility adapter methods delegate to these runtimes, so existing
+orchestrator callers remain valid while control and execution responsibilities
+are independently testable.
 
 ---
 
@@ -198,12 +214,20 @@ phys-mcp/
   adapters/
     __init__.py
     base_adapter.py
+    contracts.py
     chemical_adapter.py
     cortical_labs_adapter.py
     edge_adapter.py
     fault_injecting_adapter.py
     remote_edge_adapter.py
     wetware_adapter.py
+
+  runtimes/
+    __init__.py
+    base_runtime.py
+    twin_runtimes.py
+    remote_edge_runtime.py
+    cortical_labs_runtime.py
 
   agent/
     __init__.py
@@ -598,6 +622,17 @@ The A4 security tests additionally validate malformed and hostile MCP calls,
 server-side authorization, dry-run non-commitment, append-only audit integrity,
 sanitized outputs, and external approval. They use only local simulators and
 test doubles.
+
+### 10.2 Adapter conformance
+
+```bash
+pytest tests/test_adapter_conformance.py -q
+```
+
+This validates the A5 control-adapter/runtime split for local twins, the
+same-host HTTP backend, the optional CL simulator path, capability
+declarations, and operation without any CL module. Core evaluations publish a
+versioned backend matrix and each retains at least one non-CL backend.
 
 ### 10.1 Resource-contract validation
 

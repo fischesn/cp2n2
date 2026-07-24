@@ -128,6 +128,11 @@ def test_cortical_prepare_invoke_and_telemetry_with_fake_sdk(monkeypatch: pytest
     assert "channel_count" in tel
     assert "fps" in tel
 
+    artifacts = adapter.list_artifacts()
+    assert len(artifacts) == 1
+    assert artifacts[0].kind == "recording"
+    assert artifacts[0].media_type == "application/x-hdf5"
+
     adapter.reset()
 
 

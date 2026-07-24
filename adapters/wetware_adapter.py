@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from adapters.base_adapter import AdapterInvocationResult, AdapterPreparationResult, BaseAdapter
+from adapters.contracts import make_adapter_capability_declaration
 from core.task_model import TaskRequest
 from descriptors.capability_schema import (
     CapabilityDescriptor,
@@ -24,6 +25,8 @@ from descriptors.capability_schema import (
     TrainingMode,
     TwinBinding,
 )
+from descriptors.resource_contract import EvidenceLevel
+from runtimes.twin_runtimes import WetwareTwinRuntime
 from twins.wetware_twin import WetwareTwin
 
 
@@ -31,59 +34,38 @@ class WetwareAdapter(BaseAdapter):
     """Adapter exposing a closed-loop wetware-inspired backend."""
 
     def __init__(self, backend_id: str = "wetware-backend", twin: WetwareTwin | None = None) -> None:
-        self._twin = twin or WetwareTwin()
         descriptor = self._build_descriptor(backend_id=backend_id)
-        super().__init__(descriptor=descriptor)
+        runtime = WetwareTwinRuntime(backend_id, twin=twin)
+        self._twin = runtime.twin
+        super().__init__(
+            descriptor=descriptor,
+            runtime=runtime,
+            capability_declaration=make_adapter_capability_declaration(
+                adapter_id=f"{self.__class__.__module__}.{self.__class__.__qualname__}",
+                descriptor=descriptor,
+                runtime=runtime.capabilities,
+                evidence_ceiling=EvidenceLevel.E1_SYNTHETIC_TWIN,
+                notes="Generic local wetware-twin control adapter.",
+            ),
+        )
 
     def describe(self) -> SubstrateDescriptor:
         return self.descriptor
 
     def prepare(self, task: TaskRequest) -> AdapterPreparationResult:
-        stimulation_strength = self._extract_stimulation_strength(task)
-        prepared, details = self._twin.prepare(stimulation_strength=stimulation_strength)
-        return AdapterPreparationResult(prepared=prepared, details=details)
+        return super().prepare(task)
 
     def invoke(self, task: TaskRequest) -> AdapterInvocationResult:
-        stimulation_strength = self._extract_stimulation_strength(task)
-        observation_window_ms = self._extract_observation_window(task)
-        result = self._twin.run(
-            stimulation_strength=stimulation_strength,
-            observation_window_ms=observation_window_ms,
-        )
-        return AdapterInvocationResult(
-            backend_id=self.backend_id(),
-            task_id=task.task_id,
-            output_payload=result.output_payload,
-            confidence=result.confidence,
-            execution_latency_ms=result.execution_latency_ms,
-            backend_state=result.backend_state,
-            notes="Wetware-inspired stimulation/observation cycle.",
-        )
+        return super().invoke(task)
 
     def collect_telemetry(self) -> dict[str, float | int | str | bool | None]:
-        return self._twin.telemetry()
+        return super().collect_telemetry()
 
     def reset(self, mode: ResetMode | None = None) -> bool:
-        return self._twin.reset(mode=mode)
+        return super().reset(mode=mode)
 
     def recalibrate(self) -> bool:
-        return self._twin.recalibrate()
-
-    @staticmethod
-    def _extract_stimulation_strength(task: TaskRequest) -> float:
-        raw_value = task.metadata.get("stimulation_strength", 0.55)
-        try:
-            return float(raw_value)
-        except (TypeError, ValueError):
-            return 0.55
-
-    @staticmethod
-    def _extract_observation_window(task: TaskRequest) -> float:
-        raw_value = task.metadata.get("observation_window_ms", 120.0)
-        try:
-            return float(raw_value)
-        except (TypeError, ValueError):
-            return 120.0
+        return super().recalibrate()
 
     @staticmethod
     def _build_descriptor(backend_id: str) -> SubstrateDescriptor:

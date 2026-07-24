@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from adapters.base_adapter import AdapterInvocationResult, AdapterPreparationResult, BaseAdapter
+from adapters.contracts import make_adapter_capability_declaration
 from core.task_model import TaskRequest
 from descriptors.capability_schema import (
     CapabilityDescriptor,
@@ -24,6 +25,8 @@ from descriptors.capability_schema import (
     TrainingMode,
     TwinBinding,
 )
+from descriptors.resource_contract import EvidenceLevel
+from runtimes.twin_runtimes import EdgeTwinRuntime
 from twins.edge_twin import EdgeTwin
 
 
@@ -31,49 +34,38 @@ class EdgeAdapter(BaseAdapter):
     """Adapter exposing a fast edge-accelerator-style backend."""
 
     def __init__(self, backend_id: str = "edge-backend", twin: EdgeTwin | None = None) -> None:
-        self._twin = twin or EdgeTwin()
         descriptor = self._build_descriptor(backend_id=backend_id)
-        super().__init__(descriptor=descriptor)
+        runtime = EdgeTwinRuntime(backend_id, twin=twin)
+        self._twin = runtime.twin
+        super().__init__(
+            descriptor=descriptor,
+            runtime=runtime,
+            capability_declaration=make_adapter_capability_declaration(
+                adapter_id=f"{self.__class__.__module__}.{self.__class__.__qualname__}",
+                descriptor=descriptor,
+                runtime=runtime.capabilities,
+                evidence_ceiling=EvidenceLevel.E1_SYNTHETIC_TWIN,
+                notes="Generic local edge-twin control adapter.",
+            ),
+        )
 
     def describe(self) -> SubstrateDescriptor:
         return self.descriptor
 
     def prepare(self, task: TaskRequest) -> AdapterPreparationResult:
-        input_vector = self._extract_input_vector(task)
-        prepared, details = self._twin.prepare(input_vector=input_vector)
-        return AdapterPreparationResult(prepared=prepared, details=details)
+        return super().prepare(task)
 
     def invoke(self, task: TaskRequest) -> AdapterInvocationResult:
-        input_vector = self._extract_input_vector(task)
-        result = self._twin.run(input_vector=input_vector)
-        return AdapterInvocationResult(
-            backend_id=self.backend_id(),
-            task_id=task.task_id,
-            output_payload=result.output_payload,
-            confidence=result.confidence,
-            execution_latency_ms=result.execution_latency_ms,
-            backend_state=result.backend_state,
-            notes="Fast edge-style vector inference backend.",
-        )
+        return super().invoke(task)
 
     def collect_telemetry(self) -> dict[str, float | int | str | bool | None]:
-        return self._twin.telemetry()
+        return super().collect_telemetry()
 
     def reset(self, mode: ResetMode | None = None) -> bool:
-        return self._twin.reset(mode=mode)
+        return super().reset(mode=mode)
 
     def recalibrate(self) -> bool:
-        return self._twin.recalibrate()
-
-    @staticmethod
-    def _extract_input_vector(task: TaskRequest) -> list[float]:
-        raw_value = task.metadata.get("input_vector")
-        if isinstance(raw_value, list) and raw_value:
-            try:
-                return [float(item) for item in raw_value]
-            except (TypeError, ValueError):
-                pass
-        return [0.2, 0.4, 0.6, 0.8]
+        return super().recalibrate()
 
     @staticmethod
     def _build_descriptor(backend_id: str) -> SubstrateDescriptor:

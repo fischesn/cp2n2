@@ -27,7 +27,19 @@ class FaultInjectingAdapter(BaseAdapter):
     def __init__(self, wrapped: BaseAdapter, fault_profile: FaultProfile | None = None) -> None:
         self._wrapped = wrapped
         self._fault_profile = fault_profile or FaultProfile()
-        super().__init__(descriptor=wrapped.describe())
+        declaration = wrapped.capability_declaration.model_copy(
+            update={
+                "adapter_id": (
+                    f"{self.__class__.__module__}.{self.__class__.__qualname__}"
+                ),
+                "notes": "Control-plane fault-injection decorator.",
+            }
+        )
+        super().__init__(
+            descriptor=wrapped.describe(),
+            runtime=wrapped.runtime,
+            capability_declaration=declaration,
+        )
 
     def describe(self) -> SubstrateDescriptor:
         return self._wrapped.describe()
@@ -36,9 +48,13 @@ class FaultInjectingAdapter(BaseAdapter):
         """Preserve evidence while publishing the injected runtime telemetry."""
         injected = super().resource_contract()
         wrapped = self._wrapped.resource_contract()
+        identity = wrapped.identity.model_copy(
+            update={"adapter_id": self.capability_declaration.adapter_id}
+        )
         return wrapped.model_copy(
             update={
                 "published_at": injected.published_at,
+                "identity": identity,
                 "state": injected.state,
                 "telemetry": injected.telemetry,
             }

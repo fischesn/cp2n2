@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
-
+from adapters.contracts import (
+    AdapterCapabilityDeclaration,
+    AdapterInvocationResult,
+    AdapterPreparationResult,
+    RuntimeArtifact,
+)
 from core.task_model import TaskRequest
 from descriptors.capability_schema import ResetMode, SubstrateDescriptor
 from descriptors.resource_contract import (
@@ -31,47 +34,10 @@ from descriptors.resource_contract import (
     Uncertainty,
     UncertaintyKind,
 )
+from runtimes.base_runtime import SubstrateRuntime
 
 
-class AdapterPreparationResult(BaseModel):
-    """Outcome of a backend preparation step."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    prepared: bool = Field(..., description="Whether preparation succeeded.")
-    details: str = Field(default="", description="Short preparation summary.")
-
-
-class AdapterInvocationResult(BaseModel):
-    """Normalized result returned by a backend adapter invocation."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    backend_id: str = Field(..., description="Identifier of the backend that produced the result.")
-    task_id: str = Field(..., description="Identifier of the task that was executed.")
-    output_payload: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Backend output payload normalized into a Python dictionary.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        ge=0.0,
-        le=1.0,
-        description="Optional confidence value reported by the backend.",
-    )
-    execution_latency_ms: float = Field(
-        default=0.0,
-        ge=0.0,
-        description="Observed or estimated execution latency.",
-    )
-    backend_state: str = Field(
-        default="ready",
-        description="Backend-reported lifecycle state after invocation.",
-    )
-    notes: str | None = Field(default=None, description="Optional result notes.")
-
-
-class BaseAdapter(ABC):
+class BaseAdapter:
     """Common adapter interface used by the phys-MCP control plane.
 
     Each concrete adapter translates generic control-plane operations into the
@@ -82,6 +48,8 @@ class BaseAdapter(ABC):
         self,
         descriptor: SubstrateDescriptor,
         *,
+        runtime: SubstrateRuntime,
+        capability_declaration: AdapterCapabilityDeclaration,
         runtime_kind: RuntimeKind = RuntimeKind.SYNTHETIC_TWIN,
         provider_id: str = "phys-mcp",
         hardware_id: str | None = None,
@@ -89,6 +57,8 @@ class BaseAdapter(ABC):
         telemetry_source: ObservationSource = ObservationSource.ESTIMATED,
     ) -> None:
         self._descriptor = descriptor
+        self._runtime = runtime
+        self._capability_declaration = capability_declaration
         self._contract_runtime_kind = runtime_kind
         self._contract_provider_id = provider_id
         self._contract_hardware_id = hardware_id
@@ -97,11 +67,46 @@ class BaseAdapter(ABC):
         self._contract_attested_at = (
             None if runtime_kind == RuntimeKind.UNKNOWN else datetime.now(timezone.utc)
         )
+        self.validate_conformance()
 
     @property
     def descriptor(self) -> SubstrateDescriptor:
         """Return the immutable descriptor published by this adapter."""
         return self._descriptor
+
+    @property
+    def runtime(self) -> SubstrateRuntime:
+        """Return the separate substrate-side runtime bound to this adapter."""
+        return self._runtime
+
+    @property
+    def capability_declaration(self) -> AdapterCapabilityDeclaration:
+        """Return the required, versioned A5 adapter capability declaration."""
+        return self._capability_declaration.model_copy(deep=True)
+
+    def validate_conformance(self) -> bool:
+        """Validate structural alignment of adapter, descriptor, and runtime."""
+
+        declaration = self._capability_declaration
+        if not declaration.explicit:
+            raise ValueError("adapter capability declarations must be explicit")
+        if declaration.backend_id != self._descriptor.backend_id:
+            raise ValueError(
+                "capability declaration backend_id must match the descriptor"
+            )
+        if declaration.substrate_class != str(
+            self._descriptor.capability.substrate_class
+        ):
+            raise ValueError(
+                "capability declaration substrate_class must match the descriptor"
+            )
+        if declaration.runtime != self._runtime.capabilities:
+            raise ValueError(
+                "adapter capability declaration must embed the bound runtime declaration"
+            )
+        if self._runtime is self:
+            raise ValueError("control adapter and substrate runtime must be separate")
+        return True
 
     def backend_id(self) -> str:
         """Return the backend identifier."""
@@ -179,7 +184,7 @@ class BaseAdapter(ABC):
             identity=ResourceIdentity(
                 resource_id=self.backend_id(),
                 provider_id=self._contract_provider_id,
-                adapter_id=f"{self.__class__.__module__}.{self.__class__.__qualname__}",
+                adapter_id=self._capability_declaration.adapter_id,
                 substrate_id=str(self.descriptor.capability.substrate_class),
                 hardware_id=self._contract_hardware_id,
             ),
@@ -282,42 +287,29 @@ class BaseAdapter(ABC):
             return candidate
         return ResourceLifecycleState.UNKNOWN.value
 
-    @abstractmethod
     def describe(self) -> SubstrateDescriptor:
         """Return the published substrate descriptor."""
-        raise NotImplementedError
+        return self.descriptor
 
-    @abstractmethod
     def prepare(self, task: TaskRequest) -> AdapterPreparationResult:
-        """Prepare the backend for task execution.
+        """Ask the bound runtime to prepare for one task."""
+        return self._runtime.prepare(task)
 
-        Examples include warmup, priming, loading weights, or validating the
-        task against backend-specific preconditions.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
     def invoke(self, task: TaskRequest) -> AdapterInvocationResult:
-        """Execute the task through the backend and return a normalized result."""
-        raise NotImplementedError
+        """Delegate time-critical execution to the bound runtime."""
+        return self._runtime.execute(task)
 
-    @abstractmethod
     def collect_telemetry(self) -> dict[str, float | int | str | bool | None]:
-        """Return the latest telemetry snapshot from the backend."""
-        raise NotImplementedError
+        """Return the latest runtime telemetry snapshot."""
+        return self._runtime.telemetry()
 
-    @abstractmethod
     def reset(self, mode: ResetMode | None = None) -> bool:
-        """Reset or recover the backend state.
+        """Reset or recover the bound runtime."""
+        return self._runtime.reset(mode=mode)
 
-        If *mode* is None, the adapter may choose a sensible default reset mode.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
     def recalibrate(self) -> bool:
-        """Trigger backend recalibration if supported."""
-        raise NotImplementedError
+        """Trigger runtime recalibration if supported."""
+        return self._runtime.recalibrate()
 
     def abort(self) -> bool:
         """Attempt to stop an uncertain or active operation.
@@ -327,9 +319,22 @@ class BaseAdapter(ABC):
         conservative: the control plane will not infer successful cancellation.
         """
 
-        return False
+        return self._runtime.abort()
 
     def abort_supported(self) -> bool:
         """Return whether ``abort()`` has provider-level semantics."""
 
-        return False
+        return self._runtime.capabilities.provider_abort_supported
+
+    def deployment_status(self) -> dict[str, str]:
+        """Return the declared deployment relationship without deploying work."""
+
+        return {
+            "mode": str(self._capability_declaration.deployment_mode),
+            "runtime_id": self._runtime.capabilities.runtime_id,
+        }
+
+    def list_artifacts(self) -> list[RuntimeArtifact]:
+        """Return normalized artifacts exposed by the bound runtime."""
+
+        return [item.model_copy(deep=True) for item in self._runtime.artifacts()]
