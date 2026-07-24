@@ -6,8 +6,18 @@ import json
 from urllib.request import Request, urlopen
 
 from adapters.base_adapter import AdapterInvocationResult, AdapterPreparationResult, BaseAdapter
+from adapters.contracts import (
+    DeploymentMode,
+    make_adapter_capability_declaration,
+)
 from core.task_model import TaskRequest
 from descriptors.capability_schema import ResetMode, SubstrateDescriptor
+from descriptors.resource_contract import (
+    EvidenceLevel,
+    ObservationSource,
+    RuntimeKind,
+)
+from runtimes.remote_edge_runtime import RemoteEdgeRuntime
 
 
 class RemoteEdgeAdapter(BaseAdapter):
@@ -17,31 +27,41 @@ class RemoteEdgeAdapter(BaseAdapter):
         self._base_url = base_url.rstrip("/")
         descriptor_payload = self._request_json("GET", "/describe")
         descriptor = SubstrateDescriptor.model_validate(descriptor_payload)
-        super().__init__(descriptor=descriptor)
+        runtime = RemoteEdgeRuntime(descriptor.backend_id, self._base_url)
+        super().__init__(
+            descriptor=descriptor,
+            runtime=runtime,
+            capability_declaration=make_adapter_capability_declaration(
+                adapter_id=f"{self.__class__.__module__}.{self.__class__.__qualname__}",
+                descriptor=descriptor,
+                runtime=runtime.capabilities,
+                evidence_ceiling=EvidenceLevel.E2_SAME_HOST_SERVICE,
+                deployment_mode=DeploymentMode.PREDEPLOYED,
+                notes="HTTP control adapter for an externalized edge runtime.",
+            ),
+            runtime_kind=RuntimeKind.SAME_HOST_SERVICE,
+            provider_id="phys-mcp-remote-edge-service",
+            attestation_method="http_same_host_service_descriptor",
+            telemetry_source=ObservationSource.PROVIDER_REPORTED,
+        )
 
     def describe(self) -> SubstrateDescriptor:
         return self.descriptor
 
     def prepare(self, task: TaskRequest) -> AdapterPreparationResult:
-        payload = self._request_json("POST", "/prepare", {"task": task.model_dump(mode="json")})
-        return AdapterPreparationResult.model_validate(payload)
+        return super().prepare(task)
 
     def invoke(self, task: TaskRequest) -> AdapterInvocationResult:
-        payload = self._request_json("POST", "/invoke", {"task": task.model_dump(mode="json")})
-        return AdapterInvocationResult.model_validate(payload)
+        return super().invoke(task)
 
     def collect_telemetry(self) -> dict[str, float | int | str | bool | None]:
-        payload = self._request_json("GET", "/telemetry")
-        return payload
+        return super().collect_telemetry()
 
     def reset(self, mode: ResetMode | None = None) -> bool:
-        payload = {"mode": str(mode) if mode is not None else None}
-        response = self._request_json("POST", "/reset", payload)
-        return bool(response.get("success", False))
+        return super().reset(mode=mode)
 
     def recalibrate(self) -> bool:
-        response = self._request_json("POST", "/recalibrate", {})
-        return bool(response.get("success", False))
+        return super().recalibrate()
 
     def _request_json(self, method: str, path: str, payload: dict | None = None) -> dict:
         body = None if payload is None else json.dumps(payload).encode("utf-8")

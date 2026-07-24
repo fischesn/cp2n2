@@ -28,7 +28,6 @@ import csv
 import json
 import sys
 from dataclasses import asdict
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -41,8 +40,7 @@ def bootstrap_project_root() -> Path:
 
 
 PROJECT_ROOT = bootstrap_project_root()
-RESULTS_DIR = PROJECT_ROOT / "evaluation" / "results"
-RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+from evaluation.common import RESULTS_DIR  # noqa: E402
 
 from demos.common import build_live_target_orchestrator, make_cortical_task  # noqa: E402
 
@@ -108,9 +106,8 @@ def summarize_run(run_result, task) -> dict[str, Any]:
 
 
 def write_results(rows: list[dict[str, Any]]) -> tuple[Path, Path]:
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    json_path = RESULTS_DIR / f"cortical_runtime_results_{timestamp}.json"
-    csv_path = RESULTS_DIR / f"cortical_runtime_results_{timestamp}.csv"
+    json_path = RESULTS_DIR / "cortical_runtime_results.json"
+    csv_path = RESULTS_DIR / "cortical_runtime_results.csv"
 
     json_path.write_text(json.dumps(rows, indent=2, ensure_ascii=False), encoding="utf-8")
 

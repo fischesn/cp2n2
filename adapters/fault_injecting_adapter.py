@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from adapters.base_adapter import AdapterInvocationResult, AdapterPreparationResult, BaseAdapter
 from core.task_model import TaskRequest
 from descriptors.capability_schema import ResetMode, SubstrateDescriptor
+from descriptors.resource_contract import PhysicalNeuralResourceContract
 
 
 @dataclass
@@ -26,10 +27,38 @@ class FaultInjectingAdapter(BaseAdapter):
     def __init__(self, wrapped: BaseAdapter, fault_profile: FaultProfile | None = None) -> None:
         self._wrapped = wrapped
         self._fault_profile = fault_profile or FaultProfile()
-        super().__init__(descriptor=wrapped.describe())
+        declaration = wrapped.capability_declaration.model_copy(
+            update={
+                "adapter_id": (
+                    f"{self.__class__.__module__}.{self.__class__.__qualname__}"
+                ),
+                "notes": "Control-plane fault-injection decorator.",
+            }
+        )
+        super().__init__(
+            descriptor=wrapped.describe(),
+            runtime=wrapped.runtime,
+            capability_declaration=declaration,
+        )
 
     def describe(self) -> SubstrateDescriptor:
         return self._wrapped.describe()
+
+    def resource_contract(self) -> PhysicalNeuralResourceContract:
+        """Preserve evidence while publishing the injected runtime telemetry."""
+        injected = super().resource_contract()
+        wrapped = self._wrapped.resource_contract()
+        identity = wrapped.identity.model_copy(
+            update={"adapter_id": self.capability_declaration.adapter_id}
+        )
+        return wrapped.model_copy(
+            update={
+                "published_at": injected.published_at,
+                "identity": identity,
+                "state": injected.state,
+                "telemetry": injected.telemetry,
+            }
+        )
 
     def configure(self, fault_profile: FaultProfile) -> None:
         self._fault_profile = fault_profile
@@ -70,6 +99,12 @@ class FaultInjectingAdapter(BaseAdapter):
 
     def recalibrate(self) -> bool:
         return self._wrapped.recalibrate()
+
+    def abort(self) -> bool:
+        return self._wrapped.abort()
+
+    def abort_supported(self) -> bool:
+        return self._wrapped.abort_supported()
 
     def _consume_one_shot_if_needed(self) -> None:
         if self._fault_profile.one_shot:

@@ -1,4 +1,7 @@
-# phys-MCP v3.0
+# phys-MCP
+
+This branch develops the accepted post-v3.0 master plan. The immutable `v3.0`
+tag remains the reproducible baseline.
 
 `phys-MCP` is a substrate-aware control-plane prototype for exposing heterogeneous **physical neural network (PNN)** resources as discoverable, invocable, and monitorable software-visible backends.
 
@@ -9,8 +12,9 @@ This repository contains:
 - a Python reference implementation of the `phys-MCP` control plane
 - representative local prototype backends for chemical, wetware, and fast edge-style execution
 - an externalized remote edge backend path
-- a real API-backed integration path for **Cortical Labs**
-- minimal **Gemini-based** and **Ollama-based** agents that plan and execute tasks through `phys-MCP`
+- an attested integration path for the **Cortical Labs CL API / CL SDK**
+- minimal **Gemini-based**, **Ollama-based**, and **University of Lübeck
+  AI-Lab-based** agents that plan and execute tasks through `phys-MCP`
 - demos, tests, and evaluation scripts
 
 The current code base should be understood as a **research prototype**: it is operational, structured, and demonstrable, but not a production runtime.
@@ -36,6 +40,33 @@ The prototype treats physical AI resources as **managed backends** rather than o
 
 `phys-MCP` answers these questions through a substrate-aware descriptor model, a matcher, an orchestrator, and backend-specific adapters.
 
+The post-v3.0 development line also publishes a versioned, substrate-neutral
+[Physical Neural Resource Contract](docs/physical-neural-resource-contract-v1.0.md).
+It preserves the legacy capability descriptor while adding runtime evidence,
+telemetry provenance and freshness, safety constraints, access, cost, and data
+governance. Missing safety-relevant information produces an explicit
+`INADMISSIBLE` decision before invocation.
+
+It also implements a
+[lifecycle and lease protocol](docs/lifecycle-leases-and-errors.md) with
+exclusive time-bounded reservations, state-version checks, client-scoped
+idempotency, independent phase timeouts, explicit abort, provider
+reconciliation, and typed error codes.
+
+Resource choice follows a documented
+[admission, feasibility, and selection protocol](docs/admission-feasibility-selection.md).
+The default is a non-compensatory lexicographic policy. Latency-, safety- and
+locality-oriented profiles, an explicit weighted comparison, and three
+reproducible baselines operate only on resources that passed all hard checks.
+
+Backend integrations follow a versioned
+[general adapter architecture](docs/general-adapter-architecture.md). Every
+control adapter publishes reservation, deployment, state, abort, artifact,
+runtime-location, and evidence-ceiling capabilities and delegates
+time-critical work to a separate substrate runtime. The CL SDK Simulator is
+one optional E3 target; generic chemical, wetware, edge, and service-backed
+integrations do not depend on it.
+
 ---
 
 ## 2. High-level architecture
@@ -52,6 +83,9 @@ The control plane is responsible for:
 - validation and fallback handling
 - collection of normalized result and telemetry information
 
+Every integration exposes a small control adapter here. Provider-specific
+execution is not implemented in the orchestrator.
+
 ### Twin / runtime state
 The prototype keeps state that is relevant for runtime decisions, such as:
 
@@ -64,12 +98,17 @@ The prototype keeps state that is relevant for runtime decisions, such as:
 This is not a full digital twin framework, but it is enough to make runtime state visible to the control logic.
 
 ### Data / backend integration layer
-The data-plane side is implemented through adapters and backend-specific client logic:
+The data-plane side is implemented through separate substrate runtimes and
+backend-specific client logic:
 
 - local synthetic backends for representative substrate regimes
 - a remote edge path via HTTP
-- a real API-backed path via the Cortical Labs CL SDK / simulator
+- an explicitly attested Cortical Labs path, currently exercised with the CL SDK Simulator
 - a foundation for additional future integrations
+
+The compatibility adapter methods delegate to these runtimes, so existing
+orchestrator callers remain valid while control and execution responsibilities
+are independently testable.
 
 ---
 
@@ -77,6 +116,11 @@ The data-plane side is implemented through adapters and backend-specific client 
 
 ### 3.1 Discover heterogeneous backends
 The orchestrator can enumerate backends described through a shared descriptor model.
+
+For compatibility, `discover_backends()` returns the v3.0 descriptors.
+`discover_resource_contracts()` returns the complete v1.0 resource contracts.
+The latter includes the current control-plane lifecycle and its version, not
+only provider telemetry.
 
 Each backend publishes information such as:
 
@@ -95,7 +139,11 @@ Tasks can be routed in two ways:
 - **capability-driven**: let the matcher select the best compatible backend
 - **directed**: explicitly target a backend such as `cortical-labs-backend`
 
-Matching is based on descriptor compatibility and runtime signals rather than on mere endpoint presence.
+Matching first separates hard admission constraints from dynamic feasibility.
+Only admitted and currently feasible resources are ranked. Every exclusion
+names its violated constraint, and every selected resource carries a
+machine-readable policy, rank key, normalized criteria, and comparison-weight
+breakdown.
 
 ### 3.3 Execute tasks with telemetry-aware control
 A task execution can include:
@@ -119,8 +167,8 @@ These are not intended as faithful physical simulators. Their role is to exercis
 ### 3.5 Use an externalized backend path
 The remote edge path demonstrates that the same control-plane logic also works across an explicit service boundary.
 
-### 3.6 Use a real Cortical Labs path
-The repository includes a real adapter and client path for the **Cortical Labs CL API / CL SDK simulator**.
+### 3.6 Use an attested Cortical Labs path
+The repository includes an adapter and client path for the **Cortical Labs CL API / CL SDK**. The adapter attests the active runtime as `sdk_simulator`, `physical_hardware`, or `unknown`; verified v3.0 results use `sdk_simulator`.
 
 Through this path, `phys-MCP` can:
 
@@ -128,9 +176,18 @@ Through this path, `phys-MCP` can:
 - submit a simple stimulation/recording task
 - collect normalized result data
 - capture structured recording artifact metadata
-- expose readiness, health, backend latency, observation latency, and recording path as telemetry
+- expose session readiness, runtime kind, latency, recording-path metadata, and explicitly sourced telemetry
 
-### 3.7 Use LLM-based agents
+### 3.7 Evaluate a distributed control path
+
+The A6 testbed isolates the agent load generator, gateway, control plane, and
+adapter runtime in four operating-system processes. Versioned profiles cover
+latency, jitter, request loss, partitions, and stale telemetry. Runs propagate
+one trace identifier across all services and archive raw JSONL spans, request
+tables, summaries, figures, exact configuration copies, and SHA-256 checksums.
+The testbed is generic and uses the non-CL remote edge integration.
+
+### 3.8 Use LLM-based agents
 The repository also includes:
 
 - a **Gemini-based agent**
@@ -138,13 +195,17 @@ The repository also includes:
 
 These agents can:
 
-- discover backends through `phys-MCP`
-- ask an LLM to produce a structured execution plan
-- execute that plan only via `phys-MCP`
-- receive the result and telemetry
+- discover sanitized resources and server-owned assay presets
+- ask an LLM to choose only a resource, preset, and dry-run mode
+- execute at most one lease-bound assay through the constrained MCP surface
+- receive only a sanitized result summary
 - ask the model to summarize the outcome
 
-The agents do **not** call substrate APIs directly. This is intentional: `phys-MCP` remains the sole control plane.
+They cannot supply electrodes, stimulation parameters, loop counts, policy
+changes, runtime claims, or lease bypasses. Real biological execution requires
+an external one-time human approval that the agent cannot issue. The full A4
+boundary is documented in
+[Agent-Facing MCP Surface](docs/agent-facing-mcp-surface.md).
 
 ---
 
@@ -163,12 +224,20 @@ phys-mcp/
   adapters/
     __init__.py
     base_adapter.py
+    contracts.py
     chemical_adapter.py
     cortical_labs_adapter.py
     edge_adapter.py
     fault_injecting_adapter.py
     remote_edge_adapter.py
     wetware_adapter.py
+
+  runtimes/
+    __init__.py
+    base_runtime.py
+    twin_runtimes.py
+    remote_edge_runtime.py
+    cortical_labs_runtime.py
 
   agent/
     __init__.py
@@ -207,6 +276,7 @@ phys-mcp/
     evaluate_gemini_agent.py
     evaluate_matching.py
     evaluate_matching_baselines.py
+    evaluate_selection_robustness.py
     evaluate_overhead.py
     evaluate_portability.py
     plots.py
@@ -279,6 +349,8 @@ cl-sdk
 google-genai
 requests
 pytest
+pydantic>=2,<3
+mcp>=1.27,<2
 ```
 
 Optional but useful:
@@ -290,7 +362,7 @@ ipywidgets
 
 ### 5.3 Runtime configuration
 
-Create a `.env` file in the project root. A typical starting point is:
+Copy `.env.example` to an untracked `.env` file in the project root. Do not commit credentials. A typical starting point is:
 
 ```dotenv
 # Cortical Labs SDK / Simulator
@@ -315,6 +387,17 @@ GEMINI_API_KEY=YOUR_KEY_HERE
 # Ollama
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=qwen2.5:7b-instruct
+
+# University of Lübeck AI-Lab
+AI_LAB_API_KEY=YOUR_PERSONAL_KEY
+AI_LAB_BASE_URL=https://llm-api.ai-lab.uni-luebeck.de
+AI_LAB_MODEL=minimax-m2.7
+
+# Constrained MCP server (fail-closed if principal or scopes are absent)
+PHYSMCP_PRINCIPAL_ID=research-agent
+PHYSMCP_SCOPES=resources:read,leases:write,assays:prepare,assays:execute,runs:abort
+PHYSMCP_INCLUDE_CORTICAL_LABS=0
+PHYSMCP_AUDIT_PATH=.physmcp/mcp-audit.jsonl
 ```
 
 Important: the same Python environment that runs `phys-MCP` must also have `cl-sdk` installed.
@@ -391,7 +474,9 @@ Typical result fields include:
 Typical telemetry includes:
 
 - `readiness_state`
-- `health_status`
+- `health_status` (only provider-reported; otherwise `unknown`)
+- `runtime_kind`
+- `telemetry_source`
 - `backend_latency_ms`
 - `observation_latency_ms`
 - `recording_path`
@@ -408,13 +493,13 @@ Typical telemetry includes:
 python -m evaluation.run_all_evaluations
 ```
 
-### 8.2 Real Cortical runtime evaluation
+### 8.2 Cortical runtime evaluation — explicit execution gate
 
 ```bash
 python -m evaluation.evaluate_cortical_runtime
 ```
 
-This performs several directed runs against the Cortical Labs integration path and stores JSON/CSV results under `evaluation/results/`.
+This performs directed stimulation/recording runs. It is **not** part of the default test suite and must only be run after confirming the active runtime and obtaining the appropriate hardware-safety approval. Its results must state `runtime_kind` and may not be presented as physical-hardware evidence when the SDK Simulator is active. Evaluation outputs are written to a fresh `evaluation/results/run-<UTC timestamp>/` directory by default; set `PHYSMCP_RESULTS_DIR` to select another location.
 
 ### 8.3 Gemini agent evaluation
 
@@ -422,12 +507,16 @@ This performs several directed runs against the Cortical Labs integration path a
 python -m evaluation.evaluate_gemini_agent
 ```
 
-This performs several agent-driven runs and stores JSON/CSV results under `evaluation/results/`.
+This calls Gemini to produce several constrained **dry-run** plans and stores
+JSON/CSV results under `evaluation/results/`. It does not execute a substrate
+and is not part of the default test suite.
 
 ### 8.4 Additional evaluation scripts
 
 The repository also contains dedicated scripts for:
 
+- `evaluation.evaluate_distributed_testbed`
+- `evaluation.evaluate_ai_lab_agent` (explicit network acknowledgement required)
 - `evaluation.evaluate_externalized_backend`
 - `evaluation.evaluate_failure_campaign`
 - `evaluation.evaluate_matching`
@@ -437,24 +526,50 @@ The repository also contains dedicated scripts for:
 
 These scripts can be run individually from the project root with `python -m ...`.
 
+### 8.5 Distributed RQ2 campaign
+
+```bash
+python -m evaluation.evaluate_distributed_testbed
+```
+
+The committed campaign uses 1, 2, 4, 8, 16, and 32 competing clients across
+five versioned network/fault profiles. For a short local installation check,
+add `--quick`. The complete method, archive layout, interpretation boundary,
+and figure-regeneration command are documented in
+`docs/distributed-testbed.md`.
+
+### 8.6 University of Lübeck AI-Lab dry-run evaluation
+
+```bash
+python -m evaluation.evaluate_ai_lab_agent --confirm-network
+```
+
+This performs two LLM planning cases against the University AI-Lab and
+consumes provider budget units. Both cases remain dry runs and execute no PNN
+substrate. Results are explicitly labeled as AI-Lab inference evidence, not
+PNN evidence. See `docs/ai-lab-agent.md`.
+
 ---
 
 ## 9. Agent-based access
 
-The repository provides two minimal agent clients on top of `phys-MCP`:
+The repository provides three minimal agent clients on top of `phys-MCP`:
 
 - **Gemini-based agent**
 - **Ollama-based agent**
+- **University of Lübeck AI-Lab agent**
 
-Both agents follow the same principle:
+All three agents follow the same constrained flow:
 
-1. discover resources through `phys-MCP`
-2. ask an LLM to produce a structured execution plan
-3. execute that plan only through the `phys-MCP` orchestrator
-4. summarize the result and telemetry in natural language
+1. discover sanitized resources and compatible server-owned presets
+2. ask an LLM to choose `resource_id`, `preset_id`, and `dry_run`
+3. validate the plan with an extra-fields-forbidden schema
+4. call only the high-level MCP service operations
+5. summarize a sanitized result
 
-The agents do **not** call backend APIs such as Cortical Labs directly.  
-`phys-MCP` remains the sole control plane.
+The agents do not construct arbitrary `TaskRequest` objects and do not call
+backend APIs such as Cortical Labs directly. `phys-MCP` remains the sole
+control plane. Both examples default to dry-run behavior.
 
 ### 9.1 Gemini agent
 
@@ -501,16 +616,47 @@ python -m agent.ollama_agent
 
 This agent is the preferred free and local option for immediate experimentation.
 
-### 9.3 Current scope
+### 9.3 University of Lübeck AI-Lab agent
+
+Expected location:
+
+```text
+agent/ai_lab_agent.py
+```
+
+The client uses the provider's OpenAI-compatible LiteLLM endpoint. It pins
+credentials to the official HTTPS host and uses the same strict plan schema
+and constrained executor as the other agents. Configuration and the explicitly
+networked dry-run evaluation are documented in `docs/ai-lab-agent.md`.
+
+```bash
+python -m agent.ai_lab_agent
+```
+
+### 9.4 Current scope
 
 The current agent implementations are intentionally minimal. They focus on:
 
-- backend discovery
-- structured planning
-- directed execution against the Cortical Labs path
-- concise result summarization
+- resource and preset discovery
+- strictly bounded planning
+- dry-run admission checks or one fixed reserve–prepare–run sequence
+- concise sanitized result summarization
 
 They are operational demonstrations of **agent-facing control-plane access**, not full autonomous multi-agent systems.
+
+### 9.5 MCP server
+
+Run the official MCP 1.x stdio binding with:
+
+```bash
+python -m mcp_surface.server
+```
+
+It publishes exactly ten tools and is unauthenticated and unscoped by default.
+Configure the server-owned principal and scopes through the variables shown
+above. The optional CL adapter remains one scenario and is disabled by default
+for the stdio server; enabling it does not bypass runtime attestation or human
+approval.
 
 ---
 
@@ -528,7 +674,44 @@ For the Cortical Labs adapter specifically:
 pytest tests/test_cortical_labs_adapter.py -q
 ```
 
-The tests validate descriptor structure, adapter behavior, and integration assumptions. They complement, but do not replace, the real simulator runs.
+The tests validate descriptor structure, adapter behaviour, and integration assumptions. `pytest.ini` restricts default collection to `tests/`; scripts capable of stimulation are deliberately excluded.
+
+The A4 security tests additionally validate malformed and hostile MCP calls,
+server-side authorization, dry-run non-commitment, append-only audit integrity,
+sanitized outputs, and external approval. They use only local simulators and
+test doubles.
+
+### 10.2 Adapter conformance
+
+```bash
+pytest tests/test_adapter_conformance.py -q
+```
+
+This validates the A5 control-adapter/runtime split for local twins, the
+same-host HTTP backend, the optional CL simulator path, capability
+declarations, and operation without any CL module. Core evaluations publish a
+versioned backend matrix and each retains at least one non-CL backend.
+
+### 10.3 Distributed-testbed validation
+
+```bash
+pytest tests/test_distributed_testbed.py -q
+```
+
+These tests validate the versioned topology and profile matrix, seeded fault
+decisions, trace propagation through bounded worker threads, metric
+aggregation, and a real four-process smoke campaign with manifest checksum
+verification.
+
+### 10.4 Resource-contract validation
+
+```bash
+python scripts/validate_resource_contract.py examples/resource-contract-v1.0/valid-chemical-synthetic-twin.json
+```
+
+The canonical Draft 2020-12 JSON Schema is stored under `schemas/`, with
+cross-substrate valid, invalid, and conservatively inadmissible examples under
+`examples/resource-contract-v1.0/`.
 
 ---
 
@@ -541,7 +724,7 @@ This is the low-level client wrapper around the CL SDK. It handles:
 
 - session open/close
 - simple stimulation/recording cycles
-- health/readiness retrieval
+- session readiness and runtime-kind attestation
 - recording artifact normalization
 
 ### `adapters/cortical_labs_adapter.py`
@@ -557,35 +740,33 @@ This separation keeps backend-specific API handling in the client and control-pl
 ## 12. How the agent integrations work
 
 ### Planning
-The LLM receives:
-- a planning prompt
-- a user goal
-
-It returns structured JSON such as:
+The LLM receives a user goal plus sanitized discovery data. It can choose only
+a compatible server-owned preset and resource:
 
 ```json
 {
-  "action": "run_cortical_screen",
+  "action": "prepare_assay",
   "arguments": {
-    "preferred_backend_id": "cortical-labs-backend",
-    "channel": 24,
-    "amplitude": 0.6,
-    "observation_window_ms": 100,
-    "pre_delay_ms": 10,
-    "allow_fallback": false,
-    "human_supervision_available": true
+    "resource_id": "cortical-labs-backend",
+    "preset_id": "cl_pattern_discrimination_v1",
+    "dry_run": true
   },
   "rationale": "..."
 }
 ```
 
 ### Execution
-The agent converts this plan into a `phys-MCP` task and calls the orchestrator.
+The shared constrained executor validates the plan and calls the MCP service.
+For a dry run it performs no reservation, lifecycle change, run creation, or
+adapter invocation. For explicit execution it performs one fixed
+reserve–prepare–run sequence. Preset internals remain server-owned.
 
 ### Summarization
-The LLM then receives the structured result and telemetry and produces a short human-readable explanation.
+The LLM receives a sanitized result without raw recordings, raw substrate
+output, or physical control parameters.
 
-This keeps the LLM in a **planning and summarization role**, while all actual backend control remains in `phys-MCP`.
+This keeps the LLM in a planning and summarization role. The approval issuer
+for physical wetware is deliberately external to MCP.
 
 ---
 
@@ -608,6 +789,12 @@ or, for the free local agent path:
 python -m agent.ollama_agent
 ```
 
+or, through the University AI-Lab:
+
+```bash
+python -m agent.ai_lab_agent
+```
+
 If the first two scripts fail, there is no point debugging the adapter or the agents yet.
 
 ---
@@ -621,8 +808,9 @@ This repository is a research prototype and should be interpreted accordingly.
 - task matching and directed execution
 - telemetry-aware control
 - an externalized remote backend path
-- a real API-backed Cortical Labs integration path
-- working Gemini- and Ollama-based agents on top of `phys-MCP`
+- an attested Cortical Labs integration path, currently demonstrated with the CL SDK Simulator
+- working Gemini-, Ollama-, and University AI-Lab-based agents on top of
+  `phys-MCP`
 
 ### What it does not claim
 - production readiness
@@ -632,8 +820,8 @@ This repository is a research prototype and should be interpreted accordingly.
 - complete support for all physical substrate classes
 
 The Cortical Labs integration should currently be understood as:
-- a real wetware-facing API path
-- successfully exercised end to end
+- an API-compatible E3 CL SDK Simulator path in the verified v3.0 evidence
+- capable of targeting physical hardware only when that runtime is explicitly attested
 - useful for research and demonstration
 - still narrow in scope
 
@@ -671,6 +859,17 @@ Check:
 - `OLLAMA_MODEL`
 - whether the Cortical Labs demo already works independently
 
+### If the AI-Lab agent fails
+
+Check:
+
+- University network/VPN connectivity
+- `AI_LAB_API_KEY`
+- `AI_LAB_MODEL` against the current `/v1/models` response
+- the remaining weekly provider budget
+- that the official endpoint remains
+  `https://llm-api.ai-lab.uni-luebeck.de`
+
 ---
 
 ## 16. Summary
@@ -680,9 +879,10 @@ Check:
 Its current strengths are:
 
 - coherent substrate-aware control semantics
-- a working real API-backed Cortical Labs path
-- reproducible runtime evaluation of that path
-- and minimal but functional Gemini- and Ollama-based agents on top of the same control plane
+- an attested Cortical Labs CL SDK integration path
+- reproducible SDK Simulator evaluation of that path
+- and minimal but functional Gemini-, Ollama-, and University AI-Lab-based
+  agents on top of the same control plane
 
 That makes the repository useful both as:
 

@@ -17,7 +17,6 @@ def bootstrap_project_root() -> Path:
 PROJECT_ROOT = bootstrap_project_root()
 
 from adapters.chemical_adapter import ChemicalAdapter
-from adapters.cortical_labs_adapter import CorticalLabsAdapter
 from adapters.edge_adapter import EdgeAdapter
 from adapters.remote_edge_adapter import RemoteEdgeAdapter
 from adapters.wetware_adapter import WetwareAdapter
@@ -51,6 +50,8 @@ def build_live_target_orchestrator(
     """Create an orchestrator with optional live-target adapters."""
     orchestrator = build_extended_orchestrator(remote_base_url=remote_base_url)
     if include_cortical_labs:
+        from adapters.cortical_labs_adapter import CorticalLabsAdapter
+
         orchestrator.register_adapter(CorticalLabsAdapter())
     return orchestrator
 

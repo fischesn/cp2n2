@@ -31,12 +31,37 @@ class OutputPreference(str, Enum):
     TELEMETRY_AWARE_RESULT = "telemetry_aware_result"
 
 
+class SelectionPolicy(str, Enum):
+    """Reproducible policies for ranking resources that passed hard checks."""
+
+    LEXICOGRAPHIC = "lexicographic"
+    LATENCY_FIRST = "latency_first"
+    SAFETY_FRESHNESS_FIRST = "safety_freshness_first"
+    LOCALITY_COST_FIRST = "locality_cost_first"
+    WEIGHTED_COMPARISON = "weighted_comparison"
+    STATIC_PRIORITY = "static_priority"
+    CONSTRAINT_BASED = "constraint_based"
+    RANDOM_ADMISSIBLE = "random_admissible"
+
+
 class TaskRequest(BaseModel):
     """A normalized task request submitted to the phys-MCP orchestrator."""
 
     model_config = ConfigDict(extra="forbid", use_enum_values=True)
 
     task_id: str = Field(..., description="Stable or externally visible task identifier.")
+    client_id: str = Field(
+        default="anonymous",
+        description="Lease and idempotency ownership scope.",
+    )
+    correlation_id: str | None = Field(
+        default=None,
+        description="Optional end-to-end correlation identifier; generated if absent.",
+    )
+    idempotency_key: str | None = Field(
+        default=None,
+        description="Optional client-scoped key for exactly-once orchestration semantics.",
+    )
     task_kind: TaskKind = Field(..., description="Logical task category.")
     summary: str = Field(..., description="Short human-readable description of the requested operation.")
     required_input_modalities: list[SignalModality] = Field(
@@ -51,6 +76,23 @@ class TaskRequest(BaseModel):
         default=1000.0,
         gt=0.0,
         description="Maximum acceptable end-to-end latency in milliseconds.",
+    )
+    max_estimated_cost: float | None = Field(
+        default=None,
+        ge=0.0,
+        description="Optional hard cost ceiling for one invocation.",
+    )
+    cost_currency: str | None = Field(
+        default=None,
+        description="Currency required when max_estimated_cost is set.",
+    )
+    selection_policy: SelectionPolicy = Field(
+        default=SelectionPolicy.LEXICOGRAPHIC,
+        description="Policy used only after admission and feasibility checks pass.",
+    )
+    selection_seed: int = Field(
+        default=7,
+        description="Seed used by the reproducible random-admissible baseline.",
     )
     min_confidence: float = Field(
         default=0.0,
@@ -88,6 +130,50 @@ class TaskRequest(BaseModel):
         default=None,
         description="If set, restrict execution to this concrete backend identifier.",
     )
+    expected_resource_state_version: int | None = Field(
+        default=None,
+        ge=0,
+        description="Optional optimistic-concurrency precondition for a directed backend.",
+    )
+    lease_id: str | None = Field(
+        default=None,
+        description="Optional pre-acquired exclusive lease for a directed backend.",
+    )
+    expected_lease_version: int | None = Field(
+        default=None,
+        ge=0,
+        description="Optional optimistic-concurrency precondition for lease use.",
+    )
+    lease_ttl_ms: float = Field(
+        default=60_000.0,
+        gt=0.0,
+        description="Duration of the exclusive resource lease.",
+    )
+    preparation_timeout_ms: float = Field(
+        default=10_000.0,
+        gt=0.0,
+        description="Maximum wait for backend preparation.",
+    )
+    invocation_timeout_ms: float = Field(
+        default=30_000.0,
+        gt=0.0,
+        description="Maximum wait for substrate invocation.",
+    )
+    validation_timeout_ms: float = Field(
+        default=5_000.0,
+        gt=0.0,
+        description="Maximum wait for postcondition validation.",
+    )
+    abort_timeout_ms: float = Field(
+        default=5_000.0,
+        gt=0.0,
+        description="Maximum wait for an explicit backend abort.",
+    )
+    cooldown_timeout_ms: float = Field(
+        default=5_000.0,
+        gt=0.0,
+        description="Maximum wait for post-execution recovery/cooldown handling.",
+    )
     max_twin_age_ms: float | None = Field(
         default=None,
         gt=0.0,
@@ -106,12 +192,32 @@ class TaskRequest(BaseModel):
         description="Additional application-specific task metadata.",
     )
 
-    @field_validator("task_id", "summary")
+    @field_validator("task_id", "client_id", "summary")
     @classmethod
     def validate_non_empty_strings(cls, value: str) -> str:
         stripped = value.strip()
         if not stripped:
             raise ValueError("task_id and summary must not be empty.")
+        return stripped
+
+    @field_validator("correlation_id", "idempotency_key", "lease_id")
+    @classmethod
+    def validate_optional_identifiers(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("optional identifiers must not be empty when provided.")
+        return stripped
+
+    @field_validator("cost_currency")
+    @classmethod
+    def validate_cost_currency(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        stripped = value.strip().upper()
+        if not stripped:
+            raise ValueError("cost_currency must not be empty when provided.")
         return stripped
 
     @field_validator("direct_backend_id")
@@ -144,6 +250,19 @@ class TaskRequest(BaseModel):
                 "continuous_monitoring_required is not meaningful with a sub-millisecond latency budget "
                 "in this prototype model."
             )
+        if (
+            self.expected_resource_state_version is not None
+            and self.direct_backend_id is None
+        ):
+            raise ValueError(
+                "expected_resource_state_version requires direct_backend_id."
+            )
+        if self.lease_id is not None and self.direct_backend_id is None:
+            raise ValueError("lease_id requires direct_backend_id.")
+        if self.expected_lease_version is not None and self.lease_id is None:
+            raise ValueError("expected_lease_version requires lease_id.")
+        if self.max_estimated_cost is not None and self.cost_currency is None:
+            raise ValueError("max_estimated_cost requires cost_currency.")
         return self
 
     def normalized_task_type(self) -> str:

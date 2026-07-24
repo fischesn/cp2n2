@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from common import PROJECT_ROOT, RESULTS_DIR, save_csv, save_json
+from evaluation.common import PROJECT_ROOT, RESULTS_DIR, save_csv, save_json
 
 from adapters.chemical_adapter import ChemicalAdapter
 from adapters.edge_adapter import EdgeAdapter
@@ -138,10 +138,18 @@ def evaluate() -> dict:
         run_result = orchestrator.execute_task(task)
         rows.append(
             _row_from_result(
-                scenario="telemetry_loss_triggers_fallback",
+                scenario="telemetry_loss_excludes_primary",
                 run_result=run_result,
-                expected_behavior="Fallback to remote backend because primary backend cannot satisfy telemetry contract.",
-                expectation_met=(run_result.success and run_result.decision.used_fallback),
+                expected_behavior=(
+                    "Select the remote backend because feasibility excludes the "
+                    "primary before ranking."
+                ),
+                expectation_met=(
+                    run_result.success
+                    and run_result.decision.selected_backend_id
+                    == "remote-edge-backend"
+                    and not run_result.decision.used_fallback
+                ),
             )
         )
 

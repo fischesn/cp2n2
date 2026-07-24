@@ -1,23 +1,10 @@
-"""Minimal Gemini-based agent for the current phys-MCP prototype.
-
-This version is aligned with the current repository state:
-- resource discovery uses PhysMCPOrchestrator.discover_backends()
-- runtime execution goes only through phys-MCP
-- the agent prefers the Cortical Labs backend but does not call CL APIs directly
-
-Expected location:
-    agent/gemini_agent.py
-
-Expected run command from project root:
-    python -m agent.gemini_agent
-"""
+"""Gemini planner constrained to the A4 phys-MCP tool boundary."""
 
 from __future__ import annotations
 
 import json
 import os
 import sys
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -38,68 +25,14 @@ load_dotenv()
 from google.genai import Client  # noqa: E402
 from google.genai.types import GenerateContentConfig  # noqa: E402
 
-from demos.common import build_live_target_orchestrator, make_cortical_task  # noqa: E402
-
-
-PLANNING_PROMPT = """You are a planner for a phys-MCP control-plane client.
-Return ONLY valid JSON with this schema:
-
-{
-  "action": "run_cortical_screen",
-  "arguments": {
-    "preferred_backend_id": "cortical-labs-backend",
-    "channel": <int>,
-    "amplitude": <float>,
-    "observation_window_ms": <int>,
-    "pre_delay_ms": <int>,
-    "allow_fallback": <bool>,
-    "human_supervision_available": <bool>
-  },
-  "rationale": "<short string>"
-}
-
-Rules:
-- Use action exactly "run_cortical_screen"
-- Prefer backend_id "cortical-labs-backend"
-- Keep amplitude between 0.1 and 1.0
-- Keep channel as a positive integer
-- observation_window_ms between 50 and 500
-- pre_delay_ms between 0 and 100
-- Unless the user explicitly requests otherwise:
-  - allow_fallback = false
-  - human_supervision_available = true
-- Output JSON only, no markdown, no explanation.
-"""
-
-SUMMARY_PROMPT_TEMPLATE = """You are summarizing a phys-MCP execution result.
-
-User goal:
-{user_goal}
-
-Structured plan:
-{plan_json}
-
-Execution result:
-{result_json}
-
-Write a short, technically clear summary for a researcher.
-Mention:
-- whether the run succeeded
-- which backend was used
-- backend latency
-- observation latency
-- recording path if available
-- whether fallback was used
-Keep it to 4-8 sentences.
-"""
-
-
-@dataclass
-class AgentResult:
-    plan: dict[str, Any]
-    resources: list[dict[str, Any]]
-    run_result: dict[str, Any]
-    summary: str
+from agent.constrained_client import (  # noqa: E402
+    AgentResult,
+    ConstrainedAgentExecutor,
+    PLANNING_PROMPT,
+    SUMMARY_PROMPT_TEMPLATE,
+    build_agent_surface,
+)
+from mcp_surface.service import MCPControlSurface  # noqa: E402
 
 
 class PhysMCPGeminiAgent:
@@ -107,24 +40,33 @@ class PhysMCPGeminiAgent:
         self,
         api_key: str | None = None,
         model: str = "gemini-2.5-pro",
+        *,
+        surface: MCPControlSurface | None = None,
+        audit_path: Path | None = None,
     ) -> None:
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
             raise RuntimeError("Missing GEMINI_API_KEY in environment.")
-
         self.client = Client(api_key=self.api_key)
         self.model = model
-        self.orchestrator = build_live_target_orchestrator(include_cortical_labs=True)
+        self.surface = surface or build_agent_surface(
+            principal_id="gemini-agent",
+            audit_path=audit_path
+            or Path(".physmcp") / "gemini-agent-audit.jsonl",
+            include_cortical_labs=True,
+        )
+        self.executor = ConstrainedAgentExecutor(self.surface)
 
     def discover_resources(self) -> list[dict[str, Any]]:
-        return self.orchestrator.discover_backends()
+        return self.executor.discover_resources()
 
     def plan(self, user_goal: str) -> dict[str, Any]:
+        resources = self.discover_resources()
         response = self.client.models.generate_content(
             model=self.model,
             contents=[
                 PLANNING_PROMPT,
-                "",
+                f"Discovered resources: {json.dumps(resources)}",
                 f"User goal: {user_goal}",
             ],
             config=GenerateContentConfig(
@@ -132,52 +74,18 @@ class PhysMCPGeminiAgent:
                 response_mime_type="application/json",
             ),
         )
-        text = response.text or ""
-        return json.loads(text)
+        return json.loads(response.text or "")
 
-    def execute_plan(self, plan: dict[str, Any]) -> dict[str, Any]:
-        action = plan.get("action")
-        if action != "run_cortical_screen":
-            raise RuntimeError(f"Unsupported action: {action!r}")
-
-        args = plan.get("arguments", {})
-
-        task = make_cortical_task(
-            task_id="agent-cortical-run",
-            direct_backend_id=args.get("preferred_backend_id", "cortical-labs-backend"),
-            allow_fallback=bool(args.get("allow_fallback", False)),
+    def execute_plan(
+        self,
+        plan: dict[str, Any],
+        *,
+        approval_token: str | None = None,
+    ) -> dict[str, Any]:
+        return self.executor.execute_plan(
+            plan,
+            approval_token=approval_token,
         )
-
-        task.human_supervision_available = bool(
-            args.get("human_supervision_available", True)
-        )
-        task.metadata["stimulation_pattern"] = {
-            "channels": [int(args.get("channel", 1))],
-            "amplitude": float(args.get("amplitude", 0.4)),
-        }
-        task.metadata["observation_window_ms"] = int(
-            args.get("observation_window_ms", 100)
-        )
-        task.metadata["pre_delay_ms"] = int(args.get("pre_delay_ms", 20))
-
-        run_result = self.orchestrator.execute_task(task)
-        invocation = run_result.invocation
-        payload = invocation.output_payload if invocation is not None else {}
-
-        return {
-            "success": run_result.success,
-            "selected_backend": run_result.decision.selected_backend_id,
-            "used_fallback": run_result.decision.used_fallback,
-            "failure_reason": run_result.failure_reason,
-            "decision_notes": list(run_result.decision.notes or []),
-            "validation_failures": list(run_result.validation_failures or []),
-            "recovery_actions": list(run_result.recovery_actions or []),
-            "execution_latency_ms": getattr(invocation, "execution_latency_ms", None),
-            "confidence": getattr(invocation, "confidence", None),
-            "output_payload": payload,
-            "telemetry_before": run_result.telemetry_before or {},
-            "telemetry_after": run_result.telemetry_after or {},
-        }
 
     def summarize(
         self,
@@ -193,16 +101,19 @@ class PhysMCPGeminiAgent:
         response = self.client.models.generate_content(
             model=self.model,
             contents=prompt,
-            config=GenerateContentConfig(
-                temperature=0.2,
-            ),
+            config=GenerateContentConfig(temperature=0.2),
         )
         return (response.text or "").strip()
 
-    def run(self, user_goal: str) -> AgentResult:
+    def run(
+        self,
+        user_goal: str,
+        *,
+        approval_token: str | None = None,
+    ) -> AgentResult:
         resources = self.discover_resources()
         plan = self.plan(user_goal)
-        run_result = self.execute_plan(plan)
+        run_result = self.execute_plan(plan, approval_token=approval_token)
         summary = self.summarize(user_goal, plan, run_result)
         return AgentResult(
             plan=plan,
@@ -214,25 +125,11 @@ class PhysMCPGeminiAgent:
 
 def main() -> None:
     user_goal = (
-        "Probe whether the cultured network produces a stable response under a "
-        "candidate stimulation pattern. Prefer Cortical Labs. Use a short "
-        "observation window and do not enable fallback."
+        "Prepare a dry-run plan for the fixed Cortical Labs pattern-"
+        "discrimination preset and report whether it is currently admissible."
     )
-
-    agent = PhysMCPGeminiAgent()
-    result = agent.run(user_goal)
-
-    print("=" * 80)
-    print("Gemini phys-MCP agent result")
-    print("=" * 80)
-    print("\nPlan:")
-    print(json.dumps(result.plan, indent=2))
-    print("\nDiscovered resources:")
-    print(json.dumps(result.resources, indent=2)[:4000])
-    print("\nExecution result:")
-    print(json.dumps(result.run_result, indent=2))
-    print("\nSummary:")
-    print(result.summary)
+    result = PhysMCPGeminiAgent().run(user_goal)
+    print(json.dumps(result.__dict__, indent=2))
 
 
 if __name__ == "__main__":

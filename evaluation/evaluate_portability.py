@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from common import RESULTS_DIR, PROJECT_ROOT, save_csv, save_json
-from plots import save_bar_chart
+from evaluation.common import RESULTS_DIR, PROJECT_ROOT, save_csv, save_json
+from evaluation.plots import save_bar_chart
 
 from adapters.cortical_labs_adapter import CorticalLabsAdapter
 from demos.common import (

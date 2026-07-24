@@ -5,6 +5,7 @@ from adapters.fault_injecting_adapter import FaultInjectingAdapter, FaultProfile
 from demos.common import build_default_orchestrator, build_extended_orchestrator, make_edge_task, make_wetware_task
 from evaluation.common import PROJECT_ROOT
 from remote.service_controller import start_remote_edge_service
+from descriptors.resource_contract import assess_contract_admission
 
 
 def test_unsupervised_wetware_task_is_rejected() -> None:
@@ -31,5 +32,11 @@ def test_prepare_failure_uses_remote_fallback() -> None:
         assert result.success
         assert result.decision.used_fallback
         assert result.decision.selected_backend_id == "remote-edge-backend"
+        remote_contract = orchestrator.registry.get_adapter(
+            "remote-edge-backend"
+        ).resource_contract()
+        assert remote_contract.evidence.runtime_kind == "same_host_service"
+        assert remote_contract.evidence.evidence_level == "E2"
+        assert assess_contract_admission(remote_contract).admissible
     finally:
         service.stop()

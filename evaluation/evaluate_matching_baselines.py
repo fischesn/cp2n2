@@ -2,18 +2,18 @@
 
 from __future__ import annotations
 
-import random
 from dataclasses import dataclass
 from typing import Callable
 
-from common import PROJECT_ROOT, RESULTS_DIR, save_csv, save_json
+from evaluation.common import PROJECT_ROOT, RESULTS_DIR, save_csv, save_json
 
 from adapters.chemical_adapter import ChemicalAdapter
 from adapters.edge_adapter import EdgeAdapter
 from adapters.fault_injecting_adapter import FaultInjectingAdapter, FaultProfile
 from adapters.wetware_adapter import WetwareAdapter
 from core.matcher import BackendMatcher
-from core.task_model import TaskRequest
+from core.orchestrator import PhysMCPOrchestrator
+from core.task_model import SelectionPolicy, TaskRequest
 from demos.common import (
     build_extended_orchestrator,
     make_chemical_task,
@@ -60,42 +60,43 @@ def _stale_chemical_orchestrator(remote_base_url: str):
     return orchestrator
 
 
-def _simple_candidates(task: TaskRequest, orchestrator) -> list:
-    descriptors = orchestrator.registry.list_descriptors()
-    if task.direct_backend_id is not None:
-        descriptors = [d for d in descriptors if d.backend_id == task.direct_backend_id]
-    supported = []
-    required_modalities = {str(modality) for modality in task.required_input_modalities}
-    for descriptor in descriptors:
-        supported_modalities = {str(contract.modality) for contract in descriptor.input_contracts}
-        if descriptor.supports_task_type(task.normalized_task_type()) and required_modalities.intersection(supported_modalities):
-            supported.append(descriptor)
-    return supported
-
-
-def _select_random(task: TaskRequest, orchestrator) -> str | None:
-    candidates = _simple_candidates(task, orchestrator)
-    if not candidates:
-        return None
-    rng = random.Random(7)
-    return rng.choice(sorted(candidates, key=lambda item: item.backend_id)).backend_id
-
-
-def _select_modality_only(task: TaskRequest, orchestrator) -> str | None:
-    candidates = sorted(_simple_candidates(task, orchestrator), key=lambda item: item.backend_id)
-    return candidates[0].backend_id if candidates else None
-
-
-def _select_latency_only(task: TaskRequest, orchestrator) -> str | None:
-    candidates = _simple_candidates(task, orchestrator)
-    if not candidates:
-        return None
-    return min(candidates, key=lambda item: item.timing.typical_latency_ms).backend_id
-
-
-def _select_physmcp(task: TaskRequest, orchestrator) -> str | None:
-    best = orchestrator.plan_task(task).best_candidate()
+def _select_with_policy(
+    task: TaskRequest,
+    orchestrator,
+    policy: SelectionPolicy,
+) -> str | None:
+    planned_task = task.model_copy(update={"selection_policy": policy})
+    best = orchestrator.plan_task(planned_task).best_candidate()
     return best.backend_id if best is not None else None
+
+
+def _selector(policy: SelectionPolicy):
+    return lambda task, orchestrator: _select_with_policy(
+        task,
+        orchestrator,
+        policy,
+    )
+
+
+def _select_static_priority(task: TaskRequest, orchestrator) -> str | None:
+    """Apply one fixed order independent of task preferences."""
+    static_matcher = BackendMatcher(
+        static_priority=[
+            "remote-edge-backend",
+            "edge-backend",
+            "wetware-backend",
+            "chemical-backend",
+        ]
+    )
+    static_orchestrator = PhysMCPOrchestrator(
+        registry=orchestrator.registry,
+        matcher=static_matcher,
+    )
+    return _select_with_policy(
+        task,
+        static_orchestrator,
+        SelectionPolicy.STATIC_PRIORITY,
+    )
 
 
 def evaluate() -> dict:
@@ -151,10 +152,15 @@ def evaluate() -> dict:
         ]
 
         selectors = {
-            "random_admissible": _select_random,
-            "modality_only": _select_modality_only,
-            "latency_only": _select_latency_only,
-            "physmcp_full": _select_physmcp,
+            "static_priority": _select_static_priority,
+            "constraint_based": _selector(SelectionPolicy.CONSTRAINT_BASED),
+            "random_admissible": _selector(SelectionPolicy.RANDOM_ADMISSIBLE),
+            "weighted_comparison": _selector(
+                SelectionPolicy.WEIGHTED_COMPARISON
+            ),
+            "physmcp_lexicographic": _selector(
+                SelectionPolicy.LEXICOGRAPHIC
+            ),
         }
 
         rows: list[dict] = []
