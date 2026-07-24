@@ -17,3 +17,4 @@ evaluation/results/run-*/
 .venv/
 .vscode/
 .idea/
+.physmcp/

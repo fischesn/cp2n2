@@ -1,22 +1,9 @@
-"""Evaluate the Gemini-based phys-MCP agent.
+"""Evaluate Gemini planning through the constrained A4 phys-MCP surface.
 
-This script performs a small number of agent-driven runs and records:
-
-- the user goal
-- the structured plan returned by Gemini
-- whether execution succeeded
-- which backend was selected
-- whether fallback was used
-- execution latency
-- observation latency
-- recording artifact / recording path
-- readiness and health telemetry after execution
-
-The purpose is not to benchmark LLM quality broadly, but to document that the
-agent-facing control-plane path operates end-to-end in a reproducible way.
-
-Expected location:
-    evaluation/evaluate_gemini_agent.py
+This explicit networked evaluation is not part of the default test suite.
+Every supplied goal requests a dry run. The evaluation never executes a
+substrate, never accepts physical stimulation parameters from the model, and
+never records raw substrate output.
 
 Run from the project root:
     python -m evaluation.evaluate_gemini_agent
@@ -39,78 +26,56 @@ def bootstrap_project_root() -> Path:
 
 
 PROJECT_ROOT = bootstrap_project_root()
-from evaluation.common import RESULTS_DIR  # noqa: E402
 
 from agent.gemini_agent import PhysMCPGeminiAgent  # noqa: E402
+from evaluation.common import RESULTS_DIR  # noqa: E402
 
 
 def build_user_goals() -> list[str]:
     return [
         (
-            "Probe whether the cultured network produces a stable response under a "
-            "candidate stimulation pattern. Prefer Cortical Labs. Use a short "
-            "observation window and do not enable fallback."
+            "Prepare a dry-run plan for the server-owned Cortical Labs pattern "
+            "discrimination preset. Report admissibility and whether real execution "
+            "would require human approval."
         ),
         (
-            "Run a directed Cortical Labs stimulation test with a moderate channel "
-            "index and moderate amplitude. Keep the observation window short and "
-            "avoid fallback."
+            "Without executing any substrate, choose a compatible fixed preset for "
+            "the Cortical Labs simulator and assess it through phys-MCP."
         ),
         (
-            "Test a slightly stronger candidate stimulation through the Cortical Labs "
-            "backend, keeping human supervision enabled and using a short observation "
-            "window."
+            "Prepare a dry-run plan for a fixed edge vector-classification preset."
         ),
         (
-            "Use phys-MCP to run a Cortical Labs screening task with a single channel, "
-            "a compact observation window, and no fallback."
+            "Prepare a dry-run plan for a fixed chemical-sensing preset and report "
+            "the evidence level of the selected resource."
         ),
         (
-            "Execute a short wetware screening task on the Cortical Labs backend and "
-            "summarize the resulting telemetry and recording path."
+            "Prepare a dry-run plan for the fixed generic wetware temporal-probe "
+            "preset. Do not request physical control parameters."
         ),
     ]
 
 
 def summarize_agent_result(user_goal: str, result) -> dict[str, Any]:
     run_result = result.run_result
-    payload = run_result.get("output_payload", {}) or {}
-    telemetry_before = run_result.get("telemetry_before", {}) or {}
-    telemetry_after = run_result.get("telemetry_after", {}) or {}
-    recording_artifact = payload.get("recording_artifact", {}) or {}
-
     return {
         "user_goal": user_goal,
         "plan": result.plan,
         "resources": result.resources,
+        "dry_run": run_result.get("dry_run"),
         "success": run_result.get("success"),
         "selected_backend": run_result.get("selected_backend"),
-        "used_fallback": run_result.get("used_fallback"),
+        "preset_id": run_result.get("preset_id"),
+        "runtime_kind": run_result.get("runtime_kind"),
+        "evidence_level": run_result.get("evidence_level"),
+        "human_approval_required": run_result.get(
+            "human_approval_required"
+        ),
+        "raw_substrate_output_exposed": run_result.get(
+            "raw_substrate_output_exposed"
+        ),
         "failure_reason": run_result.get("failure_reason"),
-        "decision_notes": run_result.get("decision_notes", []),
-        "validation_failures": run_result.get("validation_failures", []),
-        "recovery_actions": run_result.get("recovery_actions", []),
-        "execution_latency_ms": run_result.get("execution_latency_ms"),
-        "confidence": run_result.get("confidence"),
-        "response_fingerprint": payload.get("response_fingerprint"),
-        "stim_channel": payload.get("stim_channel"),
-        "stim_amplitude_ua": payload.get("stim_amplitude_ua"),
-        "observation_window_ms": payload.get("observation_window_ms"),
-        "recording_name": recording_artifact.get("name"),
-        "recording_path": telemetry_after.get("recording_path") or recording_artifact.get("path"),
-        "backend_latency_ms": telemetry_after.get("backend_latency_ms"),
-        "observation_latency_ms": telemetry_after.get("observation_latency_ms"),
-        "readiness_before": telemetry_before.get("readiness_state"),
-        "health_before": telemetry_before.get("health_status"),
-        "readiness_after": telemetry_after.get("readiness_state"),
-        "health_after": telemetry_after.get("health_status"),
-        "runtime_kind": telemetry_after.get("runtime_kind"),
-        "telemetry_source": telemetry_after.get("telemetry_source"),
-        "channel_count": telemetry_after.get("channel_count"),
-        "fps": telemetry_after.get("fps"),
-        "drift_score": telemetry_after.get("drift_score"),
-        "age_of_information_ms": telemetry_after.get("age_of_information_ms"),
-        "sdk_available": telemetry_after.get("sdk_available"),
+        "error_code": run_result.get("error_code"),
         "summary": result.summary,
     }
 
@@ -118,82 +83,60 @@ def summarize_agent_result(user_goal: str, result) -> dict[str, Any]:
 def write_results(rows: list[dict[str, Any]]) -> tuple[Path, Path]:
     json_path = RESULTS_DIR / "gemini_agent_results.json"
     csv_path = RESULTS_DIR / "gemini_agent_results.csv"
-
-    json_path.write_text(json.dumps(rows, indent=2, ensure_ascii=False), encoding="utf-8")
+    json_path.write_text(
+        json.dumps(rows, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
 
     fieldnames = [
         "user_goal",
+        "dry_run",
         "success",
         "selected_backend",
-        "used_fallback",
-        "failure_reason",
-        "execution_latency_ms",
-        "confidence",
-        "response_fingerprint",
-        "stim_channel",
-        "stim_amplitude_ua",
-        "observation_window_ms",
-        "recording_name",
-        "recording_path",
-        "backend_latency_ms",
-        "observation_latency_ms",
-        "readiness_before",
-        "health_before",
-        "readiness_after",
-        "health_after",
+        "preset_id",
         "runtime_kind",
-        "telemetry_source",
-        "channel_count",
-        "fps",
-        "drift_score",
-        "age_of_information_ms",
-        "sdk_available",
+        "evidence_level",
+        "human_approval_required",
+        "raw_substrate_output_exposed",
+        "failure_reason",
+        "error_code",
         "summary",
     ]
-
-    with csv_path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+    with csv_path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         for row in rows:
-            writer.writerow({k: row.get(k) for k in fieldnames})
-
+            writer.writerow({key: row.get(key) for key in fieldnames})
     return json_path, csv_path
 
 
-def print_summary(rows: list[dict[str, Any]], json_path: Path, csv_path: Path) -> None:
-    print()
-    print("=" * 80)
-    print("Gemini agent evaluation summary")
-    print("=" * 80)
-
-    success_count = sum(1 for r in rows if r["success"])
-    print(f"Runs: {len(rows)}")
-    print(f"Successful runs: {success_count}/{len(rows)}")
-
-    for idx, row in enumerate(rows, start=1):
-        print("-" * 80)
+def print_summary(
+    rows: list[dict[str, Any]],
+    json_path: Path,
+    csv_path: Path,
+) -> None:
+    success_count = sum(1 for row in rows if row["success"])
+    dry_run_count = sum(1 for row in rows if row["dry_run"])
+    print("Gemini constrained-agent evaluation")
+    print(
+        f"Admissible plans: {success_count}/{len(rows)}; "
+        f"dry runs: {dry_run_count}/{len(rows)}"
+    )
+    for index, row in enumerate(rows, start=1):
         print(
-            f"run-{idx}: success={row['success']}, "
-            f"backend={row['selected_backend']}, "
-            f"backend_latency_ms={row['backend_latency_ms']}, "
-            f"observation_latency_ms={row['observation_latency_ms']}, "
-            f"recording_path={row['recording_path']}"
+            f"plan-{index}: resource={row['selected_backend']}, "
+            f"preset={row['preset_id']}, admissible={row['success']}"
         )
-
-    print("-" * 80)
     print(f"JSON results: {json_path}")
     print(f"CSV results:  {csv_path}")
 
 
 def main() -> None:
     agent = PhysMCPGeminiAgent()
-    user_goals = build_user_goals()
-
-    rows: list[dict[str, Any]] = []
-    for goal in user_goals:
-        result = agent.run(goal)
-        rows.append(summarize_agent_result(goal, result))
-
+    rows = [
+        summarize_agent_result(goal, agent.run(goal))
+        for goal in build_user_goals()
+    ]
     json_path, csv_path = write_results(rows)
     print_summary(rows, json_path, csv_path)
 
