@@ -1,7 +1,38 @@
 # phys-MCP
 
-This branch develops the accepted post-v3.0 master plan. The immutable `v3.0`
-tag remains the reproducible baseline.
+## Release v4.0
+
+This is the first post-v3.0 release of the phys-MCP research prototype. It
+packages the completed A0-A7 development line: versioned resource contracts,
+lifecycle-aware orchestration, constrained agent access, general adapters,
+distributed evaluation infrastructure, and the University of Lübeck AI-Lab
+agent.
+
+The `v3.0` tag remains the reproducible legacy baseline. v4.0 is still a
+research prototype: simulator, synthetic-twin, and control-plane results must
+not be interpreted as evidence of physical PNN execution unless explicitly
+labelled as such.
+
+### Five-minute quick start
+
+From a fresh clone:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+Copy-Item .env.example .env
+pytest -q
+python -m demos.demo_cortical_labs_adapter
+```
+
+The copied `.env` is local configuration and must not be committed. The quick
+start uses the CL SDK Simulator; it does not contact physical hardware. For
+agent examples, local Ollama or the corresponding API credentials must be
+configured separately. The AI-Lab evaluation additionally requires University
+network/VPN access and an `AI_LAB_API_KEY`; run it only with the explicit
+acknowledgement described in [the AI-Lab guide](docs/ai-lab-agent.md).
 
 `phys-MCP` is a substrate-aware control-plane prototype for exposing heterogeneous **physical neural network (PNN)** resources as discoverable, invocable, and monitorable software-visible backends.
 
