@@ -13,7 +13,8 @@ This repository contains:
 - representative local prototype backends for chemical, wetware, and fast edge-style execution
 - an externalized remote edge backend path
 - an attested integration path for the **Cortical Labs CL API / CL SDK**
-- minimal **Gemini-based** and **Ollama-based** agents that plan and execute tasks through `phys-MCP`
+- minimal **Gemini-based**, **Ollama-based**, and **University of Lübeck
+  AI-Lab-based** agents that plan and execute tasks through `phys-MCP`
 - demos, tests, and evaluation scripts
 
 The current code base should be understood as a **research prototype**: it is operational, structured, and demonstrable, but not a production runtime.
@@ -387,6 +388,11 @@ GEMINI_API_KEY=YOUR_KEY_HERE
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=qwen2.5:7b-instruct
 
+# University of Lübeck AI-Lab
+AI_LAB_API_KEY=YOUR_PERSONAL_KEY
+AI_LAB_BASE_URL=https://llm-api.ai-lab.uni-luebeck.de
+AI_LAB_MODEL=minimax-m2.7
+
 # Constrained MCP server (fail-closed if principal or scopes are absent)
 PHYSMCP_PRINCIPAL_ID=research-agent
 PHYSMCP_SCOPES=resources:read,leases:write,assays:prepare,assays:execute,runs:abort
@@ -510,6 +516,7 @@ and is not part of the default test suite.
 The repository also contains dedicated scripts for:
 
 - `evaluation.evaluate_distributed_testbed`
+- `evaluation.evaluate_ai_lab_agent` (explicit network acknowledgement required)
 - `evaluation.evaluate_externalized_backend`
 - `evaluation.evaluate_failure_campaign`
 - `evaluation.evaluate_matching`
@@ -531,16 +538,28 @@ add `--quick`. The complete method, archive layout, interpretation boundary,
 and figure-regeneration command are documented in
 `docs/distributed-testbed.md`.
 
+### 8.6 University of Lübeck AI-Lab dry-run evaluation
+
+```bash
+python -m evaluation.evaluate_ai_lab_agent --confirm-network
+```
+
+This performs two LLM planning cases against the University AI-Lab and
+consumes provider budget units. Both cases remain dry runs and execute no PNN
+substrate. Results are explicitly labeled as AI-Lab inference evidence, not
+PNN evidence. See `docs/ai-lab-agent.md`.
+
 ---
 
 ## 9. Agent-based access
 
-The repository provides two minimal agent clients on top of `phys-MCP`:
+The repository provides three minimal agent clients on top of `phys-MCP`:
 
 - **Gemini-based agent**
 - **Ollama-based agent**
+- **University of Lübeck AI-Lab agent**
 
-Both agents follow the same constrained flow:
+All three agents follow the same constrained flow:
 
 1. discover sanitized resources and compatible server-owned presets
 2. ask an LLM to choose `resource_id`, `preset_id`, and `dry_run`
@@ -597,7 +616,24 @@ python -m agent.ollama_agent
 
 This agent is the preferred free and local option for immediate experimentation.
 
-### 9.3 Current scope
+### 9.3 University of Lübeck AI-Lab agent
+
+Expected location:
+
+```text
+agent/ai_lab_agent.py
+```
+
+The client uses the provider's OpenAI-compatible LiteLLM endpoint. It pins
+credentials to the official HTTPS host and uses the same strict plan schema
+and constrained executor as the other agents. Configuration and the explicitly
+networked dry-run evaluation are documented in `docs/ai-lab-agent.md`.
+
+```bash
+python -m agent.ai_lab_agent
+```
+
+### 9.4 Current scope
 
 The current agent implementations are intentionally minimal. They focus on:
 
@@ -608,7 +644,7 @@ The current agent implementations are intentionally minimal. They focus on:
 
 They are operational demonstrations of **agent-facing control-plane access**, not full autonomous multi-agent systems.
 
-### 9.4 MCP server
+### 9.5 MCP server
 
 Run the official MCP 1.x stdio binding with:
 
@@ -753,6 +789,12 @@ or, for the free local agent path:
 python -m agent.ollama_agent
 ```
 
+or, through the University AI-Lab:
+
+```bash
+python -m agent.ai_lab_agent
+```
+
 If the first two scripts fail, there is no point debugging the adapter or the agents yet.
 
 ---
@@ -767,7 +809,8 @@ This repository is a research prototype and should be interpreted accordingly.
 - telemetry-aware control
 - an externalized remote backend path
 - an attested Cortical Labs integration path, currently demonstrated with the CL SDK Simulator
-- working Gemini- and Ollama-based agents on top of `phys-MCP`
+- working Gemini-, Ollama-, and University AI-Lab-based agents on top of
+  `phys-MCP`
 
 ### What it does not claim
 - production readiness
@@ -816,6 +859,17 @@ Check:
 - `OLLAMA_MODEL`
 - whether the Cortical Labs demo already works independently
 
+### If the AI-Lab agent fails
+
+Check:
+
+- University network/VPN connectivity
+- `AI_LAB_API_KEY`
+- `AI_LAB_MODEL` against the current `/v1/models` response
+- the remaining weekly provider budget
+- that the official endpoint remains
+  `https://llm-api.ai-lab.uni-luebeck.de`
+
 ---
 
 ## 16. Summary
@@ -827,7 +881,8 @@ Its current strengths are:
 - coherent substrate-aware control semantics
 - an attested Cortical Labs CL SDK integration path
 - reproducible SDK Simulator evaluation of that path
-- and minimal but functional Gemini- and Ollama-based agents on top of the same control plane
+- and minimal but functional Gemini-, Ollama-, and University AI-Lab-based
+  agents on top of the same control plane
 
 That makes the repository useful both as:
 
