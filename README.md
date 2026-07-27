@@ -1,5 +1,8 @@
 # phys-MCP
 
+The accepted scope, evidence boundaries, completed work, and gated next steps
+are maintained in the versioned [project master plan](docs/project-masterplan.md).
+
 ## Release v4.0
 
 This is the first post-v3.0 release of the phys-MCP research prototype. It
