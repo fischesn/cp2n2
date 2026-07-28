@@ -3,7 +3,7 @@
 ## Purpose and scope
 
 The Physical Neural Resource Contract (PNRC) is the substrate-neutral
-publication format used by phys-MCP. It describes what a resource is, what it
+publication format used by CP²N². It describes what a resource is, what it
 can do, what runtime is actually active, what is known about its current state,
 and which operations may be admitted.
 
@@ -80,7 +80,7 @@ contains these keys:
 | `unit` | Explicit unit, or `null` if no unit is known; `null` does not imply dimensionless |
 | `source` | Exactly one of `observed`, `provider_reported`, `estimated`, or `configured` |
 | `observed_at` | Time the value was observed; may be `null` only for configured values |
-| `received_at` | Time phys-MCP received or constructed the observation |
+| `received_at` | Time CP²N² received or constructed the observation |
 | `uncertainty` | Explicit uncertainty kind; unknown uncertainty is not encoded as zero |
 | `valid_until` | Optional validity horizon; an expired value is stale |
 

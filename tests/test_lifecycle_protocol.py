@@ -10,7 +10,7 @@ from adapters.edge_adapter import EdgeAdapter
 from core.errors import ControlPlaneErrorCode, ControlPlaneException
 from core.leases import InMemoryLeaseStore
 from core.lifecycle import ALLOWED_TRANSITIONS, LifecycleStore
-from core.orchestrator import PhysMCPOrchestrator
+from core.orchestrator import CP2N2Orchestrator
 from demos.common import make_edge_task
 from descriptors.resource_contract import ResourceLifecycleState
 
@@ -28,7 +28,7 @@ def _ready_lifecycle(resource_id: str = "resource") -> LifecycleStore:
 
 
 def test_happy_path_follows_the_normative_lifecycle() -> None:
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(EdgeAdapter())
     task = make_edge_task(task_id="lifecycle-happy")
     task.allow_fallback = False
@@ -193,7 +193,7 @@ class SlowValidationTelemetryAdapter(EdgeAdapter):
 
 def test_idempotency_replays_result_without_second_invocation() -> None:
     adapter = CountingEdgeAdapter()
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(adapter)
     task = make_edge_task(task_id="idempotent")
     task.client_id = "client-a"
@@ -212,7 +212,7 @@ def test_idempotency_replays_result_without_second_invocation() -> None:
 
 def test_reusing_idempotency_key_for_different_request_is_rejected() -> None:
     adapter = CountingEdgeAdapter()
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(adapter)
     first_task = make_edge_task(task_id="idempotency-conflict")
     first_task.client_id = "client-a"
@@ -232,16 +232,16 @@ def test_reusing_idempotency_key_for_different_request_is_rejected() -> None:
 
 def test_competing_orchestrator_clients_cannot_invoke_concurrently() -> None:
     adapter = SlowEdgeAdapter(delay_seconds=0.15)
-    first_orchestrator = PhysMCPOrchestrator()
+    first_orchestrator = CP2N2Orchestrator()
     first_orchestrator.register_adapter(adapter)
-    second_orchestrator = PhysMCPOrchestrator(
+    second_orchestrator = CP2N2Orchestrator(
         registry=first_orchestrator.registry
     )
     barrier = threading.Barrier(2)
     results = []
     lock = threading.Lock()
 
-    def execute(client_id: str, orchestrator: PhysMCPOrchestrator) -> None:
+    def execute(client_id: str, orchestrator: CP2N2Orchestrator) -> None:
         task = make_edge_task(task_id=f"race-{client_id}")
         task.client_id = client_id
         task.allow_fallback = False
@@ -274,7 +274,7 @@ def test_competing_orchestrator_clients_cannot_invoke_concurrently() -> None:
 
 def test_explicit_reservation_renewal_ownership_and_execution() -> None:
     adapter = CountingEdgeAdapter()
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(adapter)
 
     reservation = orchestrator.reserve_backend(
@@ -322,7 +322,7 @@ def test_explicit_reservation_renewal_ownership_and_execution() -> None:
 
 
 def test_unused_lease_release_updates_published_contract_state() -> None:
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(EdgeAdapter())
     reservation = orchestrator.reserve_backend(
         "edge-backend",
@@ -360,7 +360,7 @@ def test_unused_lease_release_updates_published_contract_state() -> None:
 
 def test_invocation_timeout_never_becomes_silent_success() -> None:
     adapter = SlowEdgeAdapter(delay_seconds=0.15)
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(adapter)
     task = make_edge_task(task_id="timeout")
     task.allow_fallback = False
@@ -381,7 +381,7 @@ def test_invocation_timeout_never_becomes_silent_success() -> None:
 
 
 def test_preparation_timeout_has_its_own_error_and_uncertain_state() -> None:
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(SlowPrepareAdapter())
     task = make_edge_task(task_id="prepare-timeout")
     task.allow_fallback = False
@@ -397,7 +397,7 @@ def test_preparation_timeout_has_its_own_error_and_uncertain_state() -> None:
 
 
 def test_validation_timeout_cannot_be_reported_as_execution_success() -> None:
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(SlowValidationTelemetryAdapter())
     task = make_edge_task(task_id="validation-timeout")
     task.allow_fallback = False
@@ -413,7 +413,7 @@ def test_validation_timeout_cannot_be_reported_as_execution_success() -> None:
 
 def test_explicit_abort_and_reconciliation_restore_known_state() -> None:
     adapter = AbortableEdgeAdapter(delay_seconds=0.2)
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(adapter)
     lifecycle = orchestrator.registry.lifecycle_store
     ready = lifecycle.snapshot("edge-backend")
@@ -455,7 +455,7 @@ def test_explicit_abort_and_reconciliation_restore_known_state() -> None:
 
 def test_timeout_state_can_only_recover_through_explicit_reconciliation() -> None:
     adapter = SlowEdgeAdapter(delay_seconds=0.08)
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(adapter)
     task = make_edge_task(task_id="reconcile-timeout")
     task.allow_fallback = False
@@ -478,7 +478,7 @@ def test_timeout_state_can_only_recover_through_explicit_reconciliation() -> Non
 
 def test_directed_request_can_require_resource_state_version() -> None:
     adapter = CountingEdgeAdapter()
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(adapter)
     task = make_edge_task(task_id="stale-state-version")
     task.direct_backend_id = "edge-backend"

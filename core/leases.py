@@ -1,4 +1,4 @@
-"""Thread-safe, time-bounded exclusive leases for phys-MCP resources."""
+"""Thread-safe, time-bounded exclusive leases for CP²N² resources."""
 
 from __future__ import annotations
 

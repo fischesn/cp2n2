@@ -1,4 +1,4 @@
-"""Ollama planner constrained to the A4 phys-MCP tool boundary."""
+"""Ollama planner constrained to the A4 CP²N² tool boundary."""
 
 from __future__ import annotations
 
@@ -73,7 +73,7 @@ class OllamaClient:
         return response.json()
 
 
-class PhysMCPOllamaAgent:
+class CP2N2OllamaAgent:
     def __init__(
         self,
         model: str | None = None,
@@ -86,7 +86,7 @@ class PhysMCPOllamaAgent:
         self.surface = surface or build_agent_surface(
             principal_id="ollama-agent",
             audit_path=audit_path
-            or Path(".physmcp") / "ollama-agent-audit.jsonl",
+            or Path(".cp2n2") / "ollama-agent-audit.jsonl",
             include_cortical_labs=True,
         )
         self.executor = ConstrainedAgentExecutor(self.surface)
@@ -145,8 +145,12 @@ class PhysMCPOllamaAgent:
         )
 
 
+# Backward-compatible import for pre-rename clients.
+PhysMCPOllamaAgent = CP2N2OllamaAgent
+
+
 def main() -> None:
-    agent = PhysMCPOllamaAgent()
+    agent = CP2N2OllamaAgent()
     print(json.dumps(agent.llm.healthcheck(), indent=2)[:3000])
     result = agent.run(
         "Prepare a dry-run plan for a compatible server-owned assay preset."

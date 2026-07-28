@@ -1,4 +1,4 @@
-"""Abstract adapter interface for phys-MCP backend integrations."""
+"""Abstract adapter interface for CP²N² backend integrations."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ from runtimes.base_runtime import SubstrateRuntime
 
 
 class BaseAdapter:
-    """Common adapter interface used by the phys-MCP control plane.
+    """Common adapter interface used by the CP²N² control plane.
 
     Each concrete adapter translates generic control-plane operations into the
     substrate-specific behavior of one backend or one digital twin.
@@ -51,7 +51,7 @@ class BaseAdapter:
         runtime: SubstrateRuntime,
         capability_declaration: AdapterCapabilityDeclaration,
         runtime_kind: RuntimeKind = RuntimeKind.SYNTHETIC_TWIN,
-        provider_id: str = "phys-mcp",
+        provider_id: str = "cp2n2",
         hardware_id: str | None = None,
         attestation_method: str = "in_process_adapter_construction",
         telemetry_source: ObservationSource = ObservationSource.ESTIMATED,

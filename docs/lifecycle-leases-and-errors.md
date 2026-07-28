@@ -2,7 +2,7 @@
 
 ## Scope
 
-A2 turns the phys-MCP invocation path into an explicit execution protocol.
+A2 turns the CP²N² invocation path into an explicit execution protocol.
 Every state-changing request is correlated, every execution owns a
 time-bounded exclusive lease, and every lifecycle transition carries an
 optimistic-concurrency version.
@@ -82,7 +82,7 @@ preserving the same interface and version semantics.
 - `idempotency_key`;
 - expected resource and lease versions.
 
-If no correlation ID is supplied, phys-MCP creates one. The ID is attached to
+If no correlation ID is supplied, CP²N² creates one. The ID is attached to
 all lifecycle transitions for the run.
 
 Idempotency keys are scoped by client. Repeating the same completed request

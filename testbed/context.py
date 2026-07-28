@@ -5,14 +5,14 @@ from __future__ import annotations
 from contextvars import ContextVar, Token
 
 
-TRACE_ID_HEADER = "X-PhysMCP-Trace-ID"
-PARENT_SPAN_HEADER = "X-PhysMCP-Parent-Span-ID"
+TRACE_ID_HEADER = "X-CP2N2-Trace-ID"
+PARENT_SPAN_HEADER = "X-CP2N2-Parent-Span-ID"
 
 current_trace_id: ContextVar[str | None] = ContextVar(
-    "physmcp_trace_id", default=None
+    "cp2n2_trace_id", default=None
 )
 current_parent_span_id: ContextVar[str | None] = ContextVar(
-    "physmcp_parent_span_id", default=None
+    "cp2n2_parent_span_id", default=None
 )
 
 

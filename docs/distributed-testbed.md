@@ -2,7 +2,7 @@
 
 ## Scope
 
-The A6 testbed evaluates the generic phys-MCP control plane across explicit
+The A6 testbed evaluates the generic CP²N² control plane across explicit
 process boundaries. It does not require Cortical Labs software or hardware and
 does not make biological or physical-hardware claims.
 
@@ -44,7 +44,7 @@ five-second age against a one-second task bound.
 ## Trace and metric model
 
 The agent generates one stable trace identifier per matrix cell and request.
-`X-PhysMCP-Trace-ID` and `X-PhysMCP-Parent-Span-ID` propagate it through the
+`X-CP2N2-Trace-ID` and `X-CP2N2-Parent-Span-ID` propagate it through the
 gateway, control plane, timeout worker threads, and adapter HTTP calls. Each
 process writes append-only JSONL spans containing:
 

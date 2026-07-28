@@ -1,4 +1,4 @@
-"""Fast edge backend adapter for the phys-MCP prototype."""
+"""Fast edge backend adapter for the CP²N² prototype."""
 
 from __future__ import annotations
 

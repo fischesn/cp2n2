@@ -46,7 +46,7 @@ class CLClient:
 
     Design goals:
     - degrade honestly if the external SDK is not installed
-    - keep a small, stable interface for the phys-MCP adapter
+    - keep a small, stable interface for the CP²N² adapter
     - support simulator-first development
     """
 

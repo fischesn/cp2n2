@@ -14,7 +14,7 @@ from agent.ai_lab_agent import (
     AILabAPIError,
     AILabPlanFormatError,
     OpenAICompatibleAILabClient,
-    PhysMCPAILabAgent,
+    CP2N2AILabAgent,
     extract_agent_plan,
     strip_reasoning_wrapper,
 )
@@ -61,13 +61,13 @@ class FakeAILabLLM:
         )
 
 
-def _agent(tmp_path: Path, llm: FakeAILabLLM) -> PhysMCPAILabAgent:
+def _agent(tmp_path: Path, llm: FakeAILabLLM) -> CP2N2AILabAgent:
     surface = build_agent_surface(
         principal_id="ai-lab-test-agent",
         audit_path=tmp_path / "audit.jsonl",
         include_cortical_labs=False,
     )
-    return PhysMCPAILabAgent(llm=llm, surface=surface)
+    return CP2N2AILabAgent(llm=llm, surface=surface)
 
 
 def test_ai_lab_dry_run_is_audited_and_has_no_resource_commitment(

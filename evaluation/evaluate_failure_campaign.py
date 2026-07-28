@@ -1,4 +1,4 @@
-"""Evaluate phys-MCP behavior under representative runtime faults."""
+"""Evaluate CP²N² behavior under representative runtime faults."""
 
 from __future__ import annotations
 

@@ -68,7 +68,7 @@ def evaluate() -> dict:
         union_invocation_keys = set.union(*invocation_key_sets)
 
         payload = {
-            "application_api_call": "PhysMCPOrchestrator.execute_task(task)",
+            "application_api_call": "CP2N2Orchestrator.execute_task(task)",
             "successful_runs": len(run_rows),
             "total_runs": len(executable_tasks),
             "descriptor_backends": [descriptor["backend_id"] for descriptor in descriptor_dicts],

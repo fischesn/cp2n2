@@ -20,7 +20,9 @@ def bootstrap_project_root() -> Path:
 
 
 PROJECT_ROOT = bootstrap_project_root()
-_configured_results_dir = os.getenv("PHYSMCP_RESULTS_DIR")
+_configured_results_dir = os.getenv("CP2N2_RESULTS_DIR") or os.getenv(
+    "PHYSMCP_RESULTS_DIR"
+)
 RESULTS_DIR = (
     Path(_configured_results_dir).expanduser().resolve()
     if _configured_results_dir

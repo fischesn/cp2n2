@@ -1,7 +1,7 @@
 """Demonstrate the Cortical Labs adapter against the CL SDK Simulator or live CL setup.
 
 This demo is intentionally direct:
-- it registers the optional Cortical Labs adapter via the normal phys-MCP orchestrator
+- it registers the optional Cortical Labs adapter via the normal CP²N² orchestrator
 - it submits a directed wetware task to that backend
 - it prints descriptor, plan, execution result, and telemetry
 

@@ -3,7 +3,7 @@
 ## Purpose and scope
 
 The A4 surface is the only supported boundary between an LLM agent and
-`phys-MCP`. It exposes resource discovery, leases, fixed assay presets, run
+`CP²N²`. It exposes resource discovery, leases, fixed assay presets, run
 lifecycle operations, and sanitized results. It does not expose substrate
 drivers or arbitrary physical controls.
 
@@ -129,10 +129,10 @@ The stdio server is fail-closed unless a server operator supplies a principal
 and scopes:
 
 ```dotenv
-PHYSMCP_PRINCIPAL_ID=research-agent
-PHYSMCP_SCOPES=resources:read,leases:write,assays:prepare,assays:execute,runs:abort
-PHYSMCP_INCLUDE_CORTICAL_LABS=0
-PHYSMCP_AUDIT_PATH=.physmcp/mcp-audit.jsonl
+CP2N2_PRINCIPAL_ID=research-agent
+CP2N2_SCOPES=resources:read,leases:write,assays:prepare,assays:execute,runs:abort
+CP2N2_INCLUDE_CORTICAL_LABS=0
+CP2N2_AUDIT_PATH=.cp2n2/mcp-audit.jsonl
 ```
 
 Start it from the project root:
@@ -141,7 +141,7 @@ Start it from the project root:
 python -m mcp_surface.server
 ```
 
-Set `PHYSMCP_INCLUDE_CORTICAL_LABS=1` to register the optional CL adapter. This
+Set `CP2N2_INCLUDE_CORTICAL_LABS=1` to register the optional CL adapter. This
 does not authorize physical execution and does not change the approval policy.
 Runtime evidence still distinguishes the SDK Simulator from physical hardware.
 

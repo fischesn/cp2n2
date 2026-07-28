@@ -1,4 +1,4 @@
-"""Typed descriptor models for the phys-MCP prototype.
+"""Typed descriptor models for the CP²N² prototype.
 
 These models define the substrate-aware metadata needed by the control plane
 to discover, compare, and invoke heterogeneous PNN-like backends.
@@ -241,7 +241,7 @@ class CapabilityDescriptor(BaseModel):
 
 
 class SubstrateDescriptor(BaseModel):
-    """Top-level descriptor published by a phys-MCP backend adapter."""
+    """Top-level descriptor published by a CP²N² backend adapter."""
 
     model_config = ConfigDict(extra="forbid", use_enum_values=True)
 

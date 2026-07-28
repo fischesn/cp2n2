@@ -808,7 +808,7 @@
     },
     "SubstrateDescriptor": {
       "additionalProperties": false,
-      "description": "Top-level descriptor published by a phys-MCP backend adapter.",
+      "description": "Top-level descriptor published by a CP²N² backend adapter.",
       "properties": {
         "backend_id": {
           "description": "Stable backend identifier.",
@@ -1235,7 +1235,7 @@
       "type": "string"
     }
   },
-  "$id": "https://phys-mcp.org/schemas/physical-neural-resource-contract-v1.0.schema.json",
+  "$id": "https://raw.githubusercontent.com/fischesn/cp2n2/main/schemas/physical-neural-resource-contract-v1.0.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Top-level, versioned resource publication envelope.",

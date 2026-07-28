@@ -2,7 +2,7 @@
 
 ## Role and authority boundary
 
-The AI-Lab integration is an additional LLM planning runtime for phys-MCP. It
+The AI-Lab integration is an additional LLM planning runtime for CP²N². It
 does not replace the generic architecture or the Gemini and Ollama examples.
 It receives exactly the same sanitized discovery view, produces the same
 strict `AgentPlan`, and executes only through `ConstrainedAgentExecutor` and
@@ -46,7 +46,7 @@ data, patient data, and confidential university documents must not be sent to
 the models. The policy also prohibits extremist, sexually explicit, criminal,
 harmful, and misinformation-related uses.
 
-The phys-MCP evaluation sends only synthetic resource descriptors, fixed
+The CP²N² evaluation sends only synthetic resource descriptors, fixed
 server-owned preset identifiers, and generic goals. It contains no human
 subject data, patient data, unpublished substrate recordings, credentials, or
 confidential university documents.

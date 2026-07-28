@@ -1,4 +1,4 @@
-"""Versioned Physical Neural Resource Contract for phys-MCP.
+"""Versioned Physical Neural Resource Contract for CP²N².
 
 The contract is deliberately substrate-neutral.  It wraps the existing
 capability descriptor with runtime evidence, state, telemetry provenance,

@@ -1,4 +1,4 @@
-"""Cortical Labs adapter for the phys-MCP prototype."""
+"""Cortical Labs adapter for the CP²N² prototype."""
 
 from __future__ import annotations
 

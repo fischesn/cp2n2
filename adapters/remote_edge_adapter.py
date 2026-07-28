@@ -40,7 +40,7 @@ class RemoteEdgeAdapter(BaseAdapter):
                 notes="HTTP control adapter for an externalized edge runtime.",
             ),
             runtime_kind=RuntimeKind.SAME_HOST_SERVICE,
-            provider_id="phys-mcp-remote-edge-service",
+            provider_id="cp2n2-remote-edge-service",
             attestation_method="http_same_host_service_descriptor",
             telemetry_source=ObservationSource.PROVIDER_REPORTED,
         )

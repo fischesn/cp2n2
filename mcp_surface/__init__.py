@@ -1,4 +1,4 @@
-"""Constrained, auditable MCP surface for phys-MCP agents."""
+"""Constrained, auditable MCP surface for CP²N² agents."""
 
 from mcp_surface.approvals import (
     DenyAllApprovalVerifier,

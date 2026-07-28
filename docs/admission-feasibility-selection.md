@@ -79,7 +79,7 @@ prefer physical hardware merely because its evidence level is higher.
 ## Explicit weighted comparison
 
 `weighted_comparison` preserves the previous additive heuristic as a
-transparent comparison after hard checks. It is not the principal phys-MCP
+transparent comparison after hard checks. It is not the principal CP²N²
 policy. The implementation exposes an isolated copy through
 `BackendMatcher.weighted_heuristic`, and every candidate report contains its
 individual `weighted_components`.

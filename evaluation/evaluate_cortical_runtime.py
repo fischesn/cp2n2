@@ -1,4 +1,4 @@
-"""Evaluate the real Cortical Labs runtime path through phys-MCP.
+"""Evaluate the real Cortical Labs runtime path through CP²N².
 
 This script executes a small number of directed tasks against the
 `cortical-labs-backend` and records the most important runtime fields:

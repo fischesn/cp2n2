@@ -1,4 +1,4 @@
-"""Adapter package exports for phys-MCP."""
+"""Adapter package exports for CP²N²."""
 
 from .base_adapter import BaseAdapter, AdapterInvocationResult, AdapterPreparationResult
 from .contracts import (

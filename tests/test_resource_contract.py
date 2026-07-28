@@ -9,7 +9,7 @@ from pydantic import ValidationError
 from adapters.chemical_adapter import ChemicalAdapter
 from adapters.edge_adapter import EdgeAdapter
 from adapters.wetware_adapter import WetwareAdapter
-from core.orchestrator import PhysMCPOrchestrator
+from core.orchestrator import CP2N2Orchestrator
 from core.twin_registry import TwinRegistry
 from demos.common import make_edge_task
 from descriptors.resource_contract import (
@@ -150,7 +150,7 @@ def test_orchestrator_never_invokes_an_inadmissible_resource() -> None:
             return super().invoke(task)
 
     adapter = MissingSafetyAdapter()
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(adapter)
     task = make_edge_task(task_id="inadmissible-contract")
     task.allow_fallback = False

@@ -7,7 +7,7 @@ from common import make_edge_task, print_header, print_run_summary
 from adapters.chemical_adapter import ChemicalAdapter
 from adapters.edge_adapter import EdgeAdapter
 from adapters.wetware_adapter import WetwareAdapter
-from core.orchestrator import PhysMCPOrchestrator
+from core.orchestrator import CP2N2Orchestrator
 
 
 class FailingPrimaryEdgeAdapter(EdgeAdapter):
@@ -18,7 +18,7 @@ class FailingPrimaryEdgeAdapter(EdgeAdapter):
 
 
 def demo_recalibration() -> None:
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     edge_adapter = EdgeAdapter(backend_id="edge-recalibration")
     edge_adapter._twin._drift_score = 0.79  # Demo-only state injection.
     orchestrator.register_adapter(edge_adapter)
@@ -31,7 +31,7 @@ def demo_recalibration() -> None:
 
 
 def demo_fallback() -> None:
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(FailingPrimaryEdgeAdapter(backend_id="edge-a-primary"))
     orchestrator.register_adapter(EdgeAdapter(backend_id="edge-b-backup"))
     orchestrator.register_adapter(ChemicalAdapter())
