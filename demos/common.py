@@ -1,4 +1,4 @@
-"""Shared demo helpers for the phys-MCP prototype."""
+"""Shared demo helpers for the CP²N² prototype."""
 
 from __future__ import annotations
 
@@ -20,21 +20,21 @@ from adapters.chemical_adapter import ChemicalAdapter
 from adapters.edge_adapter import EdgeAdapter
 from adapters.remote_edge_adapter import RemoteEdgeAdapter
 from adapters.wetware_adapter import WetwareAdapter
-from core.orchestrator import PhysMCPOrchestrator
+from core.orchestrator import CP2N2Orchestrator
 from core.task_model import OutputPreference, TaskKind, TaskRequest
 from descriptors.capability_schema import Locality, SignalModality
 
 
-def build_default_orchestrator() -> PhysMCPOrchestrator:
+def build_default_orchestrator() -> CP2N2Orchestrator:
     """Create an orchestrator with the three default demo backends."""
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(ChemicalAdapter())
     orchestrator.register_adapter(WetwareAdapter())
     orchestrator.register_adapter(EdgeAdapter())
     return orchestrator
 
 
-def build_extended_orchestrator(remote_base_url: str | None = None) -> PhysMCPOrchestrator:
+def build_extended_orchestrator(remote_base_url: str | None = None) -> CP2N2Orchestrator:
     """Create an orchestrator optionally including an externalized remote edge backend."""
     orchestrator = build_default_orchestrator()
     if remote_base_url is not None:
@@ -46,7 +46,7 @@ def build_live_target_orchestrator(
     remote_base_url: str | None = None,
     *,
     include_cortical_labs: bool = False,
-) -> PhysMCPOrchestrator:
+) -> CP2N2Orchestrator:
     """Create an orchestrator with optional live-target adapters."""
     orchestrator = build_extended_orchestrator(remote_base_url=remote_base_url)
     if include_cortical_labs:

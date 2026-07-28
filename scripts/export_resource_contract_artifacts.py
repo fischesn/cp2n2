@@ -80,7 +80,7 @@ def main() -> int:
     )
     schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
     schema["$id"] = (
-        "https://phys-mcp.org/schemas/"
+        "https://raw.githubusercontent.com/fischesn/cp2n2/main/schemas/"
         f"physical-neural-resource-contract-v{CONTRACT_SCHEMA_VERSION}.schema.json"
     )
     schema_path = (

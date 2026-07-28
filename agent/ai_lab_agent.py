@@ -264,7 +264,7 @@ class OpenAICompatibleAILabClient:
         return payload
 
 
-class PhysMCPAILabAgent:
+class CP2N2AILabAgent:
     """AI-Lab agent with exactly the same authority as the A4 examples."""
 
     def __init__(
@@ -281,7 +281,7 @@ class PhysMCPAILabAgent:
         self.surface = surface or build_agent_surface(
             principal_id="ai-lab-agent",
             audit_path=audit_path
-            or Path(".physmcp") / "ai-lab-agent-audit.jsonl",
+            or Path(".cp2n2") / "ai-lab-agent-audit.jsonl",
             include_cortical_labs=include_cortical_labs,
         )
         self.executor = ConstrainedAgentExecutor(self.surface)
@@ -363,8 +363,12 @@ class PhysMCPAILabAgent:
         )
 
 
+# Backward-compatible import for pre-rename clients.
+PhysMCPAILabAgent = CP2N2AILabAgent
+
+
 def main() -> None:
-    result = PhysMCPAILabAgent().run(
+    result = CP2N2AILabAgent().run(
         "Prepare a dry-run plan for a compatible server-owned assay preset."
     )
     print(json.dumps(result.__dict__, indent=2))

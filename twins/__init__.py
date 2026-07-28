@@ -1,1 +1,1 @@
-"""phys-MCP twin backends."""
+"""CP²N² twin backends."""

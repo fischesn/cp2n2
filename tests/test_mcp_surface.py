@@ -9,7 +9,7 @@ from pydantic import ValidationError
 
 from adapters.wetware_adapter import WetwareAdapter
 from agent.constrained_client import AgentPlan, ConstrainedAgentExecutor
-from core.orchestrator import PhysMCPOrchestrator
+from core.orchestrator import CP2N2Orchestrator
 from demos.common import build_default_orchestrator
 from descriptors.resource_contract import (
     EvidenceLevel,
@@ -64,7 +64,7 @@ def _principal(
 def _surface(
     tmp_path,
     *,
-    orchestrator: PhysMCPOrchestrator | None = None,
+    orchestrator: CP2N2Orchestrator | None = None,
     principal: MCPPrincipal | None = None,
     approvals=None,
 ) -> MCPControlSurface:
@@ -408,7 +408,7 @@ def test_real_biological_execution_requires_external_one_time_approval(
     tmp_path,
 ) -> None:
     adapter = ApprovalRequiredWetwareAdapter()
-    orchestrator = PhysMCPOrchestrator()
+    orchestrator = CP2N2Orchestrator()
     orchestrator.register_adapter(adapter)
     approvals = InMemoryHumanApprovalAuthority()
     surface = _surface(

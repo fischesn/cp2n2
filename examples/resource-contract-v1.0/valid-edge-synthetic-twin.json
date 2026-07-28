@@ -148,7 +148,7 @@
   "identity": {
     "adapter_id": "adapters.edge_adapter.EdgeAdapter",
     "hardware_id": null,
-    "provider_id": "phys-mcp",
+    "provider_id": "cp2n2",
     "resource_id": "edge-backend",
     "substrate_id": "edge_accelerator"
   },

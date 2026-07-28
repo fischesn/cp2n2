@@ -1,11 +1,16 @@
-# phys-MCP
+# CP²N²
+
+**CP²N² — Control Plane for Physical Neural Networks** was formerly published
+as **phys-MCP**. The technical ASCII identifier is `cp2n2`; see the
+[naming-migration guide](docs/naming-migration.md) for compatibility details.
 
 The accepted scope, evidence boundaries, completed work, and gated next steps
 are maintained in the versioned [project master plan](docs/project-masterplan.md).
 
 ## Release v4.0
 
-This is the first post-v3.0 release of the phys-MCP research prototype. It
+Version 4.0 was released before the rename, under the former **phys-MCP**
+name. It
 packages the completed A0-A7 development line: versioned resource contracts,
 lifecycle-aware orchestration, constrained agent access, general adapters,
 distributed evaluation infrastructure, and the University of Lübeck AI-Lab
@@ -37,18 +42,18 @@ configured separately. The AI-Lab evaluation additionally requires University
 network/VPN access and an `AI_LAB_API_KEY`; run it only with the explicit
 acknowledgement described in [the AI-Lab guide](docs/ai-lab-agent.md).
 
-`phys-MCP` is a substrate-aware control-plane prototype for exposing heterogeneous **physical neural network (PNN)** resources as discoverable, invocable, and monitorable software-visible backends.
+`CP²N²` is a substrate-aware control-plane prototype for exposing heterogeneous **physical neural network (PNN)** resources as discoverable, invocable, and monitorable software-visible backends.
 
-The system is designed for settings in which materially different computational substrates cannot be treated as ordinary stateless accelerators. Instead, they expose distinct I/O modalities, timing regimes, lifecycle constraints, observability limits, and health or validity conditions. `phys-MCP` provides a single orchestration layer above such backends while preserving these substrate-specific semantics.
+The system is designed for settings in which materially different computational substrates cannot be treated as ordinary stateless accelerators. Instead, they expose distinct I/O modalities, timing regimes, lifecycle constraints, observability limits, and health or validity conditions. `CP²N²` provides a single orchestration layer above such backends while preserving these substrate-specific semantics.
 
 This repository contains:
 
-- a Python reference implementation of the `phys-MCP` control plane
+- a Python reference implementation of the `CP²N²` control plane
 - representative local prototype backends for chemical, wetware, and fast edge-style execution
 - an externalized remote edge backend path
 - an attested integration path for the **Cortical Labs CL API / CL SDK**
 - minimal **Gemini-based**, **Ollama-based**, and **University of Lübeck
-  AI-Lab-based** agents that plan and execute tasks through `phys-MCP`
+  AI-Lab-based** agents that plan and execute tasks through `CP²N²`
 - demos, tests, and evaluation scripts
 
 The current code base should be understood as a **research prototype**: it is operational, structured, and demonstrable, but not a production runtime.
@@ -57,7 +62,7 @@ The current code base should be understood as a **research prototype**: it is op
 
 ## 1. Purpose of the system
 
-`phys-MCP` exists to answer a practical systems problem:
+`CP²N²` exists to answer a practical systems problem:
 
 > How can heterogeneous physical neural substrates be exposed to software in a way that supports discovery, task matching, invocation, monitoring, and lifecycle-aware control without flattening away the properties that actually matter?
 
@@ -72,7 +77,7 @@ The prototype treats physical AI resources as **managed backends** rather than o
 - Can they be reset, recalibrated, or reused safely?
 - Can an agent or orchestrator choose among them in a principled way?
 
-`phys-MCP` answers these questions through a substrate-aware descriptor model, a matcher, an orchestrator, and backend-specific adapters.
+`CP²N²` answers these questions through a substrate-aware descriptor model, a matcher, an orchestrator, and backend-specific adapters.
 
 The post-v3.0 development line also publishes a versioned, substrate-neutral
 [Physical Neural Resource Contract](docs/physical-neural-resource-contract-v1.0.md).
@@ -204,7 +209,7 @@ The remote edge path demonstrates that the same control-plane logic also works a
 ### 3.6 Use an attested Cortical Labs path
 The repository includes an adapter and client path for the **Cortical Labs CL API / CL SDK**. The adapter attests the active runtime as `sdk_simulator`, `physical_hardware`, or `unknown`; verified v3.0 results use `sdk_simulator`.
 
-Through this path, `phys-MCP` can:
+Through this path, `CP²N²` can:
 
 - open a CL session
 - submit a simple stimulation/recording task
@@ -248,7 +253,7 @@ boundary is documented in
 The current repository layout is:
 
 ```text
-phys-mcp/
+cp2n2/
   .env
   LICENSE
   README.md
@@ -428,13 +433,13 @@ AI_LAB_BASE_URL=https://llm-api.ai-lab.uni-luebeck.de
 AI_LAB_MODEL=minimax-m2.7
 
 # Constrained MCP server (fail-closed if principal or scopes are absent)
-PHYSMCP_PRINCIPAL_ID=research-agent
-PHYSMCP_SCOPES=resources:read,leases:write,assays:prepare,assays:execute,runs:abort
-PHYSMCP_INCLUDE_CORTICAL_LABS=0
-PHYSMCP_AUDIT_PATH=.physmcp/mcp-audit.jsonl
+CP2N2_PRINCIPAL_ID=research-agent
+CP2N2_SCOPES=resources:read,leases:write,assays:prepare,assays:execute,runs:abort
+CP2N2_INCLUDE_CORTICAL_LABS=0
+CP2N2_AUDIT_PATH=.cp2n2/mcp-audit.jsonl
 ```
 
-Important: the same Python environment that runs `phys-MCP` must also have `cl-sdk` installed.
+Important: the same Python environment that runs `CP²N²` must also have `cl-sdk` installed.
 
 ---
 
@@ -533,7 +538,7 @@ python -m evaluation.run_all_evaluations
 python -m evaluation.evaluate_cortical_runtime
 ```
 
-This performs directed stimulation/recording runs. It is **not** part of the default test suite and must only be run after confirming the active runtime and obtaining the appropriate hardware-safety approval. Its results must state `runtime_kind` and may not be presented as physical-hardware evidence when the SDK Simulator is active. Evaluation outputs are written to a fresh `evaluation/results/run-<UTC timestamp>/` directory by default; set `PHYSMCP_RESULTS_DIR` to select another location.
+This performs directed stimulation/recording runs. It is **not** part of the default test suite and must only be run after confirming the active runtime and obtaining the appropriate hardware-safety approval. Its results must state `runtime_kind` and may not be presented as physical-hardware evidence when the SDK Simulator is active. Evaluation outputs are written to a fresh `evaluation/results/run-<UTC timestamp>/` directory by default; set `CP2N2_RESULTS_DIR` to select another location.
 
 ### 8.3 Gemini agent evaluation
 
@@ -587,7 +592,7 @@ PNN evidence. See `docs/ai-lab-agent.md`.
 
 ## 9. Agent-based access
 
-The repository provides three minimal agent clients on top of `phys-MCP`:
+The repository provides three minimal agent clients on top of `CP²N²`:
 
 - **Gemini-based agent**
 - **Ollama-based agent**
@@ -602,7 +607,7 @@ All three agents follow the same constrained flow:
 5. summarize a sanitized result
 
 The agents do not construct arbitrary `TaskRequest` objects and do not call
-backend APIs such as Cortical Labs directly. `phys-MCP` remains the sole
+backend APIs such as Cortical Labs directly. `CP²N²` remains the sole
 control plane. Both examples default to dry-run behavior.
 
 ### 9.1 Gemini agent
@@ -762,9 +767,9 @@ This is the low-level client wrapper around the CL SDK. It handles:
 - recording artifact normalization
 
 ### `adapters/cortical_labs_adapter.py`
-This is the `phys-MCP` adapter layer. It translates between:
+This is the `CP²N²` adapter layer. It translates between:
 
-- `phys-MCP` task and telemetry semantics
+- `CP²N²` task and telemetry semantics
 - and the CL client’s concrete runtime calls
 
 This separation keeps backend-specific API handling in the client and control-plane semantics in the adapter.
@@ -844,7 +849,7 @@ This repository is a research prototype and should be interpreted accordingly.
 - an externalized remote backend path
 - an attested Cortical Labs integration path, currently demonstrated with the CL SDK Simulator
 - working Gemini-, Ollama-, and University AI-Lab-based agents on top of
-  `phys-MCP`
+  `CP²N²`
 
 ### What it does not claim
 - production readiness
@@ -908,7 +913,9 @@ Check:
 
 ## 16. Summary
 
-`phys-MCP v3.0` is a unified research prototype for treating heterogeneous physical AI resources as discoverable, invocable, telemetry-aware backends under a common control plane.
+`phys-MCP v3.0`, the pre-rename baseline of CP²N², is a unified research
+prototype for treating heterogeneous physical AI resources as discoverable,
+invocable, telemetry-aware backends under a common control plane.
 
 Its current strengths are:
 

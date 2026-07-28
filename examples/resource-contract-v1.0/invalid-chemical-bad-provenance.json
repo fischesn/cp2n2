@@ -137,7 +137,7 @@
   "identity": {
     "adapter_id": "adapters.chemical_adapter.ChemicalAdapter",
     "hardware_id": null,
-    "provider_id": "phys-mcp",
+    "provider_id": "cp2n2",
     "resource_id": "chemical-backend",
     "substrate_id": "chemical"
   },

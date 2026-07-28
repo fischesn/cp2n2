@@ -1,1 +1,1 @@
-"""Evaluation package for the phys-MCP prototype."""
+"""Evaluation package for the CP²N² prototype."""

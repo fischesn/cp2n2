@@ -1,4 +1,4 @@
-"""Normalized control-plane errors for phys-MCP."""
+"""Normalized control-plane errors for CP²N²."""
 
 from __future__ import annotations
 

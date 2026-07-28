@@ -1,4 +1,4 @@
-"""Application-facing task model for the phys-MCP prototype."""
+"""Application-facing task model for the CP²N² prototype."""
 
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ class SelectionPolicy(str, Enum):
 
 
 class TaskRequest(BaseModel):
-    """A normalized task request submitted to the phys-MCP orchestrator."""
+    """A normalized task request submitted to the CP²N² orchestrator."""
 
     model_config = ConfigDict(extra="forbid", use_enum_values=True)
 

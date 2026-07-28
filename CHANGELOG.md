@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Renamed the project from **phys-MCP** to **CP²N² — Control Plane for Physical
+  Neural Networks**.
+- Adopted `cp2n2`, `CP2N2`, and `CP2N2_` as the canonical technical,
+  Python-class, and environment-variable forms.
+- Retained compatibility aliases and legacy environment-variable fallbacks;
+  no control-plane behavior changed.
+
 ## v4.0 — 2026-07-24
 
 The first release after the frozen v3.0 baseline. This release completes the

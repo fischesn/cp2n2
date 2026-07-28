@@ -111,7 +111,7 @@ def evaluate() -> dict:
         series_b=orchestrated_values,
         series_a_label="Direct path",
         series_b_label="Orchestrated path",
-        title="Wall-clock overhead of phys-MCP control-plane execution",
+        title="Wall-clock overhead of CP²N² control-plane execution",
         ylabel="Mean wall-clock time (ms)",
         output_path=RESULTS_DIR / "overhead_bar_chart.png",
     )

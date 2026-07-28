@@ -1,12 +1,12 @@
-# phys-MCP Master Plan
+# CP²N² Master Plan
 
 **Version:** 1.0 — 23 July 2026  
 **Status:** Accepted project plan — 23 July 2026  
-**Purpose:** Executable development, experiment, and publication plan for the next, substantially strengthened version of phys-MCP.
+**Purpose:** Executable development, experiment, and publication plan for the next, substantially strengthened version of CP²N².
 
 ## 1. Project position and target
 
-phys-MCP is a **general control plane for heterogeneous Physical Neural Networks (PNNs)**. It is not a Cortical Labs integration project. A Cortical Labs CL1 is one representative, real biological PNN scenario through which the control-plane claims can be tested; other PNNs, neuromorphic devices, simulators, and physical substrates remain equally in scope.
+CP²N² is a **general control plane for heterogeneous Physical Neural Networks (PNNs)**. It is not a Cortical Labs integration project. A Cortical Labs CL1 is one representative, real biological PNN scenario through which the control-plane claims can be tested; other PNNs, neuromorphic devices, simulators, and physical substrates remain equally in scope.
 
 The project will establish three contributions:
 
@@ -16,11 +16,11 @@ The project will establish three contributions:
 
 The core claim is:
 
-> Stateful physical-neural resources cannot be scheduled safely from endpoint metadata alone. phys-MCP defines an operational resource contract and lifecycle protocol that makes modality, provenance, freshness, calibration, health, exclusivity, safety, and recovery first-class constraints for agent-driven execution.
+> Stateful physical-neural resources cannot be scheduled safely from endpoint metadata alone. CP²N² defines an operational resource contract and lifecycle protocol that makes modality, provenance, freshness, calibration, health, exclusivity, safety, and recovery first-class constraints for agent-driven execution.
 
 ### What this project may claim
 
-- phys-MCP provides a general operational abstraction over heterogeneous PNN resources.
+- CP²N² provides a general operational abstraction over heterogeneous PNN resources.
 - It enforces explicit admissibility and safety rules before a resource is committed.
 - It provides lifecycle control, leases, provenance, validation, and recovery across backends.
 - It can be evaluated under distributed failures, stale telemetry, and competing requests.
@@ -30,7 +30,7 @@ The core claim is:
 
 - That one CL1 culture establishes general properties of all biological PNNs.
 - That an SDK simulator is biological hardware or a learning surrogate for wetware.
-- That phys-MCP is tied to, or only useful for, CL1 systems.
+- That CP²N² is tied to, or only useful for, CL1 systems.
 - Universal optimality of a resource-selection policy.
 - Hard real-time control by an LLM or by a remote MCP client.
 - Unrestricted autonomous stimulation or laboratory control by an agent.
@@ -64,17 +64,17 @@ Rules:
 
 **RQ2 — Distributed control.** How do leases, freshness, recovery, selection, and failover behave under realistic edge/fog/cloud failures and concurrency?
 
-**RQ3 — Real PNN access.** Can an LLM agent discover, reserve, and use a real PNN through phys-MCP without receiving direct access to unsafe primitive operations?
+**RQ3 — Real PNN access.** Can an LLM agent discover, reserve, and use a real PNN through CP²N² without receiving direct access to unsafe primitive operations?
 
 **RQ4 — Representative physical-computation case study.** In the selected real-PNN scenario, does the substrate produce reproducible, task-relevant observable behaviour under a controlled protocol?
 
 RQ4 is substrate-specific. It supports the real integration case study; it is not a general claim about all PNNs.
 
-## 4. Workstream A: General phys-MCP software
+## 4. Workstream A: General CP²N² software
 
 ### A0. Freeze and audit the baseline
 
-- **Recorded baseline:** the user-confirmed GitHub tag `v3.0` in the public repository <https://github.com/fischesn/phys-mcp>. The local clone currently has `origin/main` at commit `4303073` — *phys-MCP prototype v3.0 with full integration of the Cortical Labs simulator and two LLM agents*. Before implementation begins, refresh tags and record the exact commit resolved by `v3.0` in the baseline manifest.
+- **Recorded baseline:** the user-confirmed GitHub tag `v3.0` in the public repository <https://github.com/fischesn/cp2n2>. The local clone currently has `origin/main` at commit `4303073` — *phys-MCP prototype v3.0 with full integration of the Cortical Labs simulator and two LLM agents*. Before implementation begins, refresh tags and record the exact commit resolved by `v3.0` in the baseline manifest.
 
 - [x] Freeze a baseline commit and archive the current configuration and results.
 - [x] Assign every current backend an E0–E5 evidence level.
@@ -253,10 +253,10 @@ in `outputs/a6-distributed-testbed-change-set.md`; the reference archive is
 ### A7. University of Lübeck AI-Lab agent (late-stage integration)
 
 After completion of the preceding A workstream, implement an additional
-phys-MCP agent using the University of Lübeck AI-Lab platform. The platform is
+CP²N² agent using the University of Lübeck AI-Lab platform. The platform is
 available to the project through a free API-key-based access arrangement and
 will be used as a capable additional agent runtime, not as a replacement for
-the generic phys-MCP architecture or for the Gemini/Ollama reference clients.
+the generic CP²N² architecture or for the Gemini/Ollama reference clients.
 
 The integration must reuse the constrained A4 MCP surface. It must not receive
 any additional authority over PNN resources, physical controls, policies,
@@ -302,7 +302,7 @@ provenance but no API credential or provider reasoning wrapper.
 
 The CL1 scenario validates the general system on a real, remote, scarce,
 stateful biological PNN. It is a **representative case study**, not a special
-definition of phys-MCP and not the only relevant PNN class.
+definition of CP²N² and not the only relevant PNN class.
 
 The selected application is **BioPattern Gate**, a policy-bound
 spatiotemporal pattern-discrimination assay with an immediately understandable
@@ -311,7 +311,7 @@ associated with one of two hidden, charge-matched spatiotemporal input
 patterns. The CL1 culture receives the approved pattern, a fixed and
 interpretable readout classifies the evoked response, and the gate routes the
 object left or right. The visual demo shows the gate, live neural activity,
-the decision, trial outcome, session score, and the phys-MCP resource
+the decision, trial outcome, session score, and the CP²N² resource
 lifecycle.
 
 BioPattern Gate is a hybrid physical-computing application:
@@ -333,7 +333,7 @@ The primary application claim is deliberately limited:
 
 The primary control-plane claim is:
 
-> phys-MCP can discover, attest, admit, reserve, prepare, execute, monitor,
+> CP²N² can discover, attest, admit, reserve, prepare, execute, monitor,
 > validate, abort, reconcile, and release the real biological resource while
 > exposing only an approved assay preset to the agent.
 
@@ -344,7 +344,7 @@ energy, training data, or learning speed over silicon is out of scope unless
 measured under a separately pre-registered protocol.
 
 - [x] Select BioPattern Gate as the B-path application and demo.
-- [x] Retain the substrate-neutral phys-MCP architecture and evidence levels.
+- [x] Retain the substrate-neutral CP²N² architecture and evidence levels.
 - [x] Define the initial result as biological reservoir discrimination, not a
   biological-learning claim.
 - [ ] Freeze the application protocol and claims before the first E5 pilot.
@@ -367,7 +367,7 @@ application-level question is:
 > protocol, and can the resulting run be executed and documented safely?
 
 The LLM agent translates that intent into a choice among the resources and
-server-owned presets currently published by phys-MCP. Its role is limited to:
+server-owned presets currently published by CP²N². Its role is limited to:
 
 - interpreting the natural-language goal and constraints;
 - discovering the sanitized current resource catalog;
@@ -381,7 +381,7 @@ The LLM does **not** design the biological experiment. It cannot select
 electrodes, pulses, timing, trial counts, decoder parameters, safety limits,
 runtime kind, policy, or approval. It does not receive raw recordings or
 provider credentials. The server-owned BioPattern Gate preset and the
-deterministic phys-MCP executor perform the actual workflow.
+deterministic CP²N² executor perform the actual workflow.
 
 A deterministic client could run the same fixed assay. The purpose of the LLM
 case study is instead to test whether an open-ended agent request can be mapped
@@ -434,7 +434,7 @@ This second prompt permits the LLM planner to return `dry_run=false`, but it is
 not itself the safety approval. The external operator separately supplies a
 single-use approval bound to the exact resource ID, run ID, package hash,
 preset hash, and expiry. Without that independently verified approval,
-phys-MCP rejects the E5 execution even when the prompt asks to proceed.
+CP²N² rejects the E5 execution even when the prompt asks to proceed.
 
 Natural variants are allowed, for example:
 
@@ -480,7 +480,7 @@ aborted, status-unknown, or ineligible for a biological claim.
 2. The LLM receives the goal plus sanitized resource and compatible-preset
    descriptions, then returns the strict three-field choice:
    `resource_id`, `preset_id`, and `dry_run`.
-3. phys-MCP validates the plan and shows why each candidate is
+3. CP²N² validates the plan and shows why each candidate is
    admitted, rejected, or ranked.
 4. The CL1 is shown as E5 only after provider/device attestation succeeds.
 5. The dry run reports feasibility, evidence, expected resource implications,
@@ -489,7 +489,7 @@ aborted, status-unknown, or ineligible for a biological claim.
 6. The user reviews the plan and submits the explicit execution prompt.
 7. An external operator issues the exact-run, single-use approval; the approval
    is never generated or edited by the LLM.
-8. phys-MCP checks health, calibration, telemetry freshness, policy,
+8. CP²N² checks health, calibration, telemetry freshness, policy,
    reservation availability, budget metadata, and human approval.
 9. A lease is acquired and the state advances through `RESERVED`,
    `PREPARING`, and `RUNNING`.
@@ -498,7 +498,7 @@ aborted, status-unknown, or ineligible for a biological claim.
 11. The demo screen animates objects approaching the gate. For every trial it
    shows the input class only after the decision, live spike activity, the
    predicted route, correctness, and cumulative score.
-12. phys-MCP validates artifacts and postconditions, records provenance, runs
+12. CP²N² validates artifacts and postconditions, records provenance, runs
    cooldown, and releases the resource.
 13. The agent produces a sanitized result summary; it does not receive raw
    neural data, physical parameters, credentials, or approval material.
@@ -560,7 +560,7 @@ The agent may select only a server-owned preset. It may not choose channels,
 pulse widths, amplitudes, burst frequencies, trial counts, feedback rules,
 blanking windows, thresholds, safety limits, or model coefficients.
 
-The package identifier is provisionally `physmcp-biopattern-gate`; the first
+The package identifier is provisionally `cp2n2-biopattern-gate`; the first
 public protocol preset is `pattern_gate_v1`. The exact package identifier must
 be checked against provider naming rules before upload.
 
@@ -737,7 +737,7 @@ Primary application metrics:
 - calibration and probability reliability where sample size permits;
 - within-session and between-session drift.
 
-Primary phys-MCP metrics for the case study:
+Primary CP²N² metrics for the case study:
 
 - correct runtime-kind attestation;
 - zero unapproved E5 starts;
@@ -766,7 +766,7 @@ Analysis is split into:
 The package follows the current CL application model:
 
 ```text
-physmcp-biopattern-gate/
+cp2n2-biopattern-gate/
   info.json
   default.json
   requirements.txt              # only if provider permits dependencies
@@ -863,9 +863,9 @@ reference, not assumed to be a locally readable path. Export status is one of
   artifact paths.
 - [ ] Verify checksums and offline reconstruction before claim eligibility.
 
-### B9. phys-MCP control-plane integration
+### B9. CP²N² control-plane integration
 
-The CL on-device application is a substrate runtime. The phys-MCP CL control
+The CL on-device application is a substrate runtime. The CP²N² CL control
 adapter remains responsible for provider-facing discovery, deployment,
 reservation, run start/status/abort, artifact retrieval, and reconciliation.
 The remote LLM and MCP server never participate in the time-critical neural
@@ -886,7 +886,7 @@ discover_resources
   -> release_resource
 ```
 
-The adapter must map provider contention to phys-MCP leases without claiming
+The adapter must map provider contention to CP²N² leases without claiming
 stronger atomicity than the provider offers. If a network timeout makes start,
 abort, or completion uncertain, the result is
 `EXECUTION_STATUS_UNKNOWN` until provider reconciliation succeeds.
@@ -1007,7 +1007,7 @@ not be analyzed as independent biological replicates. Report all exclusions,
 missing sessions, culture age and identity metadata when available, and
 within-/between-culture uncertainty.
 
-An unsuccessful discrimination result does not invalidate the phys-MCP
+An unsuccessful discrimination result does not invalidate the CP²N²
 end-to-end systems case study if the E5 execution, safety, provenance,
 lifecycle, and artifacts are complete. It does invalidate or weaken RQ4 and
 must be reported honestly.
@@ -1167,7 +1167,7 @@ Remove or downgrade every claim that lacks passing evidence.
 
 ### Motivating agentic-PNN scenarios
 
-BioPattern Gate is the controlled evaluation scenario for phys-MCP, not the
+BioPattern Gate is the controlled evaluation scenario for CP²N², not the
 sole or strongest end-user motivation for agentic access to PNNs. The paper
 must introduce one or two forward-looking but technically grounded scenarios
 before presenting BioPattern Gate. These scenarios explain why an AI agent
@@ -1176,7 +1176,7 @@ endpoint.
 
 They are **motivating scenarios, not evaluated contributions**. The paper must
 use conditional language, cite primary evidence for the relevant substrate
-capabilities, and never imply that phys-MCP has already demonstrated the full
+capabilities, and never imply that CP²N² has already demonstrated the full
 application.
 
 #### Scenario D1: autonomous functional-neurobiology campaign
@@ -1205,7 +1205,7 @@ problem is essential because cultures are scarce, stateful, age-dependent,
 non-interchangeable, safety-constrained, and affected by their prior
 experimental history.
 
-phys-MCP provides:
+CP²N² provides:
 
 - culture/resource discovery with provenance and evidence level;
 - compatibility and policy admission for the requested assay;
@@ -1244,7 +1244,7 @@ resource choice, mission-level planning, requesting preparation or
 recalibration, interpreting validated summaries, and selecting a safe
 fallback.
 
-phys-MCP provides:
+CP²N² provides:
 
 - modality-, latency-, locality-, cost-, and evidence-aware admission;
 - transparent selection among heterogeneous physical substrates;
@@ -1254,7 +1254,7 @@ phys-MCP provides:
 - detection of stale telemetry and unsafe failover;
 - provenance linking an agent decision to the physical execution.
 
-This scenario motivates the generality of phys-MCP beyond CL1 and makes clear
+This scenario motivates the generality of CP²N² beyond CL1 and makes clear
 why hard real-time control is outside the LLM and MCP boundary.
 
 #### How the paper uses the scenarios
@@ -1269,14 +1269,14 @@ The introduction and motivating-scenario section must follow this sequence:
 4. Derive the shared requirements: explicit modality and evidence,
    provenance, freshness, calibration, health, exclusivity, safety, lifecycle,
    local real-time execution, recovery, and auditability.
-5. Introduce phys-MCP as the common control plane satisfying those
+5. Introduce CP²N² as the common control plane satisfying those
    requirements.
 6. Present BioPattern Gate later as the deliberately narrow, reproducible CL1
    evaluation case rather than as the complete application vision.
 
 The requirements section must include a traceability table:
 
-| Scenario pressure | Required phys-MCP mechanism | Evaluated by |
+| Scenario pressure | Required CP²N² mechanism | Evaluated by |
 |---|---|---|
 | scarce cultures or exclusive devices | leases and ownership | A2/A6 |
 | changing health, calibration, and drift | telemetry provenance/freshness and admission | A1/A3/A6 |
@@ -1297,10 +1297,54 @@ and which require future domain-specific validation.
   application capability used in D1 and D2.
 - [ ] Write the two introduction vignettes in user-goal language.
 - [ ] Add the scenario-to-requirement traceability table to the paper.
-- [ ] Add a generic figure showing remote agent deliberation, phys-MCP control,
+- [ ] Add a generic figure showing remote agent deliberation, CP²N² control,
   and substrate-local real-time execution.
 - [ ] Revisit both scenarios in limitations and future work without promoting
   them to demonstrated claims.
+
+### Related-work and terminology boundary: PhysMCP
+
+Before the next public paper or software release, add a focused related-work
+subsection on **PhysMCP** (the `physmcp.org` open-standard proposal). The
+similarity of the names is a discoverability and reader-confusion risk; the
+subsection must therefore be explicit rather than relying on a spelling or
+hyphen distinction. This is an architectural comparison, not a priority,
+authorship, or legal claim.
+
+The paper must fairly describe PhysMCP as a general proposal for exposing
+physical devices as native MCP servers, with direct agent-to-device interaction
+and mesh-oriented coordination. It must then state the boundary to this
+project:
+
+| Dimension | PhysMCP proposal | CP²N² project |
+|---|---|---|
+| Target resource | general physical/IoT device | scarce, stateful physical-neural resource |
+| Primary architectural unit | device-native MCP server and mesh interaction | control plane plus resource adapters and substrate-local runtime |
+| Coordination focus | device capability exposure and decentralised interaction | admission, leases, lifecycle, recovery, reconciliation, and audit |
+| Safety/accountability focus | device-local policy and declared capabilities | server-owned approved presets, human approval where required, evidence levels, and run provenance |
+| Real-time boundary | not a claim of this project | hard real-time control remains substrate-local; MCP/agent actions are deliberative |
+
+The distinction must not be caricatured: both approaches address agent access
+to physical systems and may share useful contract or capability ideas. The
+paper's precise contribution is the governance of heterogeneous PNN resources
+whose availability, calibration, health, experimental history, exclusivity,
+and uncertain physical state after failure affect whether an action may run.
+
+- [ ] Verify the current PhysMCP specification, version, authorship, licence,
+  and terminology immediately before submission; cite the primary
+  specification rather than only the project website.
+- [ ] Add a concise related-work comparison and the terminology boundary to
+  the paper.
+- [ ] Review the project name before the next public release; do not present a
+  rename as a legal necessity without a separate trademark/availability
+  clearance.
+- [x] Adopt **CP²N²** as the public project and paper name and `cp2n2` as the
+  technical ASCII identifier.
+- [x] Retain a short ``formerly phys-MCP'' migration note in the repository
+  and paper metadata where appropriate, so that the May 2026 arXiv
+  version remains discoverable without suggesting affiliation with PhysMCP.
+- [ ] Complete the external repository rename after local migration and
+  verification.
 
 ### Recommended paper structure
 
@@ -1315,11 +1359,13 @@ and which require future domain-specific validation.
 6. Admission and selection.
 7. Implementation and general adapter architecture.
 8. Evaluation: general systems evidence first; CL1 case study separately.
-9. Related work: WoT, Kubernetes DRA, KubeEdge DeviceTwin, ROS 2 lifecycle, OPC UA, NIR, and substrate runtimes.
+9. Related work: PhysMCP terminology/architecture boundary, WoT, Kubernetes
+   DRA, KubeEdge DeviceTwin, ROS 2 lifecycle, OPC UA, NIR, and substrate
+   runtimes.
 10. Limitations, ethics, and responsible agent access.
 11. Conclusion.
 
-Required visuals: motivating agent/phys-MCP/local-runtime figure, general
+Required visuals: motivating agent/CP²N²/local-runtime figure, general
 architecture, state machine, contract example, generic execution sequence,
 distributed testbed, policy/fault results, and a separately labelled
 representative CL1 case-study figure.

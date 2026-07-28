@@ -1,4 +1,4 @@
-"""Twin/adapter registry for the phys-MCP prototype."""
+"""Twin/adapter registry for the CP²N² prototype."""
 
 from __future__ import annotations
 

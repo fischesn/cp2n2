@@ -1,4 +1,4 @@
-"""Atomic, versioned lifecycle state machine for phys-MCP resources."""
+"""Atomic, versioned lifecycle state machine for CP²N² resources."""
 
 from __future__ import annotations
 

@@ -16,7 +16,7 @@ from mcp_surface.models import AssayPresetId, MCPPrincipal, ToolResponse
 from mcp_surface.service import MCPControlSurface
 
 
-PLANNING_PROMPT = """You are a planner for the constrained phys-MCP service.
+PLANNING_PROMPT = """You are a planner for the constrained CP²N² service.
 Return ONLY valid JSON with this schema:
 
 {
@@ -40,7 +40,7 @@ Rules:
 """
 
 
-SUMMARY_PROMPT_TEMPLATE = """Summarize this constrained phys-MCP agent result.
+SUMMARY_PROMPT_TEMPLATE = """Summarize this constrained CP²N² agent result.
 
 User goal:
 {user_goal}

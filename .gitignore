@@ -17,4 +17,6 @@ evaluation/results/run-*/
 .venv/
 .vscode/
 .idea/
+.cp2n2/
+# Pre-rename local audit directory; retained for compatibility and history.
 .physmcp/

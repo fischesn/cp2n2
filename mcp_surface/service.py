@@ -1,4 +1,4 @@
-"""Constrained service layer behind the phys-MCP MCP protocol server."""
+"""Constrained service layer behind the CP²N² MCP protocol server."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from core.errors import ControlPlaneError, ControlPlaneErrorCode, ControlPlaneEx
 from core.orchestrator import (
     ControlPlaneActionResult,
     OrchestrationRunResult,
-    PhysMCPOrchestrator,
+    CP2N2Orchestrator,
 )
 from descriptors.capability_schema import SubstrateClass
 from descriptors.resource_contract import (
@@ -64,7 +64,7 @@ class ToolSpec:
 TOOL_SPECS: dict[str, ToolSpec] = {
     "discover_resources": ToolSpec(
         "discover_resources",
-        "List sanitized phys-MCP resource summaries and compatible assay presets.",
+        "List sanitized CP²N² resource summaries and compatible assay presets.",
         DiscoverResourcesInput,
         Scope.RESOURCES_READ,
         True,
@@ -179,7 +179,7 @@ class MCPControlSurface:
     def __init__(
         self,
         *,
-        orchestrator: PhysMCPOrchestrator,
+        orchestrator: CP2N2Orchestrator,
         principal: MCPPrincipal,
         audit_trail: JsonlHashChainAuditTrail,
         approval_verifier: ApprovalVerifier | None = None,

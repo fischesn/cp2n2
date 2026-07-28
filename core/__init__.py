@@ -1,1 +1,1 @@
-"""phys-MCP prototype package."""
+"""CP²N² prototype package."""

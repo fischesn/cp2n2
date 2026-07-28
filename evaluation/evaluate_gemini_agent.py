@@ -1,4 +1,4 @@
-"""Evaluate Gemini planning through the constrained A4 phys-MCP surface.
+"""Evaluate Gemini planning through the constrained A4 CP²N² surface.
 
 This explicit networked evaluation is not part of the default test suite.
 Every supplied goal requests a dry run. The evaluation never executes a
@@ -27,7 +27,7 @@ def bootstrap_project_root() -> Path:
 
 PROJECT_ROOT = bootstrap_project_root()
 
-from agent.gemini_agent import PhysMCPGeminiAgent  # noqa: E402
+from agent.gemini_agent import CP2N2GeminiAgent  # noqa: E402
 from evaluation.common import RESULTS_DIR  # noqa: E402
 
 
@@ -40,7 +40,7 @@ def build_user_goals() -> list[str]:
         ),
         (
             "Without executing any substrate, choose a compatible fixed preset for "
-            "the Cortical Labs simulator and assess it through phys-MCP."
+            "the Cortical Labs simulator and assess it through CP²N²."
         ),
         (
             "Prepare a dry-run plan for a fixed edge vector-classification preset."
@@ -132,7 +132,7 @@ def print_summary(
 
 
 def main() -> None:
-    agent = PhysMCPGeminiAgent()
+    agent = CP2N2GeminiAgent()
     rows = [
         summarize_agent_result(goal, agent.run(goal))
         for goal in build_user_goals()

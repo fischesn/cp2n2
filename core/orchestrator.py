@@ -1,4 +1,4 @@
-"""Lifecycle-, lease-, and evidence-aware phys-MCP orchestrator."""
+"""Lifecycle-, lease-, and evidence-aware CP²N² orchestrator."""
 
 from __future__ import annotations
 
@@ -97,7 +97,7 @@ class ControlPlaneActionResult(BaseModel):
     error: ControlPlaneError | None = None
 
 
-class PhysMCPOrchestrator:
+class CP2N2Orchestrator:
     """Coordinates discovery, leases, lifecycle, invocation, and recovery."""
 
     def __init__(
@@ -1405,7 +1405,7 @@ class PhysMCPOrchestrator:
             ),
             correlation_id=correlation_id,
             error=error,
-            failure_reason=PhysMCPOrchestrator._format_error(error),
+            failure_reason=CP2N2Orchestrator._format_error(error),
         )
 
     def _history(self, correlation_id: str) -> list[LifecycleTransition]:
@@ -1517,3 +1517,8 @@ class PhysMCPOrchestrator:
                 actions.append("Triggered reset due to degraded health_status.")
 
         return actions
+
+
+# Backward-compatible import for software written against releases published
+# before the CP²N² rename. New code should import CP2N2Orchestrator.
+PhysMCPOrchestrator = CP2N2Orchestrator

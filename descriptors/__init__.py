@@ -1,4 +1,4 @@
-"""Descriptor and resource-contract models for the phys-MCP prototype."""
+"""Descriptor and resource-contract models for the CP²N² prototype."""
 
 from descriptors.resource_contract import (
     CONTRACT_SCHEMA_VERSION,

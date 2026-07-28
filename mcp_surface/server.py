@@ -17,14 +17,23 @@ from mcp_surface.models import MCPPrincipal, ToolResponse
 from mcp_surface.service import MCPControlSurface, TOOL_SPECS
 
 
-SERVER_NAME = "phys-mcp-constrained"
+SERVER_NAME = "cp2n2-constrained"
 SERVER_VERSION = "0.4.0"
 SERVER_INSTRUCTIONS = (
-    "Use only the listed high-level phys-MCP tools. Physical control parameters, "
+    "Use only the listed high-level CP²N² tools. Physical control parameters, "
     "policy mutation, runtime-kind mutation, lease bypass, and repeated execution "
     "loops are intentionally unavailable. Real biological execution requires an "
     "external one-time human approval."
 )
+
+
+def _configuration_value(
+    name: str,
+    legacy_name: str,
+    default: str = "",
+) -> str:
+    """Read a CP²N² setting with a pre-rename environment fallback."""
+    return os.getenv(name, os.getenv(legacy_name, default))
 
 
 def create_mcp_server(surface: MCPControlSurface) -> Server:
@@ -69,10 +78,17 @@ def create_mcp_server(surface: MCPControlSurface) -> Server:
 
 def build_default_surface() -> MCPControlSurface:
     """Build a fail-closed stdio surface from server-controlled environment."""
-    principal_id = os.getenv("PHYSMCP_PRINCIPAL_ID", "unauthenticated")
+    principal_id = _configuration_value(
+        "CP2N2_PRINCIPAL_ID",
+        "PHYSMCP_PRINCIPAL_ID",
+        "unauthenticated",
+    )
     scopes = [
         item.strip()
-        for item in os.getenv("PHYSMCP_SCOPES", "").split(",")
+        for item in _configuration_value(
+            "CP2N2_SCOPES",
+            "PHYSMCP_SCOPES",
+        ).split(",")
         if item.strip()
     ]
     principal = MCPPrincipal(
@@ -80,14 +96,22 @@ def build_default_surface() -> MCPControlSurface:
         authenticated=principal_id != "unauthenticated",
         scopes=scopes,
     )
-    include_cortical = os.getenv("PHYSMCP_INCLUDE_CORTICAL_LABS", "0") == "1"
+    include_cortical = (
+        _configuration_value(
+            "CP2N2_INCLUDE_CORTICAL_LABS",
+            "PHYSMCP_INCLUDE_CORTICAL_LABS",
+            "0",
+        )
+        == "1"
+    )
     orchestrator = build_live_target_orchestrator(
         include_cortical_labs=include_cortical
     )
     audit_path = Path(
-        os.getenv(
+        _configuration_value(
+            "CP2N2_AUDIT_PATH",
             "PHYSMCP_AUDIT_PATH",
-            str(Path(".physmcp") / "mcp-audit.jsonl"),
+            str(Path(".cp2n2") / "mcp-audit.jsonl"),
         )
     )
     return MCPControlSurface(

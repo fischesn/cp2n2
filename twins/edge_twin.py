@@ -1,4 +1,4 @@
-"""Lightweight fast edge backend for the phys-MCP prototype."""
+"""Lightweight fast edge backend for the CP²N² prototype."""
 
 from __future__ import annotations
 

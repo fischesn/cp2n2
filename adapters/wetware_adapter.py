@@ -1,4 +1,4 @@
-"""Wetware backend adapter for the phys-MCP prototype."""
+"""Wetware backend adapter for the CP²N² prototype."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Reproducible distributed-testbed support for phys-MCP."""
+"""Reproducible distributed-testbed support for CP²N²."""
 
 from .config import (
     CampaignConfiguration,

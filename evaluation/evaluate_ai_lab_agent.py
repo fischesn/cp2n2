@@ -19,7 +19,7 @@ from agent.ai_lab_agent import (
     AI_LAB_BASE_URL,
     AILabConfiguration,
     OpenAICompatibleAILabClient,
-    PhysMCPAILabAgent,
+    CP2N2AILabAgent,
 )
 from agent.constrained_client import build_agent_surface
 from evaluation.common import RESULTS_DIR
@@ -60,7 +60,7 @@ def evaluate(*, output_dir: Path = RESULTS_DIR) -> dict[str, Any]:
         audit_path=audit_path,
         include_cortical_labs=False,
     )
-    agent = PhysMCPAILabAgent(llm=client, surface=surface)
+    agent = CP2N2AILabAgent(llm=client, surface=surface)
 
     rows: list[dict[str, Any]] = []
     for index, goal in enumerate(build_user_goals(), start=1):

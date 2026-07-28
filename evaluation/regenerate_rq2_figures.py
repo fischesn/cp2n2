@@ -33,7 +33,7 @@ def regenerate(summary_csv: str | Path, output_dir: str | Path) -> list[Path]:
         )
     plt.xlabel("Competing clients")
     plt.ylabel("P95 end-to-end latency (ms)")
-    plt.title("RQ2: distributed phys-MCP latency under load and faults")
+    plt.title("RQ2: distributed CP²N² latency under load and faults")
     plt.xticks(sorted({int(row["client_count"]) for row in rows}))
     plt.legend(fontsize=8)
     plt.tight_layout()

@@ -1,4 +1,4 @@
-"""Gemini planner constrained to the A4 phys-MCP tool boundary."""
+"""Gemini planner constrained to the A4 CP²N² tool boundary."""
 
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ from agent.constrained_client import (  # noqa: E402
 from mcp_surface.service import MCPControlSurface  # noqa: E402
 
 
-class PhysMCPGeminiAgent:
+class CP2N2GeminiAgent:
     def __init__(
         self,
         api_key: str | None = None,
@@ -52,7 +52,7 @@ class PhysMCPGeminiAgent:
         self.surface = surface or build_agent_surface(
             principal_id="gemini-agent",
             audit_path=audit_path
-            or Path(".physmcp") / "gemini-agent-audit.jsonl",
+            or Path(".cp2n2") / "gemini-agent-audit.jsonl",
             include_cortical_labs=True,
         )
         self.executor = ConstrainedAgentExecutor(self.surface)
@@ -123,12 +123,16 @@ class PhysMCPGeminiAgent:
         )
 
 
+# Backward-compatible import for pre-rename clients.
+PhysMCPGeminiAgent = CP2N2GeminiAgent
+
+
 def main() -> None:
     user_goal = (
         "Prepare a dry-run plan for the fixed Cortical Labs pattern-"
         "discrimination preset and report whether it is currently admissible."
     )
-    result = PhysMCPGeminiAgent().run(user_goal)
+    result = CP2N2GeminiAgent().run(user_goal)
     print(json.dumps(result.__dict__, indent=2))
 
 

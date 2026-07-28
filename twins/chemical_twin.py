@@ -1,4 +1,4 @@
-"""Lightweight chemical/dna-inspired twin for the phys-MCP prototype."""
+"""Lightweight chemical/dna-inspired twin for the CP²N² prototype."""
 
 from __future__ import annotations
 

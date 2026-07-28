@@ -1,4 +1,4 @@
-"""In-process idempotency records for state-changing phys-MCP requests."""
+"""In-process idempotency records for state-changing CP²N² requests."""
 
 from __future__ import annotations
 

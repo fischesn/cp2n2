@@ -1,4 +1,4 @@
-"""Admission, feasibility, and selection for phys-MCP resources."""
+"""Admission, feasibility, and selection for CP²N² resources."""
 
 from __future__ import annotations
 

@@ -16,7 +16,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from adapters.remote_edge_adapter import RemoteEdgeAdapter
-from core.orchestrator import PhysMCPOrchestrator
+from core.orchestrator import CP2N2Orchestrator
 from core.task_model import TaskRequest
 from testbed.config import NetworkProfile, load_network_profile
 from testbed.context import (
@@ -38,7 +38,7 @@ class ControlPlaneServiceState:
     ) -> None:
         self.profile = profile
         self.recorder = JsonlSpanRecorder(trace_path, "control-plane")
-        self.orchestrator = PhysMCPOrchestrator()
+        self.orchestrator = CP2N2Orchestrator()
         self.orchestrator.register_adapter(RemoteEdgeAdapter(adapter_url))
 
 

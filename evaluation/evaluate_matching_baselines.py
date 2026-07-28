@@ -1,4 +1,4 @@
-"""Evaluate phys-MCP matching against simpler baseline selectors."""
+"""Evaluate CP²N² matching against simpler baseline selectors."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from adapters.edge_adapter import EdgeAdapter
 from adapters.fault_injecting_adapter import FaultInjectingAdapter, FaultProfile
 from adapters.wetware_adapter import WetwareAdapter
 from core.matcher import BackendMatcher
-from core.orchestrator import PhysMCPOrchestrator
+from core.orchestrator import CP2N2Orchestrator
 from core.task_model import SelectionPolicy, TaskRequest
 from demos.common import (
     build_extended_orchestrator,
@@ -88,7 +88,7 @@ def _select_static_priority(task: TaskRequest, orchestrator) -> str | None:
             "chemical-backend",
         ]
     )
-    static_orchestrator = PhysMCPOrchestrator(
+    static_orchestrator = CP2N2Orchestrator(
         registry=orchestrator.registry,
         matcher=static_matcher,
     )
@@ -158,7 +158,7 @@ def evaluate() -> dict:
             "weighted_comparison": _selector(
                 SelectionPolicy.WEIGHTED_COMPARISON
             ),
-            "physmcp_lexicographic": _selector(
+            "cp2n2_lexicographic": _selector(
                 SelectionPolicy.LEXICOGRAPHIC
             ),
         }
