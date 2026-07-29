@@ -99,7 +99,7 @@
       {
         "from_version": 2,
         "occurred_at": "2026-07-29T16:41:12.752540Z",
-        "proof_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+        "proof_sha256": "ecbceb97fe0d6a9f605e1e8beb81757ea5f7c1d1e56bcbb2bc60481bf7fd45ff",
         "reason": "backend preparation started",
         "source": "LifecycleStore transition",
         "state": "preparing",
@@ -108,7 +108,7 @@
       {
         "from_version": 3,
         "occurred_at": "2026-07-29T16:41:12.753842Z",
-        "proof_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+        "proof_sha256": "ecbceb97fe0d6a9f605e1e8beb81757ea5f7c1d1e56bcbb2bc60481bf7fd45ff",
         "reason": "substrate invocation started",
         "source": "LifecycleStore transition",
         "state": "running",
@@ -117,7 +117,7 @@
       {
         "from_version": 4,
         "occurred_at": "2026-07-29T16:41:12.755884Z",
-        "proof_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+        "proof_sha256": "ecbceb97fe0d6a9f605e1e8beb81757ea5f7c1d1e56bcbb2bc60481bf7fd45ff",
         "reason": "postcondition validation started",
         "source": "LifecycleStore transition",
         "state": "validating",
@@ -126,7 +126,7 @@
       {
         "from_version": 5,
         "occurred_at": "2026-07-29T16:41:12.756520Z",
-        "proof_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+        "proof_sha256": "ecbceb97fe0d6a9f605e1e8beb81757ea5f7c1d1e56bcbb2bc60481bf7fd45ff",
         "reason": "execution completed; cooldown started",
         "source": "LifecycleStore transition",
         "state": "cooldown",
@@ -135,7 +135,7 @@
       {
         "from_version": 6,
         "occurred_at": "2026-07-29T16:41:12.756954Z",
-        "proof_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+        "proof_sha256": "ecbceb97fe0d6a9f605e1e8beb81757ea5f7c1d1e56bcbb2bc60481bf7fd45ff",
         "reason": "cooldown completed",
         "source": "LifecycleStore transition",
         "state": "ready",
@@ -230,10 +230,10 @@
     "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
     "config_sha256": "5fccaac3022e223fc181508833eaad38755279556b43b6b2df4e2f7e032a08e4",
     "control_plane_audit_sha256": "ca395c568dde89e95ea4f0ed64218684c75f9a4e508c90df6046417f277e3981",
-    "control_plane_transcript_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+    "control_plane_transcript_sha256": "ecbceb97fe0d6a9f605e1e8beb81757ea5f7c1d1e56bcbb2bc60481bf7fd45ff",
     "decoder_sha256": "42789a20ea16e048f1a23b28e601ff3445e64b125c48de8656b11e612991afbf",
     "result_artifact_sha256": "af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381",
-    "source_replay_sha256": "02b0004c5da26d9b2d58565892f3c9f09abd74895d535663b9cb147a87997bef"
+    "source_replay_sha256": "8c56948bb2bda076786dca9e699c2f88558a3545b5e98f9e007216dc1d3fed28"
   },
   "mode": "replay",
   "run": {
