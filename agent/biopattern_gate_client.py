@@ -15,6 +15,7 @@ class BioPatternGateTranscript:
 
     steps: tuple[dict[str, Any], ...]
     result_summary: dict[str, Any]
+    lifecycle_history: tuple[dict[str, Any], ...]
 
     @property
     def audit_request_ids(self) -> tuple[str, ...]:
@@ -31,6 +32,7 @@ class BioPatternGateTranscript:
             "steps": list(self.steps),
             "audit_request_ids": list(self.audit_request_ids),
             "result_summary": self.result_summary,
+            "lifecycle_history": list(self.lifecycle_history),
             "raw_substrate_output_exposed": False,
         }
 
@@ -113,6 +115,16 @@ class BioPatternGateDeterministicClient:
         lease = self.surface.orchestrator.registry.lease_store.current(BACKEND_ID)
         if snapshot.state != "ready" or lease is not None:
             raise RuntimeError("control plane did not release the E3 resource")
+        correlation_id = str(result["summary"]["orchestration_correlation_id"])
+        lifecycle_history = tuple(
+            transition.model_dump(mode="json")
+            for transition in (
+                self.surface.orchestrator.registry.lifecycle_store.history(
+                    resource_id=BACKEND_ID,
+                    correlation_id=correlation_id,
+                )
+            )
+        )
         steps.append(
             {
                 "stage": "automatic_release",
@@ -130,6 +142,7 @@ class BioPatternGateDeterministicClient:
         return BioPatternGateTranscript(
             steps=tuple(steps),
             result_summary=result["summary"],
+            lifecycle_history=lifecycle_history,
         )
 
     def _call(

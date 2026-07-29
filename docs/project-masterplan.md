@@ -563,13 +563,17 @@ The application visualizer has four coordinated panels:
 The gate remains a visualization of a rigorously defined assay; visual effects
 must not obscure missed trials, aborted runs, unknown status, or uncertainty.
 
-- [ ] Produce a static UI wireframe and demo storyboard.
+- [x] Produce the four-panel UI and replay interaction storyboard.
 - [ ] Implement the CL application web visualizer using application data
   streams plus `cl_spikes` and `cl_stims`.
-- [ ] Implement a replay mode that renders a completed HDF5/result bundle
+- [x] Implement a replay mode that renders a completed result bundle
   without contacting a substrate.
-- [ ] Add prominent E3/E5, live/replay, and success/partial/aborted labels.
-- [ ] Record a deterministic E3 demo and, after approval, an E5 demo.
+- [x] Add prominent evidence, live/replay, and terminal-status labels to the
+  shared visualizer; E5 remains unavailable until attested hardware exists.
+- [x] Record a deterministic E3 execution through the constrained MCP surface
+  and bind the visualizer to its verified audit chain, LifecycleStore history,
+  result artifact, and automatic lease release.
+- [ ] After provider approval, record an attested E5 hardware demo.
 
 ### B3. Assay contract and immutable configuration
 

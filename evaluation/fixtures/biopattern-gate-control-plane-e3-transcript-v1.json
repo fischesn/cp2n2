@@ -1,0 +1,683 @@
+{
+  "audit_chain_verified": true,
+  "audit_request_ids": [
+    "ec18a604-2f5f-49b0-afc3-fa4211881c4f",
+    "821408c1-da39-45eb-a7d5-49f7031134d1",
+    "f40f3565-5155-4d8f-9888-dee34c098ce1",
+    "a00827fd-7fc0-41c9-882a-33ac1fd4527f",
+    "4b3d38a7-8800-4a15-86d6-2e02af8db556",
+    "e2bb3c11-ee2f-450e-ad3f-e44bd4457327",
+    "96e54b91-ac30-4972-9b88-9d89b71049fb",
+    "644ef94e-6717-40a4-b2b1-384734c0d0ea"
+  ],
+  "client_kind": "deterministic_non_llm",
+  "lifecycle_history": [
+    {
+      "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+      "from_state": "reserved",
+      "from_version": 2,
+      "occurred_at": "2026-07-29T16:41:12.752540Z",
+      "reason": "backend preparation started",
+      "resource_id": "cortical-labs-biopattern-gate-e3",
+      "to_state": "preparing",
+      "to_version": 3
+    },
+    {
+      "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+      "from_state": "preparing",
+      "from_version": 3,
+      "occurred_at": "2026-07-29T16:41:12.753842Z",
+      "reason": "substrate invocation started",
+      "resource_id": "cortical-labs-biopattern-gate-e3",
+      "to_state": "running",
+      "to_version": 4
+    },
+    {
+      "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+      "from_state": "running",
+      "from_version": 4,
+      "occurred_at": "2026-07-29T16:41:12.755884Z",
+      "reason": "postcondition validation started",
+      "resource_id": "cortical-labs-biopattern-gate-e3",
+      "to_state": "validating",
+      "to_version": 5
+    },
+    {
+      "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+      "from_state": "validating",
+      "from_version": 5,
+      "occurred_at": "2026-07-29T16:41:12.756520Z",
+      "reason": "execution completed; cooldown started",
+      "resource_id": "cortical-labs-biopattern-gate-e3",
+      "to_state": "cooldown",
+      "to_version": 6
+    },
+    {
+      "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+      "from_state": "cooldown",
+      "from_version": 6,
+      "occurred_at": "2026-07-29T16:41:12.756954Z",
+      "reason": "cooldown completed",
+      "resource_id": "cortical-labs-biopattern-gate-e3",
+      "to_state": "ready",
+      "to_version": 7
+    }
+  ],
+  "raw_substrate_output_exposed": false,
+  "resource_id": "cortical-labs-biopattern-gate-e3",
+  "result_summary": {
+    "application": {
+      "application_id": "cp2n2-biopattern-gate",
+      "application_run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+      "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+      "application_status": "complete",
+      "biological_claim": false,
+      "config_sha256": "5fccaac3022e223fc181508833eaad38755279556b43b6b2df4e2f7e032a08e4",
+      "decoder_sha256": "42789a20ea16e048f1a23b28e601ff3445e64b125c48de8656b11e612991afbf",
+      "evidence_level": "E3",
+      "pipeline_assertion_accuracy": 1.0,
+      "runtime_kind": "sdk_simulator",
+      "scored_trial_count": 12,
+      "sham_trial_count": 2,
+      "trial_count": 14
+    },
+    "artifact_references": [
+      {
+        "artifact_id": "biopattern-gate-result-af813f7ddcb25e18",
+        "kind": "biopattern_gate_result_summary",
+        "media_type": "application/json",
+        "metadata": {
+          "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+          "application_status": "complete",
+          "biological_claim": false,
+          "completed_trial_count": 14,
+          "evidence_level": "E3",
+          "runtime_kind": "sdk_simulator",
+          "sha256": "af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+        },
+        "uri": "memory://biopattern-gate/af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+      }
+    ],
+    "confidence": null,
+    "error_code": null,
+    "error_message": null,
+    "evidence_level": "E3",
+    "execution_latency_ms": 1.3996999987284653,
+    "orchestration_correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+    "preset_id": "pattern_gate_v1",
+    "raw_output_included": false,
+    "runtime_kind": "sdk_simulator",
+    "selected_resource_id": "cortical-labs-biopattern-gate-e3",
+    "success": true,
+    "used_fallback": false,
+    "validation_failure_count": 0
+  },
+  "steps": [
+    {
+      "error": null,
+      "ok": true,
+      "request_id": "ec18a604-2f5f-49b0-afc3-fa4211881c4f",
+      "result": {
+        "available_tools_are_constrained": true,
+        "count": 4,
+        "resources": [
+          {
+            "compatible_presets": [
+              {
+                "compatible_substrates": [
+                  "chemical"
+                ],
+                "description": "Fixed-input concentration sensing assay.",
+                "physical_parameters_agent_editable": false,
+                "preset_id": "chemical_sensing_v1",
+                "task_kind": "sensing"
+              }
+            ],
+            "display_name": "Chemical Twin Backend",
+            "evidence_level": "E1",
+            "health_state": "ready",
+            "human_approval_required_for_real_execution": false,
+            "lifecycle_state": "ready",
+            "locality": "lab",
+            "resource_id": "chemical-backend",
+            "runtime_kind": "synthetic_twin",
+            "substrate_class": "chemical"
+          },
+          {
+            "compatible_presets": [
+              {
+                "compatible_substrates": [
+                  "wetware"
+                ],
+                "description": "Bounded temporal-response preset for wetware-class resources.",
+                "physical_parameters_agent_editable": false,
+                "preset_id": "wetware_temporal_probe_v1",
+                "task_kind": "temporal_inference"
+              },
+              {
+                "compatible_substrates": [
+                  "wetware"
+                ],
+                "description": "BioPattern Gate: a blinded temporal-pattern routing assay with a frozen readout; physical controls are never agent inputs.",
+                "physical_parameters_agent_editable": false,
+                "preset_id": "pattern_gate_v1",
+                "task_kind": "control"
+              }
+            ],
+            "display_name": "BioPattern Gate (Cortical Labs E3 simulator)",
+            "evidence_level": "E3",
+            "health_state": "healthy",
+            "human_approval_required_for_real_execution": false,
+            "lifecycle_state": "ready",
+            "locality": "local",
+            "resource_id": "cortical-labs-biopattern-gate-e3",
+            "runtime_kind": "sdk_simulator",
+            "substrate_class": "wetware"
+          },
+          {
+            "compatible_presets": [
+              {
+                "compatible_substrates": [
+                  "edge_accelerator"
+                ],
+                "description": "Fixed-vector low-latency classification assay.",
+                "physical_parameters_agent_editable": false,
+                "preset_id": "edge_vector_classification_v1",
+                "task_kind": "classification"
+              }
+            ],
+            "display_name": "Fast Edge Twin Backend",
+            "evidence_level": "E1",
+            "health_state": "ready",
+            "human_approval_required_for_real_execution": false,
+            "lifecycle_state": "ready",
+            "locality": "edge",
+            "resource_id": "edge-backend",
+            "runtime_kind": "synthetic_twin",
+            "substrate_class": "edge_accelerator"
+          },
+          {
+            "compatible_presets": [
+              {
+                "compatible_substrates": [
+                  "wetware"
+                ],
+                "description": "Bounded temporal-response preset for wetware-class resources.",
+                "physical_parameters_agent_editable": false,
+                "preset_id": "wetware_temporal_probe_v1",
+                "task_kind": "temporal_inference"
+              }
+            ],
+            "display_name": "Wetware Twin Backend",
+            "evidence_level": "E1",
+            "health_state": "ready",
+            "human_approval_required_for_real_execution": false,
+            "lifecycle_state": "ready",
+            "locality": "lab",
+            "resource_id": "wetware-backend",
+            "runtime_kind": "synthetic_twin",
+            "substrate_class": "wetware"
+          }
+        ]
+      },
+      "stage": "discover",
+      "tool": "discover_resources"
+    },
+    {
+      "error": null,
+      "ok": true,
+      "request_id": "821408c1-da39-45eb-a7d5-49f7031134d1",
+      "result": {
+        "dry_run": true,
+        "plan": {
+          "admissible_and_feasible": true,
+          "human_approval_required_for_execution": false,
+          "preset": {
+            "compatible_substrates": [
+              "wetware"
+            ],
+            "description": "BioPattern Gate: a blinded temporal-pattern routing assay with a frozen readout; physical controls are never agent inputs.",
+            "physical_parameters_agent_editable": false,
+            "preset_id": "pattern_gate_v1",
+            "task_kind": "control"
+          },
+          "resource_id": "cortical-labs-biopattern-gate-e3",
+          "selection_report": {
+            "candidates": [
+              {
+                "accepted": true,
+                "admission": {
+                  "passed": true,
+                  "satisfied_constraints": [
+                    "direct_backend_target",
+                    "supported_task_type",
+                    "input_modality_compatible",
+                    "repeated_invocation_policy",
+                    "required_telemetry_declared",
+                    "freshness_observable",
+                    "human_supervision_policy",
+                    "continuous_monitoring_capability",
+                    "confidence_observable",
+                    "resource_contract_safety"
+                  ],
+                  "stage": "admission",
+                  "violations": []
+                },
+                "backend_id": "cortical-labs-biopattern-gate-e3",
+                "display_name": "BioPattern Gate (Cortical Labs E3 simulator)",
+                "feasibility": {
+                  "passed": true,
+                  "satisfied_constraints": [
+                    "runtime_available",
+                    "lifecycle_available",
+                    "resource_reservable",
+                    "required_telemetry_available",
+                    "latency_budget",
+                    "telemetry_freshness"
+                  ],
+                  "stage": "feasibility",
+                  "violations": []
+                },
+                "ranking": {
+                  "criteria": {
+                    "cost_unknown": true,
+                    "drift_score": 1.0,
+                    "estimated_cost": 0.0,
+                    "freshness_ratio": 0.0,
+                    "health_penalty": 0.0,
+                    "health_sensitive_penalty": 0.0,
+                    "latency_ratio": 0.05,
+                    "locality_distance": 0.0,
+                    "reset_mismatch": 0.0,
+                    "typical_latency_ms": 25.0,
+                    "variability_mismatch": 0.0
+                  },
+                  "policy": "lexicographic",
+                  "rank": 1,
+                  "rank_key": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.05,
+                    0.0,
+                    1,
+                    0.0,
+                    "cortical-labs-biopattern-gate-e3"
+                  ],
+                  "weighted_components": {
+                    "age_of_information_supported": 6.0,
+                    "base_accepted": 50.0,
+                    "freshness": 4.0,
+                    "latency_within_budget": 20.0,
+                    "modality_overlap": 15.0,
+                    "required_telemetry": 4.0,
+                    "task_supported": 20.0
+                  },
+                  "weighted_score": 119.0
+                },
+                "reasons": [
+                  "direct_backend_target",
+                  "supported_task_type",
+                  "input_modality_compatible",
+                  "repeated_invocation_policy",
+                  "required_telemetry_declared",
+                  "freshness_observable",
+                  "human_supervision_policy",
+                  "continuous_monitoring_capability",
+                  "confidence_observable",
+                  "resource_contract_safety",
+                  "runtime_available",
+                  "lifecycle_available",
+                  "resource_reservable",
+                  "required_telemetry_available",
+                  "latency_budget",
+                  "telemetry_freshness",
+                  "Ranking policy 'lexicographic' applied only after hard checks."
+                ],
+                "rejection_reasons": [],
+                "score": 119.0
+              }
+            ],
+            "policy": "lexicographic",
+            "task_id": "mcp-assay-1f5e727f-f705-438b-b4ce-27d80240c2a8"
+          }
+        },
+        "resource_committed": false,
+        "run_created": false
+      },
+      "stage": "dry_run",
+      "tool": "prepare_assay"
+    },
+    {
+      "error": null,
+      "ok": true,
+      "request_id": "f40f3565-5155-4d8f-9888-dee34c098ce1",
+      "result": {
+        "expires_at": "2026-07-29T16:42:12.739242+00:00",
+        "lease_id": "1bdd7444-5ecd-4173-a1bb-d64144b49c39",
+        "lease_version": 0,
+        "lifecycle": {
+          "correlation_id": "02261ecb-f40e-40c8-89a9-f195fca2f056",
+          "reason": "explicit lease 1bdd7444-5ecd-4173-a1bb-d64144b49c39 acquired",
+          "resource_id": "cortical-labs-biopattern-gate-e3",
+          "state": "reserved",
+          "updated_at": "2026-07-29T16:41:12.739322Z",
+          "version": 2
+        },
+        "resource_id": "cortical-labs-biopattern-gate-e3"
+      },
+      "stage": "reserve",
+      "tool": "reserve_resource"
+    },
+    {
+      "error": null,
+      "ok": true,
+      "request_id": "a00827fd-7fc0-41c9-882a-33ac1fd4527f",
+      "result": {
+        "dry_run": false,
+        "plan": {
+          "admissible_and_feasible": true,
+          "human_approval_required_for_execution": false,
+          "preset": {
+            "compatible_substrates": [
+              "wetware"
+            ],
+            "description": "BioPattern Gate: a blinded temporal-pattern routing assay with a frozen readout; physical controls are never agent inputs.",
+            "physical_parameters_agent_editable": false,
+            "preset_id": "pattern_gate_v1",
+            "task_kind": "control"
+          },
+          "resource_id": "cortical-labs-biopattern-gate-e3",
+          "selection_report": {
+            "candidates": [
+              {
+                "accepted": true,
+                "admission": {
+                  "passed": true,
+                  "satisfied_constraints": [
+                    "direct_backend_target",
+                    "supported_task_type",
+                    "input_modality_compatible",
+                    "repeated_invocation_policy",
+                    "required_telemetry_declared",
+                    "freshness_observable",
+                    "human_supervision_policy",
+                    "continuous_monitoring_capability",
+                    "confidence_observable",
+                    "resource_contract_safety"
+                  ],
+                  "stage": "admission",
+                  "violations": []
+                },
+                "backend_id": "cortical-labs-biopattern-gate-e3",
+                "display_name": "BioPattern Gate (Cortical Labs E3 simulator)",
+                "feasibility": {
+                  "passed": true,
+                  "satisfied_constraints": [
+                    "runtime_available",
+                    "lifecycle_available",
+                    "resource_reservable",
+                    "required_telemetry_available",
+                    "latency_budget",
+                    "telemetry_freshness"
+                  ],
+                  "stage": "feasibility",
+                  "violations": []
+                },
+                "ranking": {
+                  "criteria": {
+                    "cost_unknown": true,
+                    "drift_score": 1.0,
+                    "estimated_cost": 0.0,
+                    "freshness_ratio": 0.0,
+                    "health_penalty": 0.0,
+                    "health_sensitive_penalty": 0.0,
+                    "latency_ratio": 0.05,
+                    "locality_distance": 0.0,
+                    "reset_mismatch": 0.0,
+                    "typical_latency_ms": 25.0,
+                    "variability_mismatch": 0.0
+                  },
+                  "policy": "lexicographic",
+                  "rank": 1,
+                  "rank_key": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.05,
+                    0.0,
+                    1,
+                    0.0,
+                    "cortical-labs-biopattern-gate-e3"
+                  ],
+                  "weighted_components": {
+                    "age_of_information_supported": 6.0,
+                    "base_accepted": 50.0,
+                    "freshness": 4.0,
+                    "latency_within_budget": 20.0,
+                    "modality_overlap": 15.0,
+                    "required_telemetry": 4.0,
+                    "task_supported": 20.0
+                  },
+                  "weighted_score": 119.0
+                },
+                "reasons": [
+                  "direct_backend_target",
+                  "supported_task_type",
+                  "input_modality_compatible",
+                  "repeated_invocation_policy",
+                  "required_telemetry_declared",
+                  "freshness_observable",
+                  "human_supervision_policy",
+                  "continuous_monitoring_capability",
+                  "confidence_observable",
+                  "resource_contract_safety",
+                  "runtime_available",
+                  "lifecycle_available",
+                  "resource_reservable",
+                  "required_telemetry_available",
+                  "latency_budget",
+                  "telemetry_freshness",
+                  "Ranking policy 'lexicographic' applied only after hard checks."
+                ],
+                "rejection_reasons": [],
+                "score": 119.0
+              }
+            ],
+            "policy": "lexicographic",
+            "task_id": "mcp-assay-f4893df3-77f2-4620-adda-e92e26d43dba"
+          }
+        },
+        "resource_committed": true,
+        "run_created": true,
+        "run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+        "state": "prepared"
+      },
+      "stage": "prepare",
+      "tool": "prepare_assay"
+    },
+    {
+      "error": null,
+      "ok": true,
+      "request_id": "4b3d38a7-8800-4a15-86d6-2e02af8db556",
+      "result": {
+        "approval_required": false,
+        "created_at": "2026-07-29T16:41:12.743827+00:00",
+        "preset_id": "pattern_gate_v1",
+        "resource_id": "cortical-labs-biopattern-gate-e3",
+        "resource_lifecycle": {
+          "correlation_id": "02261ecb-f40e-40c8-89a9-f195fca2f056",
+          "reason": "explicit lease 1bdd7444-5ecd-4173-a1bb-d64144b49c39 acquired",
+          "resource_id": "cortical-labs-biopattern-gate-e3",
+          "state": "reserved",
+          "updated_at": "2026-07-29T16:41:12.739322Z",
+          "version": 2
+        },
+        "run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+        "state": "prepared",
+        "updated_at": "2026-07-29T16:41:12.743827+00:00"
+      },
+      "stage": "status_prepared",
+      "tool": "get_run_status"
+    },
+    {
+      "error": null,
+      "ok": true,
+      "request_id": "e2bb3c11-ee2f-450e-ad3f-e44bd4457327",
+      "result": {
+        "run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+        "state": "succeeded",
+        "summary": {
+          "application": {
+            "application_id": "cp2n2-biopattern-gate",
+            "application_run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+            "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+            "application_status": "complete",
+            "biological_claim": false,
+            "config_sha256": "5fccaac3022e223fc181508833eaad38755279556b43b6b2df4e2f7e032a08e4",
+            "decoder_sha256": "42789a20ea16e048f1a23b28e601ff3445e64b125c48de8656b11e612991afbf",
+            "evidence_level": "E3",
+            "pipeline_assertion_accuracy": 1.0,
+            "runtime_kind": "sdk_simulator",
+            "scored_trial_count": 12,
+            "sham_trial_count": 2,
+            "trial_count": 14
+          },
+          "artifact_references": [
+            {
+              "artifact_id": "biopattern-gate-result-af813f7ddcb25e18",
+              "kind": "biopattern_gate_result_summary",
+              "media_type": "application/json",
+              "metadata": {
+                "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+                "application_status": "complete",
+                "biological_claim": false,
+                "completed_trial_count": 14,
+                "evidence_level": "E3",
+                "runtime_kind": "sdk_simulator",
+                "sha256": "af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+              },
+              "uri": "memory://biopattern-gate/af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+            }
+          ],
+          "confidence": null,
+          "error_code": null,
+          "error_message": null,
+          "evidence_level": "E3",
+          "execution_latency_ms": 1.3996999987284653,
+          "orchestration_correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+          "preset_id": "pattern_gate_v1",
+          "raw_output_included": false,
+          "runtime_kind": "sdk_simulator",
+          "selected_resource_id": "cortical-labs-biopattern-gate-e3",
+          "success": true,
+          "used_fallback": false,
+          "validation_failure_count": 0
+        }
+      },
+      "stage": "run",
+      "tool": "run_assay"
+    },
+    {
+      "error": null,
+      "ok": true,
+      "request_id": "96e54b91-ac30-4972-9b88-9d89b71049fb",
+      "result": {
+        "approval_required": false,
+        "created_at": "2026-07-29T16:41:12.743827+00:00",
+        "preset_id": "pattern_gate_v1",
+        "resource_id": "cortical-labs-biopattern-gate-e3",
+        "resource_lifecycle": {
+          "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+          "reason": "cooldown completed",
+          "resource_id": "cortical-labs-biopattern-gate-e3",
+          "state": "ready",
+          "updated_at": "2026-07-29T16:41:12.756954Z",
+          "version": 7
+        },
+        "run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+        "state": "succeeded",
+        "updated_at": "2026-07-29T16:41:12.757638+00:00"
+      },
+      "stage": "status_terminal",
+      "tool": "get_run_status"
+    },
+    {
+      "error": null,
+      "ok": true,
+      "request_id": "644ef94e-6717-40a4-b2b1-384734c0d0ea",
+      "result": {
+        "raw_substrate_output_exposed": false,
+        "run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+        "state": "succeeded",
+        "summary": {
+          "application": {
+            "application_id": "cp2n2-biopattern-gate",
+            "application_run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+            "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+            "application_status": "complete",
+            "biological_claim": false,
+            "config_sha256": "5fccaac3022e223fc181508833eaad38755279556b43b6b2df4e2f7e032a08e4",
+            "decoder_sha256": "42789a20ea16e048f1a23b28e601ff3445e64b125c48de8656b11e612991afbf",
+            "evidence_level": "E3",
+            "pipeline_assertion_accuracy": 1.0,
+            "runtime_kind": "sdk_simulator",
+            "scored_trial_count": 12,
+            "sham_trial_count": 2,
+            "trial_count": 14
+          },
+          "artifact_references": [
+            {
+              "artifact_id": "biopattern-gate-result-af813f7ddcb25e18",
+              "kind": "biopattern_gate_result_summary",
+              "media_type": "application/json",
+              "metadata": {
+                "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+                "application_status": "complete",
+                "biological_claim": false,
+                "completed_trial_count": 14,
+                "evidence_level": "E3",
+                "runtime_kind": "sdk_simulator",
+                "sha256": "af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+              },
+              "uri": "memory://biopattern-gate/af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+            }
+          ],
+          "confidence": null,
+          "error_code": null,
+          "error_message": null,
+          "evidence_level": "E3",
+          "execution_latency_ms": 1.3996999987284653,
+          "orchestration_correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+          "preset_id": "pattern_gate_v1",
+          "raw_output_included": false,
+          "runtime_kind": "sdk_simulator",
+          "selected_resource_id": "cortical-labs-biopattern-gate-e3",
+          "success": true,
+          "used_fallback": false,
+          "validation_failure_count": 0
+        }
+      },
+      "stage": "result",
+      "tool": "get_result_summary"
+    },
+    {
+      "ok": true,
+      "request_id": null,
+      "result": {
+        "lease_present": false,
+        "lifecycle_state": "ready",
+        "release_semantics": "orchestrator_finalization",
+        "resource_id": "cortical-labs-biopattern-gate-e3"
+      },
+      "stage": "automatic_release",
+      "tool": null
+    }
+  ]
+}

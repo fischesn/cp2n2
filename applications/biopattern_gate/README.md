@@ -31,6 +31,44 @@ artifact references. It binds the server-owned preset to exact application
 source, configuration, and decoder hashes. No raw spike events or physical
 control parameters cross the agent boundary.
 
+## Visual replay demo
+
+The paper-oriented dashboard combines two recorded evidence sources:
+
+- deterministic simulated trial observations for the gate, neural, and
+  decision views; and
+- a real execution through the constrained MCP surface for the control-plane
+  view, including the MCP request transcript, hash-chained audit log,
+  LifecycleStore transitions, sanitized result reference, and automatic lease
+  release.
+
+The checked-in control-plane capture is verified whenever the visual replay
+bundle is regenerated. The resulting dashboard remains a replay: it does not
+contact a substrate or execute MCP calls while it is being viewed. Start it
+from an activated virtual environment:
+
+```powershell
+python scripts\serve_biopattern_gate_demo.py
+```
+
+The command opens `http://127.0.0.1:8765/`. Use `--no-open` when the browser
+should not be opened automatically. The dashboard is unmistakably labeled
+`E3`, `REPLAY`, `MCP AUDITED`, and `NO BIOLOGICAL CLAIM`; its score is a
+deterministic pipeline assertion, not PNN performance.
+
+The recorded source evidence lives in
+`evaluation/fixtures/biopattern-gate-control-plane-e3-transcript-v1.json` and
+`evaluation/fixtures/biopattern-gate-control-plane-e3-audit-v1.jsonl`. Verify
+their binding to the visual bundle with:
+
+```powershell
+python scripts\export_biopattern_gate_demo_bundle.py --check
+```
+
+A user-oriented explanation of every visible area and its evidence meaning is
+available in
+[`docs/biopattern-gate-web-demo-guide.md`](../../docs/biopattern-gate-web-demo-guide.md).
+
 Verify that the checked-in JSON Schema matches the frozen configuration model:
 
 ```powershell

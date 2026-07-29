@@ -53,10 +53,10 @@ def main() -> int:
         },
         "entries": entries,
     }
-    MANIFEST.write_text(
-        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    with MANIFEST.open("w", encoding="utf-8", newline="\n") as manifest_file:
+        manifest_file.write(
+            json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+        )
     print(f"wrote {MANIFEST}")
     return 0
 
