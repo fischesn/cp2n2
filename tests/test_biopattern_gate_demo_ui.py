@@ -6,6 +6,7 @@ from scripts.export_biopattern_gate_demo_bundle import (
     CONTROL_PLANE_AUDIT,
     CONTROL_PLANE_TRANSCRIPT,
     OUTPUT,
+    _sha256,
     build_demo_bundle,
     render_bundle,
 )
@@ -73,6 +74,17 @@ def test_recorded_control_plane_sources_are_present_and_hash_chain_valid() -> No
     assert transcript["steps"][-1]["result"]["lease_present"] is False
     assert audit.verify() is True
     assert len(audit.events()) == 16
+
+
+def test_evidence_hash_is_invariant_to_lf_and_crlf(tmp_path) -> None:
+    lf = tmp_path / "evidence-lf.jsonl"
+    crlf = tmp_path / "evidence-crlf.jsonl"
+    lines = ('{"sequence":1}', '{"sequence":2}', "")
+
+    lf.write_bytes("\n".join(lines).encode("utf-8"))
+    crlf.write_bytes("\r\n".join(lines).encode("utf-8"))
+
+    assert _sha256(lf) == _sha256(crlf)
 
 
 def test_visualizer_contains_four_coordinated_panels_and_replay_controls() -> None:
