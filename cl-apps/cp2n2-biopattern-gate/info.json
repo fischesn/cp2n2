@@ -1,0 +1,7 @@
+{
+  "name": "CP2N2 BioPattern Gate",
+  "version": "0.1.0",
+  "description": "Blinded temporal-pattern gate demo with frozen readout and provenance.",
+  "author": "CP2N2 project",
+  "config_version": 1
+}

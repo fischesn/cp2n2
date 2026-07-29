@@ -132,6 +132,7 @@ and scopes:
 CP2N2_PRINCIPAL_ID=research-agent
 CP2N2_SCOPES=resources:read,leases:write,assays:prepare,assays:execute,runs:abort
 CP2N2_INCLUDE_CORTICAL_LABS=0
+CP2N2_INCLUDE_BIOPATTERN_GATE_E3=0
 CP2N2_AUDIT_PATH=.cp2n2/mcp-audit.jsonl
 ```
 
@@ -141,9 +142,14 @@ Start it from the project root:
 python -m mcp_surface.server
 ```
 
-Set `CP2N2_INCLUDE_CORTICAL_LABS=1` to register the optional CL adapter. This
-does not authorize physical execution and does not change the approval policy.
-Runtime evidence still distinguishes the SDK Simulator from physical hardware.
+Set `CP2N2_INCLUDE_CORTICAL_LABS=1` to register the optional generic CL
+adapter. This does not authorize physical execution and does not change the
+approval policy. Runtime evidence still distinguishes the SDK Simulator from
+physical hardware.
+
+Set `CP2N2_INCLUDE_BIOPATTERN_GATE_E3=1` to register the frozen, deterministic
+BioPattern Gate E3 application adapter. It is labeled as SDK-simulator
+evidence and cannot support a biological claim.
 
 ## Security properties and tests
 

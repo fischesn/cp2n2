@@ -7,11 +7,14 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.test-tmp/
 
 # Local diagnostics and generated recordings/results
 *.debug
 *.h5
 evaluation/results/run-*/
+cl-apps/.run-output/
+cl-apps/*.zip
 
 # Local environments and editor state
 .venv/

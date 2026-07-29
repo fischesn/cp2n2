@@ -46,6 +46,7 @@ def build_live_target_orchestrator(
     remote_base_url: str | None = None,
     *,
     include_cortical_labs: bool = False,
+    include_biopattern_gate_e3: bool = False,
 ) -> CP2N2Orchestrator:
     """Create an orchestrator with optional live-target adapters."""
     orchestrator = build_extended_orchestrator(remote_base_url=remote_base_url)
@@ -53,6 +54,28 @@ def build_live_target_orchestrator(
         from adapters.cortical_labs_adapter import CorticalLabsAdapter
 
         orchestrator.register_adapter(CorticalLabsAdapter())
+    if include_biopattern_gate_e3:
+        from adapters.biopattern_gate_e3_adapter import BioPatternGateE3Adapter
+
+        orchestrator.register_adapter(BioPatternGateE3Adapter())
+    return orchestrator
+
+
+def build_biopattern_gate_e3_orchestrator(
+    *,
+    telemetry_age_ms: float = 0.0,
+    fail_after_trials: int | None = None,
+) -> CP2N2Orchestrator:
+    """Create the dedicated access-independent BioPattern Gate E3 target."""
+    from adapters.biopattern_gate_e3_adapter import BioPatternGateE3Adapter
+
+    orchestrator = build_default_orchestrator()
+    orchestrator.register_adapter(
+        BioPatternGateE3Adapter(
+            telemetry_age_ms=telemetry_age_ms,
+            fail_after_trials=fail_after_trials,
+        )
+    )
     return orchestrator
 
 
