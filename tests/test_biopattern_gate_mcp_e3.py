@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from uuid import uuid4
 
+from adapters.biopattern_gate_e3_adapter import BioPatternGateE3Adapter
 from agent.biopattern_gate_client import BioPatternGateDeterministicClient
 from applications.biopattern_gate.control_plane_contract import (
     BACKEND_ID,
@@ -14,6 +15,8 @@ from mcp_surface.auth import Scope
 from mcp_surface.models import MCPPrincipal
 from mcp_surface.service import MCPControlSurface
 from mcp_surface.server import build_default_surface
+from runtimes.biopattern_gate_e3_runtime import application_source_digest
+from scripts.run_biopattern_gate_mcp_e3 import transcript_exit_code
 
 
 def _surface(tmp_path, *, orchestrator=None, principal_id="e3-client"):
@@ -83,9 +86,71 @@ def test_deterministic_client_executes_complete_audited_e3_lifecycle(tmp_path):
     assert application["trial_count"] == 14
     assert len(summary["artifact_references"]) == 1
     assert len(transcript.audit_request_ids) == 8
+    assert [
+        transition["to_state"]
+        for transition in rendered["lifecycle_history"]
+    ] == [
+        "preparing",
+        "running",
+        "validating",
+        "cooldown",
+        "ready",
+    ]
+    assert all(
+        transition["correlation_id"]
+        == summary["orchestration_correlation_id"]
+        for transition in rendered["lifecycle_history"]
+    )
     assert surface.audit_trail.verify()
     assert (
         surface.orchestrator.registry.lease_store.current(BACKEND_ID) is None
+    )
+
+
+def test_application_source_hash_is_invariant_to_lf_and_crlf(tmp_path):
+    lf_root = tmp_path / "lf"
+    crlf_root = tmp_path / "crlf"
+    for root, newline in ((lf_root, b"\n"), (crlf_root, b"\r\n")):
+        (root / "nested").mkdir(parents=True)
+        (root / "module.py").write_bytes(
+            newline.join((b"VALUE = 1", b"OTHER = 2", b""))
+        )
+        (root / "nested" / "preset.json").write_bytes(
+            newline.join((b"{", b'  "enabled": true', b"}", b""))
+        )
+
+    assert application_source_digest(lf_root) == application_source_digest(
+        crlf_root
+    )
+
+
+def test_demo_exit_code_reflects_execution_and_audit_status():
+    assert (
+        transcript_exit_code(
+            {
+                "audit_chain_verified": True,
+                "result_summary": {"success": True},
+            }
+        )
+        == 0
+    )
+    assert (
+        transcript_exit_code(
+            {
+                "audit_chain_verified": True,
+                "result_summary": {"success": False},
+            }
+        )
+        == 1
+    )
+    assert (
+        transcript_exit_code(
+            {
+                "audit_chain_verified": False,
+                "result_summary": {"success": True},
+            }
+        )
+        == 1
     )
 
 

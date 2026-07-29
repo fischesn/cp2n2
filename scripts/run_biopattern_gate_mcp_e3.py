@@ -20,6 +20,18 @@ from mcp_surface.models import MCPPrincipal  # noqa: E402
 from mcp_surface.service import MCPControlSurface  # noqa: E402
 
 
+def transcript_exit_code(transcript: dict) -> int:
+    """Fail the CLI when execution or audit verification did not succeed."""
+
+    summary = transcript.get("result_summary", {})
+    return (
+        0
+        if summary.get("success") is True
+        and transcript.get("audit_chain_verified") is True
+        else 1
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -46,7 +58,7 @@ def main() -> int:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(rendered + "\n", encoding="utf-8")
     print(rendered)
-    return 0
+    return transcript_exit_code(transcript)
 
 
 if __name__ == "__main__":

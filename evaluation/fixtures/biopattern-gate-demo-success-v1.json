@@ -1,0 +1,620 @@
+{
+  "application_id": "cp2n2-biopattern-gate",
+  "control_plane": {
+    "approval_required": false,
+    "audit_chain_verified": true,
+    "audit_event_count": 16,
+    "audit_head_sha256": "b9ee600532e70f35cb150c1fd1655af94b45b341a59bd3d044f466593d94f9f8",
+    "audit_principal_id": "biopattern-gate-e3-client",
+    "audit_request_count": 8,
+    "completed_audit_events": [
+      {
+        "event_sha256": "6372af5fafab4e8ce6ab485bff600ae5f312b63cbdc36ad7119c558f66311c8e",
+        "occurred_at": "2026-07-29T16:41:12.730492+00:00",
+        "outcome": "success",
+        "previous_sha256": "74bbca80088d2f2eac1d6f384e3d6244c003b6b79dc424cb80951313223d0acc",
+        "request_id": "ec18a604-2f5f-49b0-afc3-fa4211881c4f",
+        "sequence": 2,
+        "tool": "discover_resources"
+      },
+      {
+        "event_sha256": "ffae90e838d81cfc1578b473f2cc551f0bcc89a213fa2c1485c99ed83f89f638",
+        "occurred_at": "2026-07-29T16:41:12.736641+00:00",
+        "outcome": "success",
+        "previous_sha256": "2b1d2b507aa8754a2155d0ae1c001fc7c6b8fe575835bf48950c107fd51929d4",
+        "request_id": "821408c1-da39-45eb-a7d5-49f7031134d1",
+        "sequence": 4,
+        "tool": "prepare_assay"
+      },
+      {
+        "event_sha256": "6319aedc5f89a959e04162f899aea738484009eccec10ec5b50c2166deeee16c",
+        "occurred_at": "2026-07-29T16:41:12.739457+00:00",
+        "outcome": "success",
+        "previous_sha256": "4409f35f5b5462e3965c3058dca8cfb9f1d510a88a87244e6babfd1d7c0d5f17",
+        "request_id": "f40f3565-5155-4d8f-9888-dee34c098ce1",
+        "sequence": 6,
+        "tool": "reserve_resource"
+      },
+      {
+        "event_sha256": "dfae44f036db898b48b1b4ab1e835dbfeb9d6c904057c3840d3a2557c848e5cb",
+        "occurred_at": "2026-07-29T16:41:12.744008+00:00",
+        "outcome": "success",
+        "previous_sha256": "1e3c0cdcbb6541a25c2fdf3bd18086caa409b88c1a9e7100bd34b04cf1a77f93",
+        "request_id": "a00827fd-7fc0-41c9-882a-33ac1fd4527f",
+        "sequence": 8,
+        "tool": "prepare_assay"
+      },
+      {
+        "event_sha256": "dc64cb7919f9a9bdd1ebf4841700ae75089cab1481c1ea0125c7e6f586c3d6da",
+        "occurred_at": "2026-07-29T16:41:12.746472+00:00",
+        "outcome": "success",
+        "previous_sha256": "c01ab328f9a651cb92f632b5fcd9537c6050cfb4213bc839a0535557f8b7f019",
+        "request_id": "4b3d38a7-8800-4a15-86d6-2e02af8db556",
+        "sequence": 10,
+        "tool": "get_run_status"
+      },
+      {
+        "event_sha256": "b71934ef227b063b81ec2ef2ac585de3d3a546d889d695bf7c70095a405289da",
+        "occurred_at": "2026-07-29T16:41:12.757928+00:00",
+        "outcome": "success",
+        "previous_sha256": "67162598b9afcd71b95e390f014ba376903013bfa8de41c3938126e9db35a2ac",
+        "request_id": "e2bb3c11-ee2f-450e-ad3f-e44bd4457327",
+        "sequence": 12,
+        "tool": "run_assay"
+      },
+      {
+        "event_sha256": "e5d7d1d3fd6ef02202b4ec3954bae69a54a5530a674ae2cd54cc5d6277941c3c",
+        "occurred_at": "2026-07-29T16:41:12.761003+00:00",
+        "outcome": "success",
+        "previous_sha256": "db5a4fb075d5f671c8dce4293e9d6af4af19d3d8f51e5bd042003f630b650f0f",
+        "request_id": "96e54b91-ac30-4972-9b88-9d89b71049fb",
+        "sequence": 14,
+        "tool": "get_run_status"
+      },
+      {
+        "event_sha256": "b9ee600532e70f35cb150c1fd1655af94b45b341a59bd3d044f466593d94f9f8",
+        "occurred_at": "2026-07-29T16:41:12.763806+00:00",
+        "outcome": "success",
+        "previous_sha256": "636f87865747ce65983b63cab489734a2e31d142681e3d6f5592fce059b676d8",
+        "request_id": "644ef94e-6717-40a4-b2b1-384734c0d0ea",
+        "sequence": 16,
+        "tool": "get_result_summary"
+      }
+    ],
+    "exclusive_lease": true,
+    "lease_released": true,
+    "lifecycle_evidence": [
+      {
+        "occurred_at": "2026-07-29T16:41:12.730492+00:00",
+        "proof_sha256": "6372af5fafab4e8ce6ab485bff600ae5f312b63cbdc36ad7119c558f66311c8e",
+        "source": "discover_resources audit event",
+        "state": "discovered"
+      },
+      {
+        "occurred_at": "2026-07-29T16:41:12.739457+00:00",
+        "proof_sha256": "6319aedc5f89a959e04162f899aea738484009eccec10ec5b50c2166deeee16c",
+        "source": "reserve_resource audit event",
+        "state": "reserved"
+      },
+      {
+        "from_version": 2,
+        "occurred_at": "2026-07-29T16:41:12.752540Z",
+        "proof_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+        "reason": "backend preparation started",
+        "source": "LifecycleStore transition",
+        "state": "preparing",
+        "to_version": 3
+      },
+      {
+        "from_version": 3,
+        "occurred_at": "2026-07-29T16:41:12.753842Z",
+        "proof_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+        "reason": "substrate invocation started",
+        "source": "LifecycleStore transition",
+        "state": "running",
+        "to_version": 4
+      },
+      {
+        "from_version": 4,
+        "occurred_at": "2026-07-29T16:41:12.755884Z",
+        "proof_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+        "reason": "postcondition validation started",
+        "source": "LifecycleStore transition",
+        "state": "validating",
+        "to_version": 5
+      },
+      {
+        "from_version": 5,
+        "occurred_at": "2026-07-29T16:41:12.756520Z",
+        "proof_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+        "reason": "execution completed; cooldown started",
+        "source": "LifecycleStore transition",
+        "state": "cooldown",
+        "to_version": 6
+      },
+      {
+        "from_version": 6,
+        "occurred_at": "2026-07-29T16:41:12.756954Z",
+        "proof_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+        "reason": "cooldown completed",
+        "source": "LifecycleStore transition",
+        "state": "ready",
+        "to_version": 7
+      }
+    ],
+    "mcp_steps": [
+      {
+        "audit_event_sha256": "6372af5fafab4e8ce6ab485bff600ae5f312b63cbdc36ad7119c558f66311c8e",
+        "ok": true,
+        "request_id": "ec18a604-2f5f-49b0-afc3-fa4211881c4f",
+        "stage": "discover",
+        "tool": "discover_resources"
+      },
+      {
+        "audit_event_sha256": "ffae90e838d81cfc1578b473f2cc551f0bcc89a213fa2c1485c99ed83f89f638",
+        "ok": true,
+        "request_id": "821408c1-da39-45eb-a7d5-49f7031134d1",
+        "stage": "dry_run",
+        "tool": "prepare_assay"
+      },
+      {
+        "audit_event_sha256": "6319aedc5f89a959e04162f899aea738484009eccec10ec5b50c2166deeee16c",
+        "ok": true,
+        "request_id": "f40f3565-5155-4d8f-9888-dee34c098ce1",
+        "stage": "reserve",
+        "tool": "reserve_resource"
+      },
+      {
+        "audit_event_sha256": "dfae44f036db898b48b1b4ab1e835dbfeb9d6c904057c3840d3a2557c848e5cb",
+        "ok": true,
+        "request_id": "a00827fd-7fc0-41c9-882a-33ac1fd4527f",
+        "stage": "prepare",
+        "tool": "prepare_assay"
+      },
+      {
+        "audit_event_sha256": "dc64cb7919f9a9bdd1ebf4841700ae75089cab1481c1ea0125c7e6f586c3d6da",
+        "ok": true,
+        "request_id": "4b3d38a7-8800-4a15-86d6-2e02af8db556",
+        "stage": "status_prepared",
+        "tool": "get_run_status"
+      },
+      {
+        "audit_event_sha256": "b71934ef227b063b81ec2ef2ac585de3d3a546d889d695bf7c70095a405289da",
+        "ok": true,
+        "request_id": "e2bb3c11-ee2f-450e-ad3f-e44bd4457327",
+        "stage": "run",
+        "tool": "run_assay"
+      },
+      {
+        "audit_event_sha256": "e5d7d1d3fd6ef02202b4ec3954bae69a54a5530a674ae2cd54cc5d6277941c3c",
+        "ok": true,
+        "request_id": "96e54b91-ac30-4972-9b88-9d89b71049fb",
+        "stage": "status_terminal",
+        "tool": "get_run_status"
+      },
+      {
+        "audit_event_sha256": "b9ee600532e70f35cb150c1fd1655af94b45b341a59bd3d044f466593d94f9f8",
+        "ok": true,
+        "request_id": "644ef94e-6717-40a4-b2b1-384734c0d0ea",
+        "stage": "result",
+        "tool": "get_result_summary"
+      },
+      {
+        "audit_event_sha256": null,
+        "ok": true,
+        "request_id": null,
+        "stage": "automatic_release",
+        "tool": null
+      }
+    ],
+    "preset_id": "pattern_gate_v1",
+    "provenance": "recorded_audited_mcp_e3_run",
+    "raw_substrate_output_exposed_to_agent": false,
+    "resource_id": "cortical-labs-biopattern-gate-e3",
+    "result_artifact_id": "biopattern-gate-result-af813f7ddcb25e18",
+    "result_artifact_sha256": "af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381",
+    "source_artifacts": {
+      "audit": "evaluation/fixtures/biopattern-gate-control-plane-e3-audit-v1.jsonl",
+      "transcript": "evaluation/fixtures/biopattern-gate-control-plane-e3-transcript-v1.json"
+    }
+  },
+  "demo_bundle_version": "1.1",
+  "evidence": {
+    "biological_claim": false,
+    "claim_boundary": "Deterministic technical pipeline evidence only; not a biological PNN result.",
+    "label": "E3_REPLAY",
+    "level": "E3",
+    "runtime_kind": "sdk_simulator"
+  },
+  "hashes": {
+    "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+    "config_sha256": "5fccaac3022e223fc181508833eaad38755279556b43b6b2df4e2f7e032a08e4",
+    "control_plane_audit_sha256": "ca395c568dde89e95ea4f0ed64218684c75f9a4e508c90df6046417f277e3981",
+    "control_plane_transcript_sha256": "eade3ff6dc6c9f5bba3666c926185ed86d195dc5df94aeb0bf243ab0cb52f0bb",
+    "decoder_sha256": "42789a20ea16e048f1a23b28e601ff3445e64b125c48de8656b11e612991afbf",
+    "result_artifact_sha256": "af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381",
+    "source_replay_sha256": "02b0004c5da26d9b2d58565892f3c9f09abd74895d535663b9cb147a87997bef"
+  },
+  "mode": "replay",
+  "run": {
+    "orchestration_correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+    "pipeline_assertion_accuracy": 1.0,
+    "run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+    "scored_trial_count": 12,
+    "sham_trial_count": 2,
+    "status": "complete",
+    "trial_count": 14
+  },
+  "trials": [
+    {
+      "block_index": 0,
+      "correct": null,
+      "decision_commit_sha256": "ae42a271bcfe07165340a20d8f1e15cf8fabdc97201a1c729661943d9c56d05a",
+      "event_timestamps_ms": [
+        48.94079315924748
+      ],
+      "expected_label": null,
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 48.94079315924748,
+        "spike_count::sim-readout::bin-00": 0.0,
+        "spike_count::sim-readout::bin-01": 0.0,
+        "spike_count::sim-readout::bin-02": 1.0,
+        "spike_count::sim-readout::bin-03": 0.0,
+        "spike_count::sim-readout::bin-04": 0.0
+      },
+      "kind": "sham",
+      "predicted_label": "A",
+      "probability_a": 0.5,
+      "route": "left",
+      "trial_index": 0
+    },
+    {
+      "block_index": 0,
+      "correct": true,
+      "decision_commit_sha256": "9cfd4b844ac3671d8fbcd0e8028b2e9289be54302ccda8093c5e8d51e3fd6e06",
+      "event_timestamps_ms": [
+        14.880890469529128,
+        62.63009379085765,
+        71.84705457950034,
+        83.34354265213857,
+        90.80522954622111
+      ],
+      "expected_label": "B",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 14.880890469529128,
+        "spike_count::sim-readout::bin-00": 1.0,
+        "spike_count::sim-readout::bin-01": 0.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 2.0,
+        "spike_count::sim-readout::bin-04": 2.0
+      },
+      "kind": "pattern_b",
+      "predicted_label": "B",
+      "probability_a": 0.04742587317756679,
+      "route": "right",
+      "trial_index": 1
+    },
+    {
+      "block_index": 0,
+      "correct": true,
+      "decision_commit_sha256": "920ab21a2f9ca2e1a1ddfd2160c5e3dd6259dbf49cd11434ba43cebbb05cea65",
+      "event_timestamps_ms": [
+        8.880442872522849,
+        16.072530716919427,
+        26.71835064329674,
+        35.122408242721065,
+        76.5067900452569
+      ],
+      "expected_label": "A",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 8.880442872522849,
+        "spike_count::sim-readout::bin-00": 2.0,
+        "spike_count::sim-readout::bin-01": 2.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 1.0,
+        "spike_count::sim-readout::bin-04": 0.0
+      },
+      "kind": "pattern_a",
+      "predicted_label": "A",
+      "probability_a": 0.9525741268224334,
+      "route": "left",
+      "trial_index": 2
+    },
+    {
+      "block_index": 0,
+      "correct": true,
+      "decision_commit_sha256": "2ea3e113175504dcf54b4e399eeeb93e9aca9743a1788ef0c46a6eb0331f3e56",
+      "event_timestamps_ms": [
+        8.187586106914779,
+        14.471209144944144,
+        26.837567790159508,
+        34.637455691673736,
+        75.6384577283635
+      ],
+      "expected_label": "A",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 8.187586106914779,
+        "spike_count::sim-readout::bin-00": 2.0,
+        "spike_count::sim-readout::bin-01": 2.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 1.0,
+        "spike_count::sim-readout::bin-04": 0.0
+      },
+      "kind": "pattern_a",
+      "predicted_label": "A",
+      "probability_a": 0.9525741268224334,
+      "route": "left",
+      "trial_index": 3
+    },
+    {
+      "block_index": 0,
+      "correct": true,
+      "decision_commit_sha256": "362379690b9ccc586576cdd28aeae7386366fc993cae769130ec3c6ea74b2472",
+      "event_timestamps_ms": [
+        13.656019156211215,
+        63.21827160104826,
+        71.52002192214516,
+        83.26569459217842,
+        90.3756613450156
+      ],
+      "expected_label": "B",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 13.656019156211215,
+        "spike_count::sim-readout::bin-00": 1.0,
+        "spike_count::sim-readout::bin-01": 0.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 2.0,
+        "spike_count::sim-readout::bin-04": 2.0
+      },
+      "kind": "pattern_b",
+      "predicted_label": "B",
+      "probability_a": 0.04742587317756679,
+      "route": "right",
+      "trial_index": 4
+    },
+    {
+      "block_index": 0,
+      "correct": true,
+      "decision_commit_sha256": "4ffc9f48562d1ee921b3744d89734f05159f25056008f4e9095322ff078c5003",
+      "event_timestamps_ms": [
+        15.033057883297971,
+        61.833178959453186,
+        71.32459348327272,
+        83.56169756683272,
+        90.5433091531828
+      ],
+      "expected_label": "B",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 15.033057883297971,
+        "spike_count::sim-readout::bin-00": 1.0,
+        "spike_count::sim-readout::bin-01": 0.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 2.0,
+        "spike_count::sim-readout::bin-04": 2.0
+      },
+      "kind": "pattern_b",
+      "predicted_label": "B",
+      "probability_a": 0.04742587317756679,
+      "route": "right",
+      "trial_index": 5
+    },
+    {
+      "block_index": 0,
+      "correct": true,
+      "decision_commit_sha256": "6dd03191a8daa2aa312af730ba57e7e3541829d6e3ca2aa9e3a6e57b10404a31",
+      "event_timestamps_ms": [
+        8.783085201610984,
+        16.05887605130792,
+        28.040296179334998,
+        33.91079677738397,
+        76.9585678740006
+      ],
+      "expected_label": "A",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 8.783085201610984,
+        "spike_count::sim-readout::bin-00": 2.0,
+        "spike_count::sim-readout::bin-01": 2.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 1.0,
+        "spike_count::sim-readout::bin-04": 0.0
+      },
+      "kind": "pattern_a",
+      "predicted_label": "A",
+      "probability_a": 0.9525741268224334,
+      "route": "left",
+      "trial_index": 6
+    },
+    {
+      "block_index": 1,
+      "correct": true,
+      "decision_commit_sha256": "46355d192ef4bde8a5833807471cbc94ccba87c4a5a0e6b441f32321e930f89e",
+      "event_timestamps_ms": [
+        8.935881085466034,
+        15.824650051977322,
+        27.858547589696453,
+        35.973409687484306,
+        76.55773580446333
+      ],
+      "expected_label": "A",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 8.935881085466034,
+        "spike_count::sim-readout::bin-00": 2.0,
+        "spike_count::sim-readout::bin-01": 2.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 1.0,
+        "spike_count::sim-readout::bin-04": 0.0
+      },
+      "kind": "pattern_a",
+      "predicted_label": "A",
+      "probability_a": 0.9525741268224334,
+      "route": "left",
+      "trial_index": 7
+    },
+    {
+      "block_index": 1,
+      "correct": true,
+      "decision_commit_sha256": "28db0aa24169131e0048e9267959827b21a5d0af7c57a88c8addb1a1c22d228d",
+      "event_timestamps_ms": [
+        8.429618270437823,
+        14.799793831003964,
+        25.836437617815214,
+        34.70774736242267,
+        76.88589410852202
+      ],
+      "expected_label": "A",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 8.429618270437823,
+        "spike_count::sim-readout::bin-00": 2.0,
+        "spike_count::sim-readout::bin-01": 2.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 1.0,
+        "spike_count::sim-readout::bin-04": 0.0
+      },
+      "kind": "pattern_a",
+      "predicted_label": "A",
+      "probability_a": 0.9525741268224334,
+      "route": "left",
+      "trial_index": 8
+    },
+    {
+      "block_index": 1,
+      "correct": true,
+      "decision_commit_sha256": "9b7b6616759deae33a6e6cedc00992db6782bbbd4e913dceb453a233da589d3a",
+      "event_timestamps_ms": [
+        6.91281511320441,
+        15.068870167792808,
+        28.151800077522346,
+        34.80182262392843,
+        76.78353277667622
+      ],
+      "expected_label": "A",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 6.91281511320441,
+        "spike_count::sim-readout::bin-00": 2.0,
+        "spike_count::sim-readout::bin-01": 2.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 1.0,
+        "spike_count::sim-readout::bin-04": 0.0
+      },
+      "kind": "pattern_a",
+      "predicted_label": "A",
+      "probability_a": 0.9525741268224334,
+      "route": "left",
+      "trial_index": 9
+    },
+    {
+      "block_index": 1,
+      "correct": null,
+      "decision_commit_sha256": "52c02fc8efbe1b0c1d081926252b584f4a38fcbb200cfde2a5a8d01ba3bb1965",
+      "event_timestamps_ms": [
+        48.0099054037176
+      ],
+      "expected_label": null,
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 48.0099054037176,
+        "spike_count::sim-readout::bin-00": 0.0,
+        "spike_count::sim-readout::bin-01": 0.0,
+        "spike_count::sim-readout::bin-02": 1.0,
+        "spike_count::sim-readout::bin-03": 0.0,
+        "spike_count::sim-readout::bin-04": 0.0
+      },
+      "kind": "sham",
+      "predicted_label": "A",
+      "probability_a": 0.5,
+      "route": "left",
+      "trial_index": 10
+    },
+    {
+      "block_index": 1,
+      "correct": true,
+      "decision_commit_sha256": "62d6d86ea8bf1d1539b9d90b904d857ae2ae5a485d3f90f7466600386f6e3d8d",
+      "event_timestamps_ms": [
+        14.542958486476444,
+        61.32120663180728,
+        71.95189468087118,
+        83.21361862060067,
+        91.63147525301194
+      ],
+      "expected_label": "B",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 14.542958486476444,
+        "spike_count::sim-readout::bin-00": 1.0,
+        "spike_count::sim-readout::bin-01": 0.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 2.0,
+        "spike_count::sim-readout::bin-04": 2.0
+      },
+      "kind": "pattern_b",
+      "predicted_label": "B",
+      "probability_a": 0.04742587317756679,
+      "route": "right",
+      "trial_index": 11
+    },
+    {
+      "block_index": 1,
+      "correct": true,
+      "decision_commit_sha256": "3ce1deb2be59ddc9b8564de7e4275d7779fcfae1f2f327313278619ff8a3b202",
+      "event_timestamps_ms": [
+        14.942015056287724,
+        61.43749593676349,
+        72.13527574383471,
+        82.27315207612271,
+        90.22776840170283
+      ],
+      "expected_label": "B",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 14.942015056287724,
+        "spike_count::sim-readout::bin-00": 1.0,
+        "spike_count::sim-readout::bin-01": 0.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 2.0,
+        "spike_count::sim-readout::bin-04": 2.0
+      },
+      "kind": "pattern_b",
+      "predicted_label": "B",
+      "probability_a": 0.04742587317756679,
+      "route": "right",
+      "trial_index": 12
+    },
+    {
+      "block_index": 1,
+      "correct": true,
+      "decision_commit_sha256": "edde8cd5d291c935d8095861bc56ee2a256002720470d10786e84e86dba20f77",
+      "event_timestamps_ms": [
+        14.875625385805463,
+        61.27099135013717,
+        70.93251471628736,
+        84.17181390064886,
+        91.68526553856988
+      ],
+      "expected_label": "B",
+      "feature_values": {
+        "active_readout_group_count": 1.0,
+        "first_spike_latency_ms::sim-readout": 14.875625385805463,
+        "spike_count::sim-readout::bin-00": 1.0,
+        "spike_count::sim-readout::bin-01": 0.0,
+        "spike_count::sim-readout::bin-02": 0.0,
+        "spike_count::sim-readout::bin-03": 2.0,
+        "spike_count::sim-readout::bin-04": 2.0
+      },
+      "kind": "pattern_b",
+      "predicted_label": "B",
+      "probability_a": 0.04742587317756679,
+      "route": "right",
+      "trial_index": 13
+    }
+  ]
+}

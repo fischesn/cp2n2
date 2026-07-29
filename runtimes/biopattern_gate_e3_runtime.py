@@ -40,6 +40,30 @@ DECODER_PATH = (
 )
 
 
+def application_source_digest(app_root: Path = APP_ROOT) -> str:
+    """Hash textual application inputs independently of platform newlines."""
+
+    digest = hashlib.sha256()
+    files = sorted(
+        path
+        for path in app_root.rglob("*")
+        if path.is_file()
+        and "__pycache__" not in path.parts
+        and path.suffix in {".py", ".json"}
+    )
+    for path in files:
+        canonical_text = (
+            path.read_text(encoding="utf-8")
+            .replace("\r\n", "\n")
+            .replace("\r", "\n")
+        )
+        digest.update(path.relative_to(app_root).as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(canonical_text.encode("utf-8"))
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
 class _FailAfterTrialSimulator(DeterministicReservoirSimulator):
     """Test-only provider fault that preserves a sanitized partial count."""
 
@@ -108,7 +132,7 @@ class BioPatternGateE3Runtime(SubstrateRuntime):
             raise RuntimeError("BioPattern Gate E3 config hash drifted")
         if self.decoder.sha256() != DECODER_SHA256:
             raise RuntimeError("BioPattern Gate E3 decoder hash drifted")
-        self.application_source_sha256 = self._application_source_digest()
+        self.application_source_sha256 = application_source_digest()
 
     def prepare(self, task: TaskRequest) -> AdapterPreparationResult:
         self._validate_task(task)
@@ -241,24 +265,6 @@ class BioPatternGateE3Runtime(SubstrateRuntime):
                     f"unapproved BioPattern Gate task metadata: {unknown}"
                 )
             raise ValueError("BioPattern Gate task metadata/hash binding mismatch")
-
-    @staticmethod
-    def _application_source_digest() -> str:
-        """Hash executable/configuration inputs using stable relative paths."""
-        digest = hashlib.sha256()
-        files = sorted(
-            path
-            for path in APP_ROOT.rglob("*")
-            if path.is_file()
-            and "__pycache__" not in path.parts
-            and path.suffix in {".py", ".json"}
-        )
-        for path in files:
-            digest.update(path.relative_to(APP_ROOT).as_posix().encode("utf-8"))
-            digest.update(b"\0")
-            digest.update(path.read_bytes())
-            digest.update(b"\0")
-        return digest.hexdigest()
 
     @staticmethod
     def _artifact(label: str, payload: dict[str, object]) -> RuntimeArtifact:

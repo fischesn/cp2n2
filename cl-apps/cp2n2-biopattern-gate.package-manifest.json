@@ -3,8 +3,8 @@
   "application_version": "0.1.0",
   "archive": {
     "filename": "cp2n2-biopattern-gate.zip",
-    "sha256": "aa499fddfae692b1d1dacec0490a5ab6d9df7eb6011227e424182c9ad7ae5762",
-    "size_bytes": 22902
+    "sha256": "8ac66ff52c3d3eb3e6ba2245823dca85e72c318e53ee62a31890bc0ffdd7e835",
+    "size_bytes": 31808
   },
   "entries": {
     "cp2n2-biopattern-gate/default.json": {
@@ -28,8 +28,8 @@
       "size_bytes": 3349
     },
     "cp2n2-biopattern-gate/src/biopattern_gate/README.md": {
-      "sha256": "71d8b691357416f183db0de21fe16f0a23b70607d951a2086e7b9db24ed79a84",
-      "size_bytes": 2229
+      "sha256": "f4f9c520e2ea34ad96fe433cc564727ea8fa9bda0996bf3d31b38cf67a8800d9",
+      "size_bytes": 3763
     },
     "cp2n2-biopattern-gate/src/biopattern_gate/__init__.py": {
       "sha256": "5396442864f1d3c6f86afc82b7e857d8c41ef1b4857819d7664a53208ba47bde",
@@ -100,16 +100,16 @@
       "size_bytes": 957
     },
     "cp2n2-biopattern-gate/web/vis.css": {
-      "sha256": "644f0eedf35d68ae0dd7a8665995f6e5d02a691057643a7156eb1d2175bf3cc5",
-      "size_bytes": 576
+      "sha256": "d2d7b591dcc64a1ec7d9df0f9ab4a0701c52b22a9c3ed2ea355d96b5073a80e6",
+      "size_bytes": 13894
     },
     "cp2n2-biopattern-gate/web/vis.html": {
-      "sha256": "5491c8b8b31937f775959b041037dd59803bfaf3f8e67800a9eba4c4a76f5b9a",
-      "size_bytes": 351
+      "sha256": "548c931412ab9aa5492272734b651265278b17496f2dfda8679470964799eeec",
+      "size_bytes": 6934
     },
     "cp2n2-biopattern-gate/web/vis.mjs": {
-      "sha256": "5fbf66ef07b647f9e88f1b377e23edff89d6130e622acf0b2e13e7094350c2ad",
-      "size_bytes": 461
+      "sha256": "eceac6d1c91c740c2823605a4e9bf5b16ff894e0ebeae9e8877a718e4761ce7f",
+      "size_bytes": 12287
     }
   },
   "manifest_version": "1.0"
