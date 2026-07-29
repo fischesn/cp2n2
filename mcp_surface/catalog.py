@@ -26,6 +26,7 @@ class AssayPreset:
     required_telemetry_fields: tuple[str, ...] = ()
     human_supervision_available: bool = False
     compatible_backend_ids: frozenset[str] = frozenset()
+    max_twin_age_ms: float | None = None
 
     def is_compatible(self, descriptor: SubstrateDescriptor) -> bool:
         if str(descriptor.capability.substrate_class) not in self.compatible_substrates:
@@ -59,6 +60,7 @@ class AssayPreset:
             direct_backend_id=resource_id,
             lease_id=lease_id,
             expected_lease_version=expected_lease_version,
+            max_twin_age_ms=self.max_twin_age_ms,
             metadata=dict(self.metadata),
         )
 
@@ -109,26 +111,42 @@ ASSAY_PRESETS: dict[AssayPresetId, AssayPreset] = {
         required_telemetry_fields=("health_status", "drift_score"),
         human_supervision_available=True,
     ),
-    AssayPresetId.CL_PATTERN_DISCRIMINATION_V1: AssayPreset(
-        preset_id=AssayPresetId.CL_PATTERN_DISCRIMINATION_V1,
+    AssayPresetId.PATTERN_GATE_V1: AssayPreset(
+        preset_id=AssayPresetId.PATTERN_GATE_V1,
         description=(
-            "Fixed, provider-constrained CL pattern-discrimination scenario; "
-            "electrodes and pulse parameters are not agent inputs."
+            "BioPattern Gate: a blinded temporal-pattern routing assay with a "
+            "frozen readout; physical controls are never agent inputs."
         ),
         compatible_substrates=frozenset({"wetware"}),
-        compatible_backend_ids=frozenset({"cortical-labs-backend"}),
+        compatible_backend_ids=frozenset(
+            {"cortical-labs-biopattern-gate-e3"}
+        ),
         task_kind=TaskKind.CONTROL,
         modalities=(SignalModality.SPIKES,),
         preferred_output=OutputPreference.TELEMETRY_AWARE_RESULT,
         latency_budget_ms=500.0,
         metadata={
-            "assay_preset": "cl_pattern_discrimination_v1",
-            "stimulation_pattern": {"channels": [1], "amplitude": 0.4},
-            "observation_window_ms": 100,
-            "pre_delay_ms": 20,
+            "assay_preset": "pattern_gate_v1",
+            "application_id": "cp2n2-biopattern-gate",
+            "config_id": "technical-e3",
+            "config_sha256": (
+                "5fccaac3022e223fc181508833eaad387"
+                "55279556b43b6b2df4e2f7e032a08e4"
+            ),
+            "decoder_sha256": (
+                "42789a20ea16e048f1a23b28e601ff34"
+                "45e64b125c48de8656b11e612991afbf"
+            ),
+            "application_source_sha256": (
+                "4229151b731c8685e35ff46534f955cb4"
+                "8f040ca3307335f168b792b71bd09e4"
+            ),
+            "runtime_kind_required": "sdk_simulator",
+            "evidence_ceiling": "E3",
         },
         required_telemetry_fields=("readiness_state", "health_status"),
-        human_supervision_available=True,
+        human_supervision_available=False,
+        max_twin_age_ms=1_000.0,
     ),
 }
 

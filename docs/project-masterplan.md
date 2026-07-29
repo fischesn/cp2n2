@@ -12,7 +12,10 @@ The project will establish three contributions:
 
 1. A versioned **Physical Neural Resource Contract** for describing physical-neural resources and their operational state.
 2. A control plane that safely manages discovery, admissibility, reservation, execution, validation, recovery, and provenance across heterogeneous PNN backends.
-3. A reproducible evaluation spanning controlled distributed-system tests and at least one real, remote PNN scenario. The CL1 scenario is the preferred initial real-hardware case study, subject to access.
+3. A reproducible systems evaluation spanning conformance, policy,
+   portability, overhead, concurrency, and controlled distributed-failure
+   tests. A real, remote PNN scenario is a separable extension, subject to E5
+   access and evidence.
 
 The core claim is:
 
@@ -24,7 +27,10 @@ The core claim is:
 - It enforces explicit admissibility and safety rules before a resource is committed.
 - It provides lifecycle control, leases, provenance, validation, and recovery across backends.
 - It can be evaluated under distributed failures, stale telemetry, and competing requests.
-- It can expose a real PNN safely to an LLM agent through constrained high-level operations.
+- Its constrained agent surface prevents an LLM from selecting primitive
+  physical controls or bypassing admission, leases, and approvals.
+- Subject to later E5 evidence, it can expose a real PNN safely to an LLM
+  agent through constrained high-level operations.
 
 ### What it must not claim without extra evidence
 
@@ -60,15 +66,26 @@ Rules:
 
 ## 3. Research questions
 
-**RQ1 — Operational contract.** Can an explicit resource contract prevent inadmissible PNN executions and provide a common control surface across heterogeneous backends?
+**RQ1 — Operational contract and safe admission.** Can an explicit,
+versioned resource contract provide a portable control surface across
+heterogeneous backends while preventing inadmissible or insufficiently
+attested executions, including agent-requested assays?
 
-**RQ2 — Distributed control.** How do leases, freshness, recovery, selection, and failover behave under realistic edge/fog/cloud failures and concurrency?
+**RQ2 — Distributed control.** How do leases, telemetry freshness,
+selection, abort, recovery, reconciliation, auditability, and control-plane
+overhead behave under concurrency and controlled edge/fog/cloud failure
+conditions?
 
 **RQ3 — Real PNN access.** Can an LLM agent discover, reserve, and use a real PNN through CP²N² without receiving direct access to unsafe primitive operations?
 
 **RQ4 — Representative physical-computation case study.** In the selected real-PNN scenario, does the substrate produce reproducible, task-relevant observable behaviour under a controlled protocol?
 
 RQ4 is substrate-specific. It supports the real integration case study; it is not a general claim about all PNNs.
+
+RQ1 and RQ2 form the independently submission-ready systems-paper core. RQ3
+and RQ4 form an optional, explicitly separated E5 case-study layer. E3
+evidence may validate the CL software path used to prepare that layer, but it
+cannot answer either RQ3 or RQ4.
 
 ## 4. Workstream A: General CP²N² software
 
@@ -508,10 +525,10 @@ aborted, status-unknown, or ineligible for a biological claim.
 - [x] Define the user-level scientific goal and the bounded purpose of the LLM.
 - [x] Define canonical dry-run and real-execution prompts.
 - [x] Separate explicit execution intent from external human approval.
-- [ ] Add the canonical prompts as versioned agent evaluation fixtures.
+- [x] Add the canonical prompts as versioned agent evaluation fixtures.
 - [ ] Test natural paraphrases, ambiguous execution intent, simulator
   substitution, parameter-injection attempts, and approval-bypass prompts.
-- [ ] Demonstrate equivalent execution through a deterministic non-LLM client
+- [x] Demonstrate equivalent execution through a deterministic non-LLM client
   to isolate the control-plane contribution from model behavior.
 
 #### B2.2 Control-plane moments to demonstrate
@@ -599,10 +616,10 @@ must reject:
 - unknown runtime kind, approval, calibration, or recording policy;
 - timeouts shorter than the declared protocol duration.
 
-- [ ] Define `BioPatternGateConfig` and versioned JSON Schema.
-- [ ] Define simulator-only and provider-approved preset namespaces.
-- [ ] Implement all cross-field and fail-closed validators.
-- [ ] Store the exact validated configuration and its SHA-256 in every run.
+- [x] Define `BioPatternGateConfig` and versioned JSON Schema.
+- [x] Define simulator-only and provider-approved preset namespaces.
+- [x] Implement all cross-field and fail-closed validators.
+- [x] Store the exact validated configuration and its SHA-256 in every run.
 - [ ] Add configuration migration tests; never migrate an executing run.
 
 ### B4. Biological computation and stimulus design
@@ -698,13 +715,17 @@ E5 technical pilot, then frozen before the main measurement. They must be
 large enough for uncertainty estimates but small enough to avoid excessive
 stimulation, resource cost, and within-session drift.
 
-- [ ] Implement trial and session state machines independently of the UI.
-- [ ] Implement deterministic seeded scheduling with balanced blocks.
-- [ ] Implement partial-run finalization and explicit invalid-trial reasons.
+- [x] Implement trial and session state machines independently of the UI.
+- [x] Implement deterministic seeded scheduling with balanced blocks.
+- [ ] Implement full partial-run finalization and explicit per-trial invalid
+  reasons. The CP²N² E3 runtime already preserves a checksum-bearing partial
+  summary after an interrupted application run.
 - [ ] Implement cooperative abort at safe boundaries plus forced-timeout
   reporting when the platform terminates the application.
-- [ ] Verify that aborted, timed-out, and partially recorded sessions remain
-  visible and cannot be reported as successful.
+- [x] Verify that aborted and partially recorded sessions remain visible and
+  cannot be reported as successful.
+- [ ] Add the provider-backed forced-timeout case once its termination and
+  status-query semantics are known.
 
 ### B6. Controls and confirmatory analysis
 
@@ -758,7 +779,8 @@ Analysis is split into:
 - [ ] Write the independent offline analysis and figure pipeline.
 - [ ] Pre-register exclusions, primary metrics, confidence intervals, and the
   rule for aggregating trials, sessions, and cultures.
-- [ ] Demonstrate that offline reconstruction reproduces every online decision.
+- [x] Demonstrate that offline reconstruction reproduces every online decision
+  for the E3 golden success bundle; repeat against exported E5 artifacts later.
 - [ ] Add automated claim-matrix updates from validated run summaries.
 
 ### B7. CL application package
@@ -991,6 +1013,72 @@ future test data.
 **Done when:** every application and control-plane claim maps to validated,
 versioned evidence.
 
+#### B10.8 Implementation checkpoint -- 28 July 2026
+
+The first access-independent vertical slice is implemented on branch
+`codex/b1-biopattern-gate-core`:
+
+- canonical core under `applications/biopattern_gate/`;
+- frozen `BioPatternGateConfig` v1 and checked-in JSON Schema;
+- empty fail-closed `provider-approved` namespace and one explicitly
+  simulator-only `technical-e3` preset;
+- deterministic balanced scheduler, trial/session state machines, fixed
+  feature extractor, frozen decoder artifact, decision commitments, result
+  records, and a narrow future-provider port;
+- deterministic reservoir test double and local non-LLM demo runner;
+- a versioned E3 success replay bundle plus independent reconstruction of
+  every feature-based decision, gate route, probability, commitment hash,
+  confusion count, and balanced accuracy;
+- official self-contained CL app skeleton under
+  `cl-apps/cp2n2-biopattern-gate/`, including an E3 banner visualizer;
+- successful official `cl.app.pack` validation and successful local
+  `cl.app.run` execution with 14 trials, 12 scored A/B trials, and 2 shams;
+- reproducible package script and per-entry SHA-256 manifest;
+- `pattern_gate_v1` in the server-owned MCP assay catalog without channels,
+  amplitudes, timing primitives, or other agent-editable physical controls;
+- versioned canonical, paraphrase, ambiguous-intent, parameter-injection, and
+  approval-bypass prompt fixtures.
+
+This checkpoint proves only the E3 software path. The deterministic accuracy
+is a golden-pipeline assertion, not biological performance.
+
+#### B10.9 Control-plane application package -- 29 July 2026
+
+The next access-independent package connects the frozen application to the
+real CP²N² lifecycle rather than invoking its runner directly:
+
+- dedicated `BioPatternGateE3Adapter` and separate E3 runtime with attested
+  `sdk_simulator`/E3 evidence;
+- server-owned `pattern_gate_v1` bound to exact application-source,
+  configuration, and frozen-decoder SHA-256 values;
+- complete `dry-run -> reserve -> prepare -> run -> status -> result ->
+  automatic release` path through the constrained MCP control surface;
+- deterministic non-LLM client and stdio-server registration switch
+  `CP2N2_INCLUDE_BIOPATTERN_GATE_E3`;
+- sanitized aggregate application summary, orchestration correlation ID,
+  audit request IDs, and checksum-bearing result/partial artifact references;
+- explicit `biological_claim=false`, no raw event output, and no
+  agent-editable physical parameter at the application boundary;
+- tested rejection or safe handling of physical-parameter injection,
+  competing reservations, stale telemetry, prepared-run abort, interrupted
+  partial execution, and final lease release;
+- successful validation and packaging by the official `cl.app.pack` tool.
+
+The complete repository test suite passes with 127 tests. This package is
+systems evidence for RQ1/RQ2. It does not evaluate a PNN, simulate a biological
+result, or close any E5 gate.
+
+The first hard access boundary is now explicit. The following work may not be
+implemented by guessing and waits for the grant/onboarding material:
+
+1. supported non-interactive authentication and credential-provider behavior;
+2. Cloud resource discovery, application upload/install, run lifecycle,
+   status, abort, reconciliation, and artifact-export contracts;
+3. provider-approved stimulation, channel-map, blanking, recording, session,
+   cooldown, and safety limits;
+4. verified CL1 runtime/system attestation and E5 preset creation;
+5. Cloud smoke test and every biological stimulation or E5 claim.
+
 ### B11. Sample, repetition, and claim policy
 
 **Minimum:** one real culture and repeated time-separated sessions. Claims are
@@ -1100,6 +1188,12 @@ Credential handling requirements:
 
 ### B13. Final go/no-go gates and definition of done
 
+**Access status (29 July 2026):** Cortical Labs has indicated that access to a
+CL1 system can be expected no earlier than approximately twelve weeks. The
+project will enter the access queue and continue the systems-paper work in
+parallel. This estimate is a planning input, not a promised access date and
+not a submission deadline.
+
 **Application implementation may begin now** against the CL SDK Simulator and
 test doubles because it requires no real-device access and produces no E5
 claim.
@@ -1132,9 +1226,12 @@ BioPattern Gate is `DONE` only when:
 - the paper figures and demo can be regenerated from archived data;
 - every claim is supported or explicitly downgraded.
 
-If real access is unavailable, RQ3/RQ4 are removed or clearly marked as future
-work. The BioPattern Gate package and E3 demo remain software artifacts, and
-the general control-plane paper remains viable on RQ1/RQ2.
+If real access is unavailable, RQ3/RQ4 and every result-level CL1 claim are
+removed from the submission manuscript; at most, the planned E5 case study is
+described explicitly as future work. The BioPattern Gate package and E3 demo
+remain software artifacts, and the general control-plane paper remains viable
+on RQ1/RQ2. An E3 run never serves as a proxy, pilot result, or lower-fidelity
+measurement for either RQ3 or RQ4.
 
 ## 6. Workstream C: evaluation
 
@@ -1143,6 +1240,9 @@ the general control-plane paper remains viable on RQ1/RQ2.
 | Contract conformance | schema, lifecycle, errors, idempotency | E0–E3 |
 | Policy evaluation | admission, ranking, sensitivity | E1–E4 |
 | Distributed robustness | concurrency, loss, partitions, recovery | E2–E4 |
+| Control-plane overhead | local orchestration and service-boundary cost | E1–E2 |
+| Audit and authority boundary | trace completeness and adversarial agent requests | E0–E3 |
+| CL software integration | packaging, API compatibility, repeatable controls, demo logic | E3 |
 | Real PNN integration | constrained agent-mediated run | E5 |
 | Substrate case study | pattern response and stability | E5 |
 
@@ -1152,18 +1252,63 @@ All runs require a common `run_id` and produce a manifest, resource descriptor, 
 
 ## 7. Workstream D: paper and artifact
 
+### Two-layer publication strategy
+
+The manuscript is developed as two modules with independent evidence gates:
+
+1. **Systems-paper core (always present):** RQ1/RQ2; resource contracts,
+   constrained agent-facing assays, admission and selection, lifecycle,
+   leases, telemetry freshness, abort and reconciliation, auditability,
+   adapter portability, distributed faults and concurrency, and
+   control-plane overhead. This module must be submission-ready without CL1
+   access.
+2. **CL1 case-study module (conditional):** RQ3/RQ4; one attested E5
+   end-to-end orchestration case and the controlled BioPattern Gate response
+   study. This module is included only after its E5 gates pass.
+
+The E3 CL SDK Simulator belongs to the systems and implementation evidence. It
+may show API compatibility, deterministic packaging and replay,
+reproducibility, safe execution of server-owned presets, and the complete demo
+logic. It does not make the CL1 module empirically complete and does not
+support any statement about a culture, biological computation, learning,
+accuracy, latency, stability, or performance.
+
+The LaTeX source must keep the CL1 module behind one explicit inclusion switch
+whose default submission-safe state is **off**. The systems-only build must
+compile without dangling RQ3/RQ4 references, empty result promises, or wording
+that implies real-hardware evidence. When the switch is off, the paper contains
+only a short, clearly labelled future-work paragraph about the planned E5 case
+study.
+
+Submission readiness is evidence-driven, not calendar-driven. No short-term
+venue deadline justifies promoting an open claim, treating E3 as E5, or
+submitting before the RQ1/RQ2 artifact and manuscript audits pass.
+
 ### Claim matrix
 
 Maintain a living matrix before writing results:
 
-| ID | Claim | RQ | Evidence | Figure/table | Status |
+| ID | Claim | RQ | Valid evidence | Planned paper evidence | Status |
 |---|---|---|---|---|---|
-| C1 | Contract prevents inadmissible execution | RQ1 | conformance/policy tests | test table | open |
-| C2 | Leases remain safe under concurrency | RQ2 | distributed campaign | lease figure | open |
-| C3 | Agent can use a real PNN safely | RQ3 | CL1 case study | execution trace | open |
-| C4 | Selected substrate shows task-relevant response | RQ4 | controlled assay | accuracy/CI | open |
+| C1 | The versioned resource contract is shared across heterogeneous adapters and preserves substrate-specific constraints. | RQ1 | E0–E3 | schema/conformance and portability table | supported; final artifact audit pending |
+| C2 | Missing or stale safety-relevant information fails closed before execution. | RQ1 | E0–E3 | invalid-contract, stale-telemetry, and policy tests | supported; final aggregate pending |
+| C3 | Admission, feasibility, and ranking are separate and every exclusion/selection is explainable. | RQ1 | E1–E3 | curated/holdout policy evaluation and sensitivity results | supported; manuscript integration pending |
+| C4 | The agent can request only published high-level assays and cannot set physical primitives, policy, evidence level, or approval. | RQ1 | E0–E3 | MCP surface, malformed-plan, injection, and bypass tests | supported for software boundary only |
+| C5 | The adapter/runtime split preserves a common control contract across multiple non-CL backends. | RQ1 | E1–E3 | adapter conformance and no-CL portability test | supported; final table pending |
+| C6 | Exclusive leases prevent concurrent execution by competing owners. | RQ2 | E0–E2 | lifecycle tests and 1–32-client campaign | supported; final aggregate pending |
+| C7 | Timeouts and uncertain outcomes trigger explicit abort/reconciliation rather than silent success. | RQ2 | E0–E2 | state-machine, timeout, abort, and reconciliation traces | supported; final figure pending |
+| C8 | Stale telemetry and declared fault conditions cause rejection, safe fallback, or explicit failure as specified. | RQ2 | E1–E2 | loss, partition, stale-state, and fault campaign | supported; final aggregate pending |
+| C9 | Control decisions and run transitions are linked by complete, tamper-evident audit records. | RQ2 | E0–E3 | audit-chain and trace-correlation tests | supported; completeness summary pending |
+| C10 | The measured control-plane overhead is bounded for the evaluated local and same-host deployments. | RQ2 | E1–E2 | p50/p95/p99 orchestration and service-boundary latency | partially supported; rerun on frozen protocol |
+| C11 | The CL package and adapter execute reproducibly against the official SDK simulator. | RQ1 | E3 only | package validation, deterministic replay, API and demo tests | supported as technical evidence only |
+| C12 | CP²N² can safely orchestrate an attested real CL1 through a constrained agent request. | RQ3 | E5 only | real execution trace, approval, audit, abort/release evidence | open; excluded until E5 |
+| C13 | A real CL1 culture produces reproducible task-relevant BioPattern Gate responses. | RQ4 | E5 only | pre-registered controlled assay with uncertainty analysis | open; excluded until E5 |
 
 Remove or downgrade every claim that lacks passing evidence.
+
+The table is deliberately asymmetric: lower evidence levels can be correct for
+software and distributed-systems claims, while C12/C13 have an absolute E5
+floor. No combination or volume of E0–E4 results can satisfy that floor.
 
 ### Motivating agentic-PNN scenarios
 
@@ -1354,23 +1499,32 @@ and uncertain physical state after failure affect whether an action may run.
    adaptive embodied heterogeneous-PNN system; CL1 is one concrete resource,
    not the definition of the architecture.
 3. Requirements, system model, and threat model.
-4. Physical Neural Resource Contract.
-5. Lifecycle protocol, leases, recovery, and error semantics.
-6. Admission and selection.
-7. Implementation and general adapter architecture.
-8. Evaluation: general systems evidence first; CL1 case study separately.
-9. Related work: PhysMCP terminology/architecture boundary, WoT, Kubernetes
+4. CP²N² Control-Plane Design and Architecture.
+   - `\subsection{Physical Neural Resource Contract}`
+   - `\subsection{Lifecycle protocol, leases, recovery, and error semantics}`
+   - `\subsection{Admission and selection}`
+5. Implementation and adapter integration.
+6. Evaluation.
+   - `\subsection{Evidence levels, questions, and protocol}`
+   - `\subsection{RQ1: Contract, admission, and portability}`
+   - `\subsection{RQ2: Concurrency, failures, recovery, audit, and overhead}`
+   - `\subsection{E3 CL SDK Simulator integration}` (technical evidence only)
+   - `\subsection{RQ3/RQ4: CL1 case study}` (conditional E5 module)
+7. Related work: PhysMCP terminology/architecture boundary, WoT, Kubernetes
    DRA, KubeEdge DeviceTwin, ROS 2 lifecycle, OPC UA, NIR, and substrate
    runtimes.
-10. Limitations, ethics, and responsible agent access.
-11. Conclusion.
+8. Limitations, ethics, and responsible agent access.
+9. Conclusion.
 
 Required visuals: motivating agent/CP²N²/local-runtime figure, general
 architecture, state machine, contract example, generic execution sequence,
 distributed testbed, policy/fault results, and a separately labelled
 representative CL1 case-study figure.
 
-The CL SDK Simulator must appear as a permanent E3 implementation and controlled-evaluation backend, clearly differentiated from E5 results.
+The CL SDK Simulator must appear as a permanent E3 implementation and
+controlled-evaluation backend, clearly differentiated from E5 results. Its
+results must never share a table, plot series, or aggregate metric with E5
+results unless the evidence level is visually explicit in every row or mark.
 
 ### Artifact package
 
@@ -1394,12 +1548,15 @@ The timing below is effort-based, not a fixed calendar promise.
 | M3 | policy profiles and baselines | week 5 |
 | M4 | BioPattern Gate complete in SDK Simulator | week 7 |
 | M5 | distributed fault campaign | week 9 |
-| M6 | real CL1 pilot, if access is approved | access-dependent |
-| M7 | main real-PNN measurements | after M6 |
-| M8 | complete paper draft | two weeks after final data |
-| M9 | artifact package and submission version | one further week |
+| M6 | submission-ready RQ1/RQ2 systems manuscript and artifact | during CL1 wait |
+| M7 | real CL1 pilot, if access is approved | no earlier than access availability |
+| M8 | main real-PNN measurements | after successful E5 pilot |
+| M9 | optional CL1 module integrated and re-audited | after final E5 data |
 
-Software specification and paper method sections may be written from M1 onward. Results sections are added only after protocol freeze and evidence review.
+Software specification and paper method sections may be written from M1
+onward. RQ1/RQ2 result sections are added after their protocol and artifact
+freeze; the CL1 result module is added only after the separate E5 protocol
+freeze and evidence review.
 
 ## 9. Cost, access, and risk
 
@@ -1412,8 +1569,10 @@ pilot and repetition plan.
 
 | Risk | Mitigation |
 |---|---|
+| CL1 access delayed beyond the current approximately twelve-week estimate | complete and audit the submission-ready RQ1/RQ2 systems paper; keep the E5 module disabled |
 | No usable real-cloud access | confirm early; assess another independent remote PNN platform; retain RQ1/RQ2 paper path |
 | Grant denied or allocation too expensive | complete E3 artifact; seek a smaller sponsored pilot or alternative E5 platform; do not weaken evidence labels |
+| Short-term venue deadline pressures premature claims | submit only after the relevant evidence and artifact gates pass; prefer the next suitable venue over an evidence downgrade |
 | Cloud automation/authentication unavailable | use the documented interactive workflow for an approved pilot if reproducible; otherwise do not claim automated E5 control-plane integration |
 | Insufficient culture diversity | present CL1 work as a systems case study only |
 | No custom application deployment | adapt to permitted provider workflow or do not claim E5 integration |

@@ -104,8 +104,17 @@ def build_default_surface() -> MCPControlSurface:
         )
         == "1"
     )
+    include_biopattern_gate_e3 = (
+        _configuration_value(
+            "CP2N2_INCLUDE_BIOPATTERN_GATE_E3",
+            "PHYSMCP_INCLUDE_BIOPATTERN_GATE_E3",
+            "0",
+        )
+        == "1"
+    )
     orchestrator = build_live_target_orchestrator(
-        include_cortical_labs=include_cortical
+        include_cortical_labs=include_cortical,
+        include_biopattern_gate_e3=include_biopattern_gate_e3,
     )
     audit_path = Path(
         _configuration_value(

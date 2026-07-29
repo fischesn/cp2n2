@@ -24,7 +24,7 @@ class AssayPresetId(str, Enum):
     EDGE_VECTOR_CLASSIFICATION_V1 = "edge_vector_classification_v1"
     CHEMICAL_SENSING_V1 = "chemical_sensing_v1"
     WETWARE_TEMPORAL_PROBE_V1 = "wetware_temporal_probe_v1"
-    CL_PATTERN_DISCRIMINATION_V1 = "cl_pattern_discrimination_v1"
+    PATTERN_GATE_V1 = "pattern_gate_v1"
 
 
 class RunState(str, Enum):

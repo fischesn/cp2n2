@@ -705,7 +705,7 @@ class MCPControlSurface:
         contract = self.orchestrator.registry.resource_contract_for(
             record.resource_id
         )
-        return {
+        summary = {
             "success": result.success,
             "selected_resource_id": result.decision.selected_backend_id,
             "preset_id": record.preset_id,
@@ -720,7 +720,44 @@ class MCPControlSurface:
             "error_message": error.message if error else None,
             "validation_failure_count": len(result.validation_failures),
             "raw_output_included": False,
+            "orchestration_correlation_id": result.correlation_id,
         }
+        if record.preset_id == "pattern_gate_v1":
+            allowed_application_fields = {
+                "application_id",
+                "application_run_id",
+                "application_status",
+                "config_sha256",
+                "decoder_sha256",
+                "application_source_sha256",
+                "runtime_kind",
+                "evidence_level",
+                "biological_claim",
+                "trial_count",
+                "scored_trial_count",
+                "sham_trial_count",
+                "pipeline_assertion_accuracy",
+            }
+            payload = invocation.output_payload if invocation else {}
+            application = payload.get("application_summary", {})
+            if isinstance(application, dict):
+                summary["application"] = {
+                    key: application[key]
+                    for key in allowed_application_fields
+                    if key in application
+                }
+            adapter = self.orchestrator.registry.get_adapter(record.resource_id)
+            summary["artifact_references"] = [
+                {
+                    "artifact_id": item.artifact_id,
+                    "kind": item.kind,
+                    "uri": item.uri,
+                    "media_type": item.media_type,
+                    "metadata": dict(item.metadata),
+                }
+                for item in adapter.list_artifacts()
+            ]
+        return summary
 
     def _require_action_success(self, result: ControlPlaneActionResult) -> None:
         if result.success:
