@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+from evaluation.agent_to_pnn_campaign import (
+    ReferenceCampaignPlanner,
+    run_campaign as run_agent_to_pnn_campaign,
+)
+from evaluation.common import RESULTS_DIR
 from evaluation.evaluate_externalized_backend import evaluate as evaluate_externalized_backend
 from evaluation.evaluate_distributed_testbed import evaluate as evaluate_distributed_testbed
 from evaluation.evaluate_failure_campaign import evaluate as evaluate_failure_campaign
@@ -15,6 +20,10 @@ from evaluation.evaluate_selection_robustness import (
 
 
 def main() -> None:
+    run_agent_to_pnn_campaign(
+        planner=ReferenceCampaignPlanner(),
+        output_dir=RESULTS_DIR / "agent-to-pnn-reference",
+    )
     evaluate_overhead()
     evaluate_portability()
     evaluate_matching()

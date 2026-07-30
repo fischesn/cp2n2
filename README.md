@@ -533,6 +533,10 @@ Typical telemetry includes:
 python -m evaluation.run_all_evaluations
 ```
 
+This includes the non-networked Agent-to-PNN reference campaign without E3
+execution. Model-backed campaigns and the explicit E3 lifecycle remain
+separate opt-in runs.
+
 ### 8.2 Cortical runtime evaluation — explicit execution gate
 
 ```bash
@@ -563,6 +567,18 @@ The repository also contains dedicated scripts for:
 - `evaluation.evaluate_matching_baselines`
 - `evaluation.evaluate_overhead`
 - `evaluation.evaluate_portability`
+
+The BioPattern Gate Agent-to-PNN campaign evaluates canonical, paraphrased,
+ambiguous, and adversarial prompts against an independent safety oracle:
+
+```powershell
+python -m evaluation.agent_to_pnn_campaign --planner reference
+```
+
+It executes no substrate by default. Add `--execute-e3` only for the single
+reviewed SDK-simulator lifecycle. AI-Lab, Gemini, and Ollama planners are
+available behind `--confirm-model-access`. See
+[Agent-to-PNN Evaluation Campaign](docs/agent-to-pnn-evaluation-campaign.md).
 
 These scripts can be run individually from the project root with `python -m ...`.
 
