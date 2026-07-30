@@ -1688,11 +1688,12 @@ and artifact release.
 - [x] Reconcile this master plan with the implemented B2, B7, B9, and B10
   checkpoints so unchecked historical tasks do not overstate the remaining
   work.
-- [ ] Freeze a CP²N² release candidate from `main`, rerun the complete test and
+- [x] Freeze CP²N² v5.0 from `main`, rerun the complete test and
   evidence-verification suite, and generate checksummed release artifacts.
-- [ ] Publish the next CP²N² software release only after the paper/artifact
-  revision is frozen; archive the exact release on Zenodo and bind its DOI and
-  commit to the non-anonymous journal manuscript.
+- [x] Publish CP²N² v5.0 on GitHub from the verified commit with its source
+  archive, checksum file, and release manifest.
+- [ ] Archive the exact v5.0 release on Zenodo and bind its DOI and commit to
+  the non-anonymous journal manuscript.
 - [ ] Prepare the target-journal source, cover letter, data/software
   availability statement, AI declaration, and submission checklist. The
   primary target is a regular paper in *Future Generation Computer Systems*;

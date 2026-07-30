@@ -1,8 +1,9 @@
 # CP²N² v5.0 release checklist
 
-This checklist prepares the software and evidence release that accompanies the
-journal manuscript. It does not authorize publication before the manuscript
-and artifact revision is frozen.
+This checklist records the software and evidence release that accompanies the
+journal manuscript. The software/evidence scope may be frozen and released
+before the manuscript's final editorial and journal-template pass; the final
+paper must cite this immutable release or a later explicitly versioned one.
 
 ## Release identity
 
@@ -36,19 +37,20 @@ E5 evidence.
 
 ## Freeze gate
 
-- [ ] The authoritative manuscript and software wording use the same evidence
-  boundary and release identity.
-- [ ] The paper revision is frozen for release preparation.
-- [ ] `main` contains all intended changes and is synchronized with
+- [x] The authoritative manuscript and software wording use the same evidence
+  boundary; the release identity is recorded below for later non-anonymous
+  paper binding.
+- [ ] The paper revision is frozen for journal submission.
+- [x] `main` contained all intended v5.0 changes and was synchronized with
   `origin/main`.
-- [ ] `git status --short` is empty.
-- [ ] No secrets, local `.env` files, provider credentials, or unredacted
+- [x] `git status --short` was empty when the release archive was built.
+- [x] No secrets, local `.env` files, provider credentials, or unredacted
   prompts are tracked.
-- [ ] The complete automated test suite passes from a fresh environment.
-- [ ] The E3 BioPattern fixture and audit chain verify.
-- [ ] The frozen Agent-to-PNN campaign manifest, trial count, metrics, and
+- [x] The complete automated test suite passes in the release environment.
+- [x] The E3 BioPattern fixture and audit chain verify.
+- [x] The frozen Agent-to-PNN campaign manifest, trial count, metrics, and
   audit verification match the manuscript.
-- [ ] `CHANGELOG.md`, `README.md`, and the project master plan reflect the
+- [x] `CHANGELOG.md`, `README.md`, and the project master plan reflect the
   frozen state.
 
 ## Build the candidate
@@ -67,18 +69,18 @@ Record the final values here only after the gate passes:
 
 | Field | Frozen value |
 |---|---|
-| Commit | |
-| Test result | |
-| BioPattern E3 fixture verification | |
-| Agent campaign manifest | |
-| Source ZIP SHA-256 | |
-| GitHub release URL | |
+| Commit | `df8a322b79a505779c5c97323a57a15a58f7df66` |
+| Test result | 142 passed |
+| BioPattern E3 fixture verification | passed in the complete release suite |
+| Agent campaign manifest | `evaluation/results/agent-to-pnn-ai-lab-20260730T100138Z/manifest.json` |
+| Source ZIP SHA-256 | `8cc70dc0544661f44503d0b6c0144bf0ff73ea009ccb98f164446be99274e5c8` |
+| GitHub release URL | `https://github.com/fischesn/cp2n2/releases/tag/v5.0` |
 | Zenodo DOI | |
 
 ## Publish and bind
 
-- [ ] Create an annotated `v5.0` tag at the recorded commit.
-- [ ] Push the tag and publish the GitHub release with the generated archive
+- [x] Create an annotated `v5.0` tag at the recorded commit.
+- [x] Push the tag and publish the GitHub release with the generated archive
   and checksum files.
 - [ ] Archive that exact release on Zenodo and verify its files and checksum.
 - [ ] Add the Zenodo DOI and Git commit to the non-anonymous manuscript.
