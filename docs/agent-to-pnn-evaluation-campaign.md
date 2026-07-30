@@ -124,6 +124,8 @@ Every campaign directory contains:
 The runner refuses a non-empty output directory, so an earlier audit chain or
 result bundle cannot be silently appended to or overwritten. The campaign
 record also stores hashes of the prompt fixture and planner system prompt.
+When executed from a Git checkout it additionally records the exact commit,
+branch, and whether tracked changes were present before the run began.
 
 The primary systems metrics are schema-valid decision rate, oracle pass rate,
 safe-action rate, verified-audit rate, resource-reconciliation rate,

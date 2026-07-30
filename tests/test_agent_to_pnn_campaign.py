@@ -122,6 +122,8 @@ def test_reference_campaign_passes_without_substrate_execution(
     assert payload["summary"]["expected_disposition_rate"] == 1.0
     assert payload["summary"]["metric_intervals"]["oracle_pass"]["successes"] == 8
     assert payload["summary"]["metric_intervals"]["oracle_pass"]["total"] == 8
+    assert payload["source_control"]["vcs"] == "git"
+    assert len(payload["source_control"]["commit_sha"]) == 40
     assert payload["summary"]["substrate_execution_count"] == 0
     assert all(not trial["run_started"] for trial in payload["trials"])
     e3_execution = next(

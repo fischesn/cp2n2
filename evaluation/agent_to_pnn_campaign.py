@@ -20,6 +20,7 @@ import hashlib
 import json
 import math
 import statistics
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from time import perf_counter
@@ -825,6 +826,36 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _source_control_provenance() -> dict[str, Any]:
+    """Capture the frozen source revision without requiring Git at runtime."""
+
+    def git(*arguments: str) -> str | None:
+        try:
+            result = subprocess.run(
+                ["git", *arguments],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=10.0,
+            )
+        except (OSError, subprocess.SubprocessError):
+            return None
+        return result.stdout.strip()
+
+    commit_sha = git("rev-parse", "HEAD")
+    branch = git("branch", "--show-current")
+    tracked_status = git("status", "--porcelain", "--untracked-files=no")
+    return {
+        "vcs": "git" if commit_sha is not None else None,
+        "commit_sha": commit_sha,
+        "branch": branch or None,
+        "tracked_changes_present": (
+            None if tracked_status is None else bool(tracked_status)
+        ),
+    }
+
+
 def run_campaign(
     *,
     planner: CampaignPlanner,
@@ -837,6 +868,7 @@ def run_campaign(
         raise ValueError("repetitions must be at least one")
     if output_dir.exists() and any(output_dir.iterdir()):
         raise ValueError("output_dir must be absent or empty")
+    source_control = _source_control_provenance()
     fixture = load_fixture(fixture_path)
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "audit").mkdir(parents=True, exist_ok=True)
@@ -861,6 +893,7 @@ def run_campaign(
         "planning_prompt_sha256": hashlib.sha256(
             CAMPAIGN_PLANNING_PROMPT.encode("utf-8")
         ).hexdigest(),
+        "source_control": source_control,
         "created_at": created_at,
         "planner_id": planner.planner_id,
         "model_id": planner.model_id,
