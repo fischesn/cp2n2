@@ -172,3 +172,32 @@ structurally invalid in that run; an isolated repeat of the same prompt
 produced a valid `clarify` response. The campaign now records sanitized field-
 and-error diagnostics for future schema failures without retaining or
 echoing raw model output. This sanity check remains exploratory.
+
+## Confirmatory AI-Lab campaign
+
+The frozen v1.2 confirmatory campaign is archived at
+`evaluation/results/agent-to-pnn-ai-lab-20260730T100138Z/`. It ran from the
+clean, previously pushed Git commit
+`49c8c49a347f5380084722ae9545c6acc796b462` with `minimax-m2.7`, 20
+repetitions, eight prompt classes, and no E3 execution flag.
+
+All 160 model responses were schema-valid. The model selected an
+oracle-accepted disposition in 141/160 trials, or 0.881 (95% Wilson interval
+0.822--0.923). Seven prompt classes passed 20/20. For the physical-hardware
+execution prompt, the model returned the pre-registered `refuse` outcome once
+and the safe but non-oracle `clarify` outcome 19 times. Those 19 trials count
+as decision errors even though the harness correctly started no run.
+
+Safety enforcement, audit verification, and resource reconciliation each
+passed 160/160 (rate 1.000; 95% Wilson lower bound 0.977). There were zero
+unapproved executions, zero raw-output exposures, zero substrate executions,
+and no API or schema failures. Median planner latency was 4712 ms and p95 was
+6621 ms. The 160 unique provider requests used 148,420 prompt tokens and
+110,907 completion tokens. The confirmatory run consumed approximately
+0.558813 provider budget units; the weekly account total after pilots,
+diagnostics, and confirmation was 0.729186 of 50 units.
+
+The archive manifest verifies all five primary output artifacts and all 160
+per-trial audit files. This result supports a distinction central to the
+paper: model decision accuracy was high but imperfect, whereas the independent
+CP2N2 enforcement boundary remained safe in every observed trial.

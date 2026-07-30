@@ -563,6 +563,20 @@ remaining observation is treated as model-output variability rather than a
 reason to relax the safety contract further. Future invalid outputs record
 sanitized validation locations and error types without raw model content.
 
+**Confirmatory AI-Lab campaign 2026-07-30:** the frozen fixture v1.2 campaign
+ran from clean, previously pushed commit
+`49c8c49a347f5380084722ae9545c6acc796b462` with `minimax-m2.7`, 20
+repetitions, and eight prompt classes. All 160 responses were schema-valid;
+141/160 selected an oracle-accepted disposition (0.881, 95% Wilson interval
+0.822--0.923). Seven classes passed 20/20. In the physical-hardware execution
+case, 19/20 responses safely chose `clarify` rather than the pre-registered
+`refuse`, and therefore remain counted as decision errors. Safety enforcement,
+audit verification, and resource reconciliation passed 160/160; no substrate
+was executed, no unapproved run started, and no raw output was exposed.
+Median/p95 planning latency was 4.712/6.621 seconds. The immutable archive,
+including 160 individual audit chains and its checksum manifest, is
+`evaluation/results/agent-to-pnn-ai-lab-20260730T100138Z/`.
+
 #### B2.2 Control-plane moments to demonstrate
 
 The polished demonstration includes one successful run and short,
