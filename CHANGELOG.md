@@ -1,6 +1,17 @@
 # Changelog
 
-## Unreleased
+## v5.0 — 2026-07-30
+
+### Added
+
+- BioPattern Gate as an E3 Cortical Labs SDK-simulator application with a
+  constrained assay surface, lifecycle/lease control, result validation,
+  audit artifacts, replay fixtures, and an explanatory web demo.
+- A frozen Agent-to-PNN evaluation campaign with eight prompt classes,
+  deterministic oracles, per-trial audit verification, summary artifacts, and
+  a University of Lübeck AI-Lab pilot.
+- User documentation for the BioPattern Gate web demo and the agent-facing MCP
+  surface.
 
 ### Changed
 
@@ -10,6 +21,25 @@
   Python-class, and environment-variable forms.
 - Retained compatibility aliases and legacy environment-variable fallbacks;
   no control-plane behavior changed.
+- Extended the paper-facing evidence package while preserving the E3 boundary:
+  the SDK simulator demonstrates software integration, not biological
+  performance or physical CL1 execution.
+
+### Fixed
+
+- Made frozen audit-fixture hashing independent of CRLF/LF checkout
+  conversion, while retaining byte-level verification of the canonical JSONL
+  representation.
+
+### Verification and release boundary
+
+- The complete headless test suite passes with 142 tests.
+- The confirmatory Agent-to-PNN v1.2 archive contains 160 decisions and 160
+  independently verified audit chains; no substrate was executed.
+- The BioPattern Gate control-plane trace remains E3 SDK-simulator evidence
+  and makes no physical-CL1 or biological-performance claim.
+- The release archive, checksum manifest, GitHub tag, Zenodo record, and paper
+  citation must all identify the same immutable commit.
 
 ## v4.0 — 2026-07-24
 

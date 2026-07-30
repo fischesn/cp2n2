@@ -7,6 +7,17 @@ as **phys-MCP**. The technical ASCII identifier is `cp2n2`; see the
 The accepted scope, evidence boundaries, completed work, and gated next steps
 are maintained in the versioned [project master plan](docs/project-masterplan.md).
 
+## Release v5.0
+
+Version 5.0 adds the BioPattern Gate E3 application and audited
+web demo, platform-independent evidence hashing, and the frozen Agent-to-PNN
+evaluation campaign with University of Lübeck AI-Lab results. It is the
+software and evidence baseline for the journal manuscript. Its E3 Cortical
+Labs integration validates the controlled software path but is not evidence
+of a physical CL1 execution or biological performance. The immutable release
+workflow is documented in the
+[v5.0 release checklist](docs/release-v5.0-checklist.md).
+
 ## Release v4.0
 
 Version 4.0 was released before the rename, under the former **phys-MCP**

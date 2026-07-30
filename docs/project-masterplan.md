@@ -886,12 +886,14 @@ The application publishes low-volume visualization data streams for:
 Raw neural events remain in the native recording. Visualization streams must
 not duplicate large raw arrays or contain secrets.
 
-- [ ] Generate the official application skeleton and commit it in the repo.
-- [ ] Implement the package modules and provider-compatible visualization.
-- [ ] Pin or eliminate optional dependencies.
-- [ ] Pass official packager structure, import, configuration, and visualizer
+- [x] Generate the official application skeleton and commit it in the repo.
+- [x] Implement the package modules and E3 replay/banner visualization.
+- [ ] Bind the provider-compatible live visualizer to approved application
+  data streams plus `cl_spikes` and `cl_stims`.
+- [x] Eliminate optional package dependencies from the E3 application.
+- [x] Pass official packager structure, import, configuration, and visualizer
   validation.
-- [ ] Produce a reproducible ZIP and package manifest with checksums.
+- [x] Produce a reproducible ZIP and package manifest with checksums.
 - [ ] Verify installation and launch procedure on the granted Cloud environment
   before any biological stimulation.
 
@@ -936,7 +938,10 @@ reference, not assumed to be a locally readable path. Export status is one of
   filename or artifact metadata.
 - [ ] Test normal, invalid, partial, aborted, timed-out, and unknown-status
   artifact paths.
-- [ ] Verify checksums and offline reconstruction before claim eligibility.
+- [x] Verify checksums and offline reconstruction for the frozen E3 golden
+  success bundle.
+- [ ] Repeat checksum and offline-reconstruction verification for every later
+  artifact class and before any E5 claim eligibility decision.
 
 ### B9. CP²N² control-plane integration
 
@@ -971,14 +976,15 @@ compatibility requirements, expected duration/cost metadata, and high-level
 purpose. Physical parameters, channel mappings, decoder internals, and safety
 limits remain server-owned.
 
-- [ ] Add `pattern_gate_v1` to the A4 server-owned assay catalog.
+- [x] Add `pattern_gate_v1` to the A4 server-owned assay catalog.
 - [ ] Define the provider control-adapter methods after Cloud access is granted.
 - [ ] Map provider resource, queue, reservation, run, and artifact identifiers
   into the resource contract.
 - [ ] Bind human approval to package hash, preset hash, resource ID, and run ID.
 - [ ] Implement status polling, timeout semantics, abort, reconciliation, and
   artifact retrieval against documented provider behavior.
-- [ ] Prove that MCP/LLM input cannot alter physical parameters or bypass
+- [x] Prove on the implemented E3/control-plane path that MCP/LLM input cannot
+  alter physical parameters or bypass
   provider and project policy.
 
 ### B10. Development stages and acceptance gates
@@ -988,8 +994,10 @@ limits remain server-owned.
 - [ ] Confirm provider channel, stimulation, recording, raw-data, session, and
   export constraints.
 - [ ] Confirm the Cloud application lifecycle and authentication method.
-- [ ] Freeze application schemas, trial state machine, artifact layout, and
-  claim boundary.
+- [x] Freeze the access-independent v1 application schema, trial state machine,
+  E3 artifact layout, and claim boundary.
+- [ ] Freeze provider-dependent E5 bindings only after the provider constraints
+  are documented and approved.
 - [ ] Complete threat, safety, artefact, and statistical review.
 
 **Done when:** the repository contains an approved executable specification
@@ -997,7 +1005,7 @@ with no guessed E5 physical values or provider API semantics.
 
 #### B10.2 B1 -- pure software core
 
-- [ ] Implement scheduler, state machines, feature extraction, decoder, result
+- [x] Implement scheduler, state machines, feature extraction, decoder, result
   schemas, and visualizer against test doubles.
 - [ ] Add property tests for balanced schedules, charge equality, no overlap,
   deterministic replay, invalid-trial accounting, and abort finalization.
@@ -1011,9 +1019,12 @@ CL SDK.
 
 - [ ] Run random-source and fixed-seed deterministic campaigns.
 - [ ] Run replay-source campaigns using permitted recordings when available.
-- [ ] Validate local packaging, local application execution, visualizer, HDF5,
-  summaries, abort, timeout, repeat, and offline reconstruction.
-- [ ] Verify that E3 is labeled non-learning technical evidence everywhere.
+- [x] Validate local packaging, local application execution, the E3
+  visualizer, summaries, deterministic replay, checksums, and offline
+  reconstruction.
+- [ ] Complete package-level HDF5, cooperative-abort, forced-timeout, repeat,
+  and partial/unknown-status validation.
+- [x] Verify that E3 is labeled non-learning technical evidence everywhere.
 
 **Done when:** package, start, abort, repeat, artifacts, checksums, replay, and
 the complete demo work deterministically. Accuracy is not an E3 acceptance
@@ -1059,7 +1070,7 @@ future test data.
 - [ ] Execute the approved repeated-session plan.
 - [ ] Archive successful, failed, partial, and aborted runs.
 - [ ] Regenerate all results and figures independently.
-- [ ] Capture a representative live or replay demo with explicit evidence
+- [x] Capture a representative replay demo with explicit evidence
   labels.
 - [ ] Update the claim matrix and remove unsupported claims.
 
@@ -1541,7 +1552,7 @@ and uncertain physical state after failure affect whether an action may run.
 - [x] Retain a short ``formerly phys-MCP'' migration note in the repository
   and paper metadata where appropriate, so that the May 2026 arXiv
   version remains discoverable without suggesting affiliation with PhysMCP.
-- [ ] Complete the external repository rename after local migration and
+- [x] Complete the external repository rename after local migration and
   verification.
 
 ### Recommended paper structure
@@ -1647,23 +1658,142 @@ date | ID | decision | alternatives | rationale | claim impact
 
 At the end of each working week: update task status and risks; audit the claim matrix; archive artifacts and checksums; and confirm or revise the next milestone.
 
-## 11. Immediate next actions
+## 11. Submission and follow-up packages
+
+The systems-paper core no longer waits for CL1 access. The remaining work is
+organized into four bounded packages so that submission work, optional
+evidence strengthening, access-independent BioPattern Gate engineering, and
+the later E5 study cannot be confused with one another.
+
+### Package 1 -- Submission hardening
+
+**Status:** `IN_PROGRESS` from 30 July 2026.
+
+**Purpose:** turn the completed RQ1/RQ2 manuscript and merged software evidence
+into one internally consistent, visually verified, citable journal submission
+and artifact release.
+
+- [x] Add and verify the focused PhysMCP related-work comparison; replace
+  unsupported priority wording with a precise architectural contribution
+  claim.
+- [x] Replace every remaining `phys-MCP` label in current paper figures and
+  correct figure text, editable sources, and captions.
+- [ ] Add target-template accessibility descriptions when the journal source
+  format is selected.
+- [x] Make the generative-AI declaration and affected explanatory-figure
+  caption comply with the selected journal's current policy, or replace the
+  generated elements with author-created artwork.
+- [x] Produce a fresh PDF from the current authoritative source and complete
+  visual, reference, metadata, warning, and evidence-boundary checks.
+- [x] Reconcile this master plan with the implemented B2, B7, B9, and B10
+  checkpoints so unchecked historical tasks do not overstate the remaining
+  work.
+- [ ] Freeze a CP²N² release candidate from `main`, rerun the complete test and
+  evidence-verification suite, and generate checksummed release artifacts.
+- [ ] Publish the next CP²N² software release only after the paper/artifact
+  revision is frozen; archive the exact release on Zenodo and bind its DOI and
+  commit to the non-anonymous journal manuscript.
+- [ ] Prepare the target-journal source, cover letter, data/software
+  availability statement, AI declaration, and submission checklist. The
+  primary target is a regular paper in *Future Generation Computer Systems*;
+  IEEE TETC is the first fallback.
+
+**Done when:** the submitted PDF, source, public release, Zenodo record, paper
+metrics, and cited evidence all identify the same immutable revision and no
+current figure or metadata uses the former project name as the active name.
+
+### Package 2 -- Optional evidence strengthening
+
+**Status:** `TODO`; it must be time-bounded and must not turn CL1 access into a
+submission prerequisite.
+
+**Purpose:** reduce the two most obvious external-validity limitations without
+changing the paper into an LLM benchmark or a physical-substrate benchmark.
+
+- [ ] Repeat the frozen Agent-to-PNN v1.2 campaign with at least two additional
+  model families and record model, provider, parameters, cost/budget, raw
+  decisions, oracle outcomes, enforcement outcomes, and verified audits.
+- [ ] Add multilingual and adaptive adversarial cases only as a separately
+  versioned extension; never tune the frozen confirmatory oracle after seeing
+  results.
+- [ ] Run the existing distributed protocol across at least two independently
+  deployed hosts or VMs and preserve topology, clock assumptions, network
+  profile, raw traces, and checksums.
+- [ ] Decide before the submission freeze which results materially strengthen
+  the paper; report the rest as an artifact extension or future work.
+
+**Done when:** either the bounded additions are incorporated with fully
+reproducible evidence, or the package is explicitly deferred without delaying
+Package 1.
+
+### Package 3 -- Access-independent BioPattern Gate completion
+
+**Status:** `TODO`; the implemented E3 vertical slice remains the baseline.
+
+**Purpose:** finish the reusable application and analysis surfaces that can be
+implemented without inventing provider behavior.
+
+- [ ] Version result, trial-table, and run-manifest schemas and add
+  configuration/schema migration tests.
+- [ ] Complete explicit partial-run finalization plus cooperative-abort,
+  forced-timeout-test-double, invalid-trial, and unknown-status artifacts.
+- [ ] Freeze the independent offline analysis and figure pipeline and automate
+  claim-matrix updates from validated summaries.
+- [ ] Add golden bundles for success, chance-level, invalid, partial, aborted,
+  timed-out, and reconciliation-required outcomes.
+- [ ] Produce a reproducible provider-neutral CL application ZIP, package
+  manifest, installation notes, and checksums without claiming Cloud
+  compatibility beyond E3.
+
+**Done when:** every non-provider-specific application state can be generated,
+validated, reconstructed, visualized, and packaged offline with explicit E3
+labelling.
+
+### Package 4 -- CL1-dependent E5 follow-up
+
+**Status:** `BLOCKED` pending provider allocation and onboarding material.
+
+**Purpose:** add the optional real-resource systems case study and biological
+assay only after all provider, safety, ethics, provenance, and evidence gates
+are satisfied.
+
+- [ ] Obtain the grant decision, confirmed access slot, onboarding material,
+  and official authentication/automation contract.
+- [ ] Implement the real Cloud control adapter from documented provider
+  resource, upload, reservation, run, status, abort, reconciliation, and
+  artifact-export interfaces.
+- [ ] Complete provider review and freeze stimulation, recording, channel map,
+  blanking, cooldown, safety, and exact-run approval bindings.
+- [ ] Perform the no-stimulation Cloud installation smoke test, followed by the
+  smallest approved attested E5 technical pilot.
+- [ ] Run the assay pilot, freeze and pre-register the confirmatory protocol,
+  and execute repeated measurements only if the pilot passes.
+- [ ] Integrate the optional RQ3/RQ4 module or publish it separately only after
+  the E5 claim audit passes; an unsuccessful biological result remains visible
+  and is never replaced by E3 evidence.
+
+**Done when:** every real-CL1 claim maps to attested E5 artifacts and the
+systems-only paper remains valid independently of the outcome.
+
+## 12. Immediate next actions
 
 - [x] Approve the English, generalised master plan.
 - [x] Add it to the project repository as the source of truth.
 - [x] Complete and release the general A0--A7 software line as v4.0.
 - [x] Select BioPattern Gate as the representative CL1 application.
 - [x] Submit a Cortical Cloud grant request.
-- [ ] Decide the target publication path after the SEC outcome.
+- [x] Select the journal-first systems-paper path, with FGCS as the primary
+  target and without making CL1 access a submission prerequisite.
 - [ ] Obtain the grant decision and provider onboarding documentation.
 - [ ] Confirm Cloud authentication, deployment, reservation, run, abort, and
   artifact-export interfaces with Cortical Labs.
-- [ ] Freeze the BioPattern Gate v1 software interfaces and simulator-only
+- [x] Freeze the BioPattern Gate v1 software interfaces and simulator-only
   preset.
-- [ ] Build BioPattern Gate as a separate CL application package against the
+- [x] Build BioPattern Gate as a separate CL application package against the
   SDK Simulator.
+- [ ] Complete Package 1 and freeze the journal submission artifact.
 - [ ] Run a small E5 pilot only after the M4 gate passes.
 
-## 12. Definition of project readiness
+## 13. Definition of project readiness
 
 The project is submission-ready when the contract, lifecycle, and error semantics are documented and tested; every result has a correct E0–E5 label; synthetic telemetry is never presented as observed fact; distributed tests cover concurrency, freshness, partitions, and recovery; real-PNN claims have a fully attested run or are removed; the CL case study has appropriate controls; every manuscript claim maps to evidence; the artifact package reproduces the central systems results; and limitations and ethical constraints are explicit.

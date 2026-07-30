@@ -23,3 +23,6 @@ cl-apps/*.zip
 .cp2n2/
 # Pre-rename local audit directory; retained for compatibility and history.
 .physmcp/
+
+# Locally generated release-candidate archives
+/release/
