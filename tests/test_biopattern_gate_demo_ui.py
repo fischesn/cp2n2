@@ -108,12 +108,14 @@ def test_visualizer_contains_four_coordinated_panels_and_replay_controls() -> No
     assert "renderLifecycleEvidence" in javascript
     assert "renderMcpFlow" in javascript
     for stream in (
-        "pattern_gate/session",
-        "pattern_gate/trial",
-        "pattern_gate/gate",
-        "pattern_gate/features",
-        "pattern_gate/decision",
-        "pattern_gate/control_status",
+        "pattern_gate_session",
+        "pattern_gate_trial",
+        "pattern_gate_gate",
+        "pattern_gate_features",
+        "pattern_gate_decision",
+        "pattern_gate_control_status",
+        "cl_spikes",
+        "cl_stims",
     ):
         assert stream in javascript
 

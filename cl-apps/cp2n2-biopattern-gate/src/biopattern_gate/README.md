@@ -7,10 +7,17 @@ small, fixed feature vector and passed to a frozen linear readout. The
 committed decision routes the result to the `left` or `right` gate before the
 expected label is revealed.
 
-The current `technical-e3` path is deliberately a deterministic test double.
-It proves orchestration, blinding, provenance, validation, abort behavior, and
-replayability. It is not a biological result and its accuracy must not be
-reported as PNN performance.
+The current `technical-e3` line has two complementary implementations:
+
+- the fast provider-neutral deterministic test double used by the CP2N2
+  lifecycle and replay demonstrations; and
+- a complete CL API integration path that executes `StimPlan`, recording,
+  analysed reads, application data streams, abort, and HDF5 reconstruction
+  against a stimulation-responsive CL SDK data source.
+
+Both are E3 software evidence. The responsive source is not a biological
+model, and neither implementation's accuracy may be reported as PNN
+performance.
 
 Run the local demonstration from the repository root:
 
@@ -77,11 +84,11 @@ Verify that the checked-in JSON Schema matches the frozen configuration model:
 
 ## Hardware boundary
 
-The core exposes a narrow `BioPatternGatePort`. A future CL1 implementation
-must translate provider-approved logical groups and protocol references into
-the actual SDK calls. The repository intentionally contains no executable
-provider preset. Hardware modes fail validation unless all of the following
-are present:
+The core exposes a narrow `BioPatternGatePort`. `CLApiBioPatternGatePort`
+already translates logical groups into the documented CL API, but its only
+registered runtime configuration is simulator-only. The repository
+intentionally contains no executable provider preset. Hardware modes fail
+validation unless all of the following are present:
 
 - `provider_approved` preset namespace;
 - attested `cl1` runtime and E5 evidence context;
@@ -92,3 +99,9 @@ are present:
 
 The provider-approved namespace remains empty until those facts can be
 verified with the granted Cortical Labs environment.
+
+The implemented CL API flow, local execution command, expected native HDF5
+evidence, and remaining provider boundary are documented in
+[`docs/cl-api-biopattern-gate-execution.md`](../../docs/cl-api-biopattern-gate-execution.md).
+The questions to resolve during grant onboarding are maintained in
+[`docs/cortical-labs-cloud-onboarding-questions.md`](../../docs/cortical-labs-cloud-onboarding-questions.md).

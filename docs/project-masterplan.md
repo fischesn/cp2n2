@@ -876,19 +876,22 @@ replace device-side validation or safety enforcement.
 
 The application publishes low-volume visualization data streams for:
 
-- `pattern_gate/session`;
-- `pattern_gate/trial`;
-- `pattern_gate/gate`;
-- `pattern_gate/features`;
-- `pattern_gate/decision`;
-- `pattern_gate/control_status`.
+- `pattern_gate_session`;
+- `pattern_gate_trial`;
+- `pattern_gate_gate`;
+- `pattern_gate_features`;
+- `pattern_gate_decision`;
+- `pattern_gate_control_status`.
 
 Raw neural events remain in the native recording. Visualization streams must
-not duplicate large raw arrays or contain secrets.
+not duplicate large raw arrays or contain secrets. Slash-delimited stream
+names are forbidden because the official SDK maps each stream name to one HDF5
+group. The live visualizer also subscribes to the native `cl_spikes` and
+`cl_stims` streams.
 
 - [x] Generate the official application skeleton and commit it in the repo.
 - [x] Implement the package modules and E3 replay/banner visualization.
-- [ ] Bind the provider-compatible live visualizer to approved application
+- [x] Bind the provider-compatible live visualizer to approved application
   data streams plus `cl_spikes` and `cl_stims`.
 - [x] Eliminate optional package dependencies from the E3 application.
 - [x] Pass official packager structure, import, configuration, and visualizer
@@ -933,11 +936,13 @@ reference, not assumed to be a locally readable path. Export status is one of
 - validation findings and claim eligibility.
 
 - [ ] Define and version result, trial-table, and manifest schemas.
-- [ ] Capture `cl.is_simulator()` and `cl.get_system_attributes()` on every run.
-- [ ] Ensure runtime kind is visible in recording, summary, result, UI, and
-  filename or artifact metadata.
-- [ ] Test normal, invalid, partial, aborted, timed-out, and unknown-status
+- [x] Capture `cl.is_simulator()` and `cl.get_system_attributes()` on every E3
+  CL API run; repeat and extend the provenance checks on E5.
+- [x] Ensure E3 runtime kind is visible in recording, summary, result, UI, and
+  artifact metadata; verify the provider identifiers on E5.
+- [ ] Test invalid, partial, timed-out, and unknown-status
   artifact paths.
+- [x] Test complete and aborted native HDF5 artifact paths.
 - [x] Verify checksums and offline reconstruction for the frozen E3 golden
   success bundle.
 - [ ] Repeat checksum and offline-reconstruction verification for every later
@@ -1022,8 +1027,9 @@ CL SDK.
 - [x] Validate local packaging, local application execution, the E3
   visualizer, summaries, deterministic replay, checksums, and offline
   reconstruction.
-- [ ] Complete package-level HDF5, cooperative-abort, forced-timeout, repeat,
-  and partial/unknown-status validation.
+- [x] Validate complete and cooperatively aborted package-level native HDF5
+  recordings with independent online/offline comparison.
+- [ ] Complete forced-timeout, repeat, partial, and unknown-status validation.
 - [x] Verify that E3 is labeled non-learning technical evidence everywhere.
 
 **Done when:** package, start, abort, repeat, artifacts, checksums, replay, and
@@ -1143,6 +1149,41 @@ implemented by guessing and waits for the grant/onboarding material:
 4. verified CL1 runtime/system attestation and E5 preset creation;
 5. Cloud smoke test and every biological stimulation or E5 claim.
 
+#### B10.10 Documented CL API execution bridge -- 31 July 2026
+
+The provider-facing application boundary is now implemented as a separate E3
+integration layer:
+
+- `CLApiBioPatternGatePort` opens the documented CL API, captures system
+  attributes, creates application streams, starts a native recording, submits
+  atomic stimulation plans, reads analysed response windows, validates
+  stimulation acknowledgements, interrupts on abort, and closes cleanly;
+- the two temporal patterns are submitted with identical charge-balanced
+  biphasic designs and different logical group order;
+- observation windows are anchored to observed CL stimulation timestamps,
+  rather than unverified local sleeps;
+- a deterministic stimulation-responsive `cl.sim` data source exercises the
+  same `StimPlan`, recording, read, stream, and cleanup path in a simulator
+  subprocess;
+- the native HDF5 is reopened independently and its feature and decision
+  streams are checked against every online trial result;
+- complete and injected-abort recordings remain distinguishable and
+  reconstructable;
+- the six application stream names are HDF5-safe and the provider visualizer
+  implements the CL 1.0 `reset/process/draw` lifecycle while retaining the
+  local replay harness;
+- the official local application runner completes 14 trials, 12 scored A/B
+  trials, 2 shams, 24 native stimulation events, and 60 native spike events
+  with exact online/offline agreement;
+- the complete technical path and the provider-onboarding question set are
+  versioned in `docs/cl-api-biopattern-gate-execution.md` and
+  `docs/cortical-labs-cloud-onboarding-questions.md`.
+
+This closes the device-side E3 implementation gap but does not change the
+evidence ceiling. The source is a deterministic fixture, not a culture model.
+Cloud automation, provider approval, physical parameters, runtime
+attestation, installation, and every E5 result remain blocked.
+
 ### B11. Sample, repetition, and claim policy
 
 **Minimum:** one real culture and repeated time-separated sessions. Claims are
@@ -1204,6 +1245,24 @@ Public reference snapshot used for this assessment:
 - application initialization: <https://docs.corticallabs.com/cl/app/init>
 - application packaging: <https://docs.corticallabs.com/cl/app/pack>
 - local development runner: <https://docs.corticallabs.com/cl/app/run>
+- CL API reference: <https://docs.corticallabs.com/cl>
+- CL application models and safety-constrained types:
+  <https://docs.corticallabs.com/cl/app/model>
+- official SDK and v1.0 simulator source interface:
+  <https://github.com/Cortical-Labs/cl-sdk>
+- official developer notebooks:
+  <https://github.com/Cortical-Labs/cl-api-doc>
+- CL API contract paper: <https://arxiv.org/abs/2602.11632>
+
+**Documentation update (31 July 2026):** the newly published CL API material
+is sufficient to implement and validate the on-device application path. It
+specifies `cl.open()`, system attributes, atomic stimulation transactions,
+timing and channel constraints, analysed reads, native HDF5 recordings,
+application data streams, app packaging, and local execution. It also states
+that simulator semantics are authoritative at the API level but do not model
+biological response or every hardware capacity limit. The material still
+does not specify the remote Cortical Cloud authentication or lifecycle
+contract listed below.
 
 Questions to resolve during grant onboarding:
 
@@ -1249,6 +1308,9 @@ Credential handling requirements:
 - [ ] Confirm the official automation/authentication mechanism.
 - [ ] Implement and test the credential-provider boundary without committing
   credentials.
+- [x] Produce a versioned provider-onboarding question set covering
+  authentication, lifecycle, deployment, safety, provenance, export, and
+  publication.
 
 ### B13. Final go/no-go gates and definition of done
 
@@ -1692,6 +1754,9 @@ and artifact release.
   evidence-verification suite, and generate checksummed release artifacts.
 - [x] Publish CP²N² v5.0 on GitHub from the verified commit with its source
   archive, checksum file, and release manifest.
+- [ ] Freeze and publish CP²N² v5.1.0 with the provider-facing CL API
+  execution bridge, native HDF5 verification, refreshed E3 evidence, and the
+  unchanged non-biological evidence boundary.
 - [ ] Archive the exact v5.0 release on Zenodo and bind its DOI and commit to
   the non-anonymous journal manuscript.
 - [ ] Prepare the target-journal source, cover letter, data/software

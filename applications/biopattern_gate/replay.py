@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from .config import BioPatternGateConfig
+from .decoder import GateDecision
 from .features import SpikeEvent
 from .port import TrialObservation
 from .scheduler import TrialPlan
@@ -55,6 +56,23 @@ class ReplayPort:
             raise ReplayBundleError(
                 f"replay is missing trial {plan.trial_index}"
             ) from exc
+
+    def record_features(
+        self,
+        plan: TrialPlan,
+        *,
+        feature_values: dict[str, float],
+    ) -> None:
+        del plan, feature_values
+
+    def record_decision(
+        self,
+        plan: TrialPlan,
+        *,
+        decision: GateDecision,
+        decision_commit_sha256: str,
+    ) -> None:
+        del plan, decision, decision_commit_sha256
 
     def abort(self, reason: str) -> None:
         self.aborted_reason = reason
@@ -106,4 +124,3 @@ def load_replay_bundle(path: Path) -> ReplayPort:
         config_sha256=str(raw["config_sha256"]),
         observations=observations,
     )
-

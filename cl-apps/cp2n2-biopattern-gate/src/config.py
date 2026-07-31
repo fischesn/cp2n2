@@ -3,7 +3,6 @@
 from typing import Annotated, Literal, override
 
 from cl.app import BaseApplicationConfig
-from cl.app.model import DurationSeconds
 from pydantic import Field
 
 
@@ -23,6 +22,5 @@ class BioPatternGateApplicationConfig(BaseApplicationConfig):
     ] = "cl-local-technical-e3"
 
     @override
-    def estimate_duration_s(self) -> DurationSeconds:
-        return 2.1
-
+    def estimate_duration_s(self) -> float:
+        return 3.0

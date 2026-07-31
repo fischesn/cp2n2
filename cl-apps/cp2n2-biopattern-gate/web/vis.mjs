@@ -1,10 +1,12 @@
 const dataStreams = [
-  "pattern_gate/session",
-  "pattern_gate/trial",
-  "pattern_gate/gate",
-  "pattern_gate/features",
-  "pattern_gate/decision",
-  "pattern_gate/control_status"
+  "pattern_gate_session",
+  "pattern_gate_trial",
+  "pattern_gate_gate",
+  "pattern_gate_features",
+  "pattern_gate_decision",
+  "pattern_gate_control_status",
+  "cl_spikes",
+  "cl_stims"
 ];
 
 const LIFECYCLE = [
@@ -271,17 +273,23 @@ class PatternGateDashboard {
 
   update(stream, data) {
     text(this.root, "mode", "LIVE");
-    text(this.root, "demo-status", `${stream.replace("pattern_gate/", "")} update received.`);
-    if (stream === "pattern_gate/session") {
+    text(this.root, "demo-status", `${stream.replace("pattern_gate_", "")} update received.`);
+    if (stream === "pattern_gate_session") {
       text(this.root, "run-status", String(data.status ?? "running").toUpperCase());
       text(this.root, "evidence", data.evidence_level ?? "UNKNOWN");
-    } else if (stream === "pattern_gate/control_status") {
+    } else if (stream === "pattern_gate_control_status") {
       text(this.root, "lease-state", data.lease_state ?? "unknown");
       const index = LIFECYCLE.indexOf(data.lifecycle_state);
       if (index >= 0) this.renderLifecycle(index);
+    } else if (stream === "cl_spikes" || stream === "cl_stims") {
+      text(
+        this.root,
+        "demo-status",
+        `${stream === "cl_spikes" ? "Neural spike" : "Stimulation"} event received.`
+      );
     } else {
       this.liveTrial = { ...this.liveTrial, ...data };
-      if (stream === "pattern_gate/decision" && this.liveTrial.route) {
+      if (stream === "pattern_gate_decision" && this.liveTrial.route) {
         this.bundle = {
           trials: [this.liveTrial],
           evidence: { level: "E3", biological_claim: false },
@@ -314,7 +322,37 @@ function createVisualiser(uniqueId, div) {
   const root = div.querySelector("[data-pattern-gate-root]") ?? div;
   const dashboard = new PatternGateDashboard(root);
   text(root, "demo-status", `CL visualiser ${uniqueId} ready for application streams.`);
+  function reset() {
+    dashboard.pause();
+    dashboard.liveTrial = {};
+    text(root, "mode", "LIVE");
+    text(root, "run-status", "READY");
+    text(root, "demo-status", "Waiting for CL application streams.");
+  }
+  function process(dataStreamName, timestamp, data) {
+    void timestamp;
+    dashboard.update(dataStreamName, data);
+  }
+  function draw(browserTimestampMs, dataStreamTimestamp) {
+    void browserTimestampMs;
+    void dataStreamTimestamp;
+  }
+  function attributesReset(dataStreamName, initialAttributes) {
+    void dataStreamName;
+    void initialAttributes;
+  }
+  function attributesUpdated(dataStreamName, updatedAttributes) {
+    void dataStreamName;
+    void updatedAttributes;
+  }
   return {
+    bufferMs: 100,
+    reset,
+    process,
+    draw,
+    attributesReset,
+    attributesUpdated,
+    // Kept for the local replay harness that predates the CL 1.0 interface.
     update(stream, data) {
       dashboard.update(stream, data);
     }

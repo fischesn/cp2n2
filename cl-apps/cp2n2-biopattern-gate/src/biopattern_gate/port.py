@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from .config import BioPatternGateConfig
+from .decoder import GateDecision
 from .features import SpikeEvent
 from .scheduler import TrialPlan
 
@@ -32,6 +33,21 @@ class BioPatternGatePort(Protocol):
         logical_sequence: tuple[str, str] | None,
         config: BioPatternGateConfig,
     ) -> TrialObservation: ...
+
+    def record_features(
+        self,
+        plan: TrialPlan,
+        *,
+        feature_values: dict[str, float],
+    ) -> None: ...
+
+    def record_decision(
+        self,
+        plan: TrialPlan,
+        *,
+        decision: GateDecision,
+        decision_commit_sha256: str,
+    ) -> None: ...
 
     def abort(self, reason: str) -> None: ...
 

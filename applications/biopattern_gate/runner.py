@@ -80,6 +80,10 @@ def run_session(
                 observation_duration_ms=config.timing.observation_duration_ms,
                 config=config.features,
             )
+            port.record_features(
+                plan,
+                feature_values=features.values,
+            )
             decision = decoder.decide(features)
             commit = decision_commit(
                 run_id=run_id,
@@ -87,6 +91,11 @@ def run_session(
                 feature_values=features.values,
                 predicted_label=decision.predicted_label,
                 route=decision.route,
+            )
+            port.record_decision(
+                plan,
+                decision=decision,
+                decision_commit_sha256=commit,
             )
             trial.transition(TrialState.DECISION_COMMITTED)
             expected = plan.hidden_label

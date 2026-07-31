@@ -5,6 +5,7 @@ from __future__ import annotations
 import random
 
 from .config import BioPatternGateConfig
+from .decoder import GateDecision
 from .features import SpikeEvent
 from .port import TrialObservation
 from .scheduler import TrialKind, TrialPlan
@@ -65,6 +66,23 @@ class DeterministicReservoirSimulator:
                 "logical_sequence_present": logical_sequence is not None,
             },
         )
+
+    def record_features(
+        self,
+        plan: TrialPlan,
+        *,
+        feature_values: dict[str, float],
+    ) -> None:
+        del plan, feature_values
+
+    def record_decision(
+        self,
+        plan: TrialPlan,
+        *,
+        decision: GateDecision,
+        decision_commit_sha256: str,
+    ) -> None:
+        del plan, decision, decision_commit_sha256
 
     def abort(self, reason: str) -> None:
         self.aborted_reason = reason

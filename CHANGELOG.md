@@ -1,5 +1,45 @@
 # Changelog
 
+## v5.1.0 — 2026-07-31
+
+### Added
+
+- A provider-facing BioPattern Gate execution port using the documented
+  Cortical Labs CL API for atomic stimulation plans, analysed spike reads,
+  application data streams, native HDF5 recording, interruption, and cleanup.
+- A stimulation-responsive CL SDK Simulator source that exercises the same
+  application path without presenting simulated activity as biological
+  evidence.
+- Independent reconstruction of complete and aborted native HDF5 recordings,
+  including exact comparison of recorded features and decisions with the
+  online result.
+- A technical CL API execution guide and a versioned Cortical Cloud onboarding
+  question set covering authentication, lifecycle, deployment, safety,
+  provenance, export, and publication.
+
+### Changed
+
+- Updated the BioPattern Gate CL application to version 0.2.0.
+- Replaced slash-delimited application stream names with HDF5-safe names and
+  added native `cl_spikes` and `cl_stims` visualizer subscriptions.
+- Rebound the constrained MCP preset and frozen E3 evidence artifacts to the
+  expanded application source.
+
+### Fixed
+
+- Preserve partial native recordings on cooperative application abort.
+- Validate observed stimulation acknowledgements and anchor response windows
+  to the final observed stimulation rather than an assumed local timestamp.
+
+### Verification and release boundary
+
+- The complete headless test suite passes with 146 tests.
+- The official CL application runner completes 14 trials, 24 stimulation
+  events, and 60 spike events with exact online/offline agreement.
+- This remains E3 SDK-simulator evidence. The release does not claim physical
+  CL1 execution, biological performance, or an implemented Cortical Cloud
+  authentication and lifecycle contract.
+
 ## v5.0 — 2026-07-30
 
 ### Added

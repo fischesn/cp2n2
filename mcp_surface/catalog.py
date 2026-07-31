@@ -138,8 +138,8 @@ ASSAY_PRESETS: dict[AssayPresetId, AssayPreset] = {
                 "45e64b125c48de8656b11e612991afbf"
             ),
             "application_source_sha256": (
-                "4229151b731c8685e35ff46534f955cb4"
-                "8f040ca3307335f168b792b71bd09e4"
+                "fca1d699d09a57816ce7fefe073170c4"
+                "a09e146155379bec0339d4119a26bbf7"
             ),
             "runtime_kind_required": "sdk_simulator",
             "evidence_ceiling": "E3",

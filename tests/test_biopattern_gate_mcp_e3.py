@@ -79,7 +79,7 @@ def test_deterministic_client_executes_complete_audited_e3_lifecycle(tmp_path):
     assert application["decoder_sha256"] == DECODER_SHA256
     assert (
         application["application_source_sha256"]
-        == "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4"
+        == "fca1d699d09a57816ce7fefe073170c4a09e146155379bec0339d4119a26bbf7"
     )
     assert application["biological_claim"] is False
     assert application["application_status"] == "complete"

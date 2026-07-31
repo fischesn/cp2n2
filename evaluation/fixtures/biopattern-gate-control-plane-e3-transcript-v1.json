@@ -1,62 +1,62 @@
 {
   "audit_chain_verified": true,
   "audit_request_ids": [
-    "ec18a604-2f5f-49b0-afc3-fa4211881c4f",
-    "821408c1-da39-45eb-a7d5-49f7031134d1",
-    "f40f3565-5155-4d8f-9888-dee34c098ce1",
-    "a00827fd-7fc0-41c9-882a-33ac1fd4527f",
-    "4b3d38a7-8800-4a15-86d6-2e02af8db556",
-    "e2bb3c11-ee2f-450e-ad3f-e44bd4457327",
-    "96e54b91-ac30-4972-9b88-9d89b71049fb",
-    "644ef94e-6717-40a4-b2b1-384734c0d0ea"
+    "9b730121-9060-4439-a534-76e024fae7e1",
+    "f7112485-3185-4107-8582-627dadbacbc5",
+    "632c9bf1-e725-401a-aaf7-4524d6a1b2c8",
+    "a933732d-381c-4413-a8cb-877cc43735dd",
+    "25fe48b9-5f33-45ca-ab3a-c9fa951bea9b",
+    "c10eee7d-cec6-4f34-befa-42b1fa897d9d",
+    "92b97ab0-4d7e-479b-8bb7-d8cdbb9aa4fe",
+    "920fd054-3f6d-42e0-950d-93dee199d9dd"
   ],
   "client_kind": "deterministic_non_llm",
   "lifecycle_history": [
     {
-      "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+      "correlation_id": "787334fa-c665-4302-b722-dad036b29573",
       "from_state": "reserved",
       "from_version": 2,
-      "occurred_at": "2026-07-29T16:41:12.752540Z",
+      "occurred_at": "2026-07-31T08:22:07.018097Z",
       "reason": "backend preparation started",
       "resource_id": "cortical-labs-biopattern-gate-e3",
       "to_state": "preparing",
       "to_version": 3
     },
     {
-      "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+      "correlation_id": "787334fa-c665-4302-b722-dad036b29573",
       "from_state": "preparing",
       "from_version": 3,
-      "occurred_at": "2026-07-29T16:41:12.753842Z",
+      "occurred_at": "2026-07-31T08:22:07.019574Z",
       "reason": "substrate invocation started",
       "resource_id": "cortical-labs-biopattern-gate-e3",
       "to_state": "running",
       "to_version": 4
     },
     {
-      "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+      "correlation_id": "787334fa-c665-4302-b722-dad036b29573",
       "from_state": "running",
       "from_version": 4,
-      "occurred_at": "2026-07-29T16:41:12.755884Z",
+      "occurred_at": "2026-07-31T08:22:07.022756Z",
       "reason": "postcondition validation started",
       "resource_id": "cortical-labs-biopattern-gate-e3",
       "to_state": "validating",
       "to_version": 5
     },
     {
-      "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+      "correlation_id": "787334fa-c665-4302-b722-dad036b29573",
       "from_state": "validating",
       "from_version": 5,
-      "occurred_at": "2026-07-29T16:41:12.756520Z",
+      "occurred_at": "2026-07-31T08:22:07.023434Z",
       "reason": "execution completed; cooldown started",
       "resource_id": "cortical-labs-biopattern-gate-e3",
       "to_state": "cooldown",
       "to_version": 6
     },
     {
-      "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+      "correlation_id": "787334fa-c665-4302-b722-dad036b29573",
       "from_state": "cooldown",
       "from_version": 6,
-      "occurred_at": "2026-07-29T16:41:12.756954Z",
+      "occurred_at": "2026-07-31T08:22:07.023811Z",
       "reason": "cooldown completed",
       "resource_id": "cortical-labs-biopattern-gate-e3",
       "to_state": "ready",
@@ -68,8 +68,8 @@
   "result_summary": {
     "application": {
       "application_id": "cp2n2-biopattern-gate",
-      "application_run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
-      "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+      "application_run_id": "7f0bc352-c915-4b8d-9d24-46318a601df9",
+      "application_source_sha256": "fca1d699d09a57816ce7fefe073170c4a09e146155379bec0339d4119a26bbf7",
       "application_status": "complete",
       "biological_claim": false,
       "config_sha256": "5fccaac3022e223fc181508833eaad38755279556b43b6b2df4e2f7e032a08e4",
@@ -83,27 +83,27 @@
     },
     "artifact_references": [
       {
-        "artifact_id": "biopattern-gate-result-af813f7ddcb25e18",
+        "artifact_id": "biopattern-gate-result-05c7cb70b9682d66",
         "kind": "biopattern_gate_result_summary",
         "media_type": "application/json",
         "metadata": {
-          "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+          "application_source_sha256": "fca1d699d09a57816ce7fefe073170c4a09e146155379bec0339d4119a26bbf7",
           "application_status": "complete",
           "biological_claim": false,
           "completed_trial_count": 14,
           "evidence_level": "E3",
           "runtime_kind": "sdk_simulator",
-          "sha256": "af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+          "sha256": "05c7cb70b9682d664f8adb437ae4083874a445958aaf376e4a72a624b8547333"
         },
-        "uri": "memory://biopattern-gate/af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+        "uri": "memory://biopattern-gate/05c7cb70b9682d664f8adb437ae4083874a445958aaf376e4a72a624b8547333"
       }
     ],
     "confidence": null,
     "error_code": null,
     "error_message": null,
     "evidence_level": "E3",
-    "execution_latency_ms": 1.3996999987284653,
-    "orchestration_correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+    "execution_latency_ms": 2.367000008234754,
+    "orchestration_correlation_id": "787334fa-c665-4302-b722-dad036b29573",
     "preset_id": "pattern_gate_v1",
     "raw_output_included": false,
     "runtime_kind": "sdk_simulator",
@@ -116,7 +116,7 @@
     {
       "error": null,
       "ok": true,
-      "request_id": "ec18a604-2f5f-49b0-afc3-fa4211881c4f",
+      "request_id": "9b730121-9060-4439-a534-76e024fae7e1",
       "result": {
         "available_tools_are_constrained": true,
         "count": 4,
@@ -226,7 +226,7 @@
     {
       "error": null,
       "ok": true,
-      "request_id": "821408c1-da39-45eb-a7d5-49f7031134d1",
+      "request_id": "f7112485-3185-4107-8582-627dadbacbc5",
       "result": {
         "dry_run": true,
         "plan": {
@@ -342,7 +342,7 @@
               }
             ],
             "policy": "lexicographic",
-            "task_id": "mcp-assay-1f5e727f-f705-438b-b4ce-27d80240c2a8"
+            "task_id": "mcp-assay-baec8d0f-1ee3-4511-9eda-1ccef2293f9a"
           }
         },
         "resource_committed": false,
@@ -354,17 +354,17 @@
     {
       "error": null,
       "ok": true,
-      "request_id": "f40f3565-5155-4d8f-9888-dee34c098ce1",
+      "request_id": "632c9bf1-e725-401a-aaf7-4524d6a1b2c8",
       "result": {
-        "expires_at": "2026-07-29T16:42:12.739242+00:00",
-        "lease_id": "1bdd7444-5ecd-4173-a1bb-d64144b49c39",
+        "expires_at": "2026-07-31T08:23:07.005189+00:00",
+        "lease_id": "f597b3d9-fddc-4394-a854-9ebc120792e1",
         "lease_version": 0,
         "lifecycle": {
-          "correlation_id": "02261ecb-f40e-40c8-89a9-f195fca2f056",
-          "reason": "explicit lease 1bdd7444-5ecd-4173-a1bb-d64144b49c39 acquired",
+          "correlation_id": "0799ffc3-fec7-4f09-a0f7-ff44b71cb431",
+          "reason": "explicit lease f597b3d9-fddc-4394-a854-9ebc120792e1 acquired",
           "resource_id": "cortical-labs-biopattern-gate-e3",
           "state": "reserved",
-          "updated_at": "2026-07-29T16:41:12.739322Z",
+          "updated_at": "2026-07-31T08:22:07.005319Z",
           "version": 2
         },
         "resource_id": "cortical-labs-biopattern-gate-e3"
@@ -375,7 +375,7 @@
     {
       "error": null,
       "ok": true,
-      "request_id": "a00827fd-7fc0-41c9-882a-33ac1fd4527f",
+      "request_id": "a933732d-381c-4413-a8cb-877cc43735dd",
       "result": {
         "dry_run": false,
         "plan": {
@@ -491,12 +491,12 @@
               }
             ],
             "policy": "lexicographic",
-            "task_id": "mcp-assay-f4893df3-77f2-4620-adda-e92e26d43dba"
+            "task_id": "mcp-assay-7f0bc352-c915-4b8d-9d24-46318a601df9"
           }
         },
         "resource_committed": true,
         "run_created": true,
-        "run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+        "run_id": "7f0bc352-c915-4b8d-9d24-46318a601df9",
         "state": "prepared"
       },
       "stage": "prepare",
@@ -505,23 +505,23 @@
     {
       "error": null,
       "ok": true,
-      "request_id": "4b3d38a7-8800-4a15-86d6-2e02af8db556",
+      "request_id": "25fe48b9-5f33-45ca-ab3a-c9fa951bea9b",
       "result": {
         "approval_required": false,
-        "created_at": "2026-07-29T16:41:12.743827+00:00",
+        "created_at": "2026-07-31T08:22:07.009900+00:00",
         "preset_id": "pattern_gate_v1",
         "resource_id": "cortical-labs-biopattern-gate-e3",
         "resource_lifecycle": {
-          "correlation_id": "02261ecb-f40e-40c8-89a9-f195fca2f056",
-          "reason": "explicit lease 1bdd7444-5ecd-4173-a1bb-d64144b49c39 acquired",
+          "correlation_id": "0799ffc3-fec7-4f09-a0f7-ff44b71cb431",
+          "reason": "explicit lease f597b3d9-fddc-4394-a854-9ebc120792e1 acquired",
           "resource_id": "cortical-labs-biopattern-gate-e3",
           "state": "reserved",
-          "updated_at": "2026-07-29T16:41:12.739322Z",
+          "updated_at": "2026-07-31T08:22:07.005319Z",
           "version": 2
         },
-        "run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+        "run_id": "7f0bc352-c915-4b8d-9d24-46318a601df9",
         "state": "prepared",
-        "updated_at": "2026-07-29T16:41:12.743827+00:00"
+        "updated_at": "2026-07-31T08:22:07.009900+00:00"
       },
       "stage": "status_prepared",
       "tool": "get_run_status"
@@ -529,15 +529,15 @@
     {
       "error": null,
       "ok": true,
-      "request_id": "e2bb3c11-ee2f-450e-ad3f-e44bd4457327",
+      "request_id": "c10eee7d-cec6-4f34-befa-42b1fa897d9d",
       "result": {
-        "run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+        "run_id": "7f0bc352-c915-4b8d-9d24-46318a601df9",
         "state": "succeeded",
         "summary": {
           "application": {
             "application_id": "cp2n2-biopattern-gate",
-            "application_run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
-            "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+            "application_run_id": "7f0bc352-c915-4b8d-9d24-46318a601df9",
+            "application_source_sha256": "fca1d699d09a57816ce7fefe073170c4a09e146155379bec0339d4119a26bbf7",
             "application_status": "complete",
             "biological_claim": false,
             "config_sha256": "5fccaac3022e223fc181508833eaad38755279556b43b6b2df4e2f7e032a08e4",
@@ -551,27 +551,27 @@
           },
           "artifact_references": [
             {
-              "artifact_id": "biopattern-gate-result-af813f7ddcb25e18",
+              "artifact_id": "biopattern-gate-result-05c7cb70b9682d66",
               "kind": "biopattern_gate_result_summary",
               "media_type": "application/json",
               "metadata": {
-                "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+                "application_source_sha256": "fca1d699d09a57816ce7fefe073170c4a09e146155379bec0339d4119a26bbf7",
                 "application_status": "complete",
                 "biological_claim": false,
                 "completed_trial_count": 14,
                 "evidence_level": "E3",
                 "runtime_kind": "sdk_simulator",
-                "sha256": "af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+                "sha256": "05c7cb70b9682d664f8adb437ae4083874a445958aaf376e4a72a624b8547333"
               },
-              "uri": "memory://biopattern-gate/af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+              "uri": "memory://biopattern-gate/05c7cb70b9682d664f8adb437ae4083874a445958aaf376e4a72a624b8547333"
             }
           ],
           "confidence": null,
           "error_code": null,
           "error_message": null,
           "evidence_level": "E3",
-          "execution_latency_ms": 1.3996999987284653,
-          "orchestration_correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+          "execution_latency_ms": 2.367000008234754,
+          "orchestration_correlation_id": "787334fa-c665-4302-b722-dad036b29573",
           "preset_id": "pattern_gate_v1",
           "raw_output_included": false,
           "runtime_kind": "sdk_simulator",
@@ -587,23 +587,23 @@
     {
       "error": null,
       "ok": true,
-      "request_id": "96e54b91-ac30-4972-9b88-9d89b71049fb",
+      "request_id": "92b97ab0-4d7e-479b-8bb7-d8cdbb9aa4fe",
       "result": {
         "approval_required": false,
-        "created_at": "2026-07-29T16:41:12.743827+00:00",
+        "created_at": "2026-07-31T08:22:07.009900+00:00",
         "preset_id": "pattern_gate_v1",
         "resource_id": "cortical-labs-biopattern-gate-e3",
         "resource_lifecycle": {
-          "correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+          "correlation_id": "787334fa-c665-4302-b722-dad036b29573",
           "reason": "cooldown completed",
           "resource_id": "cortical-labs-biopattern-gate-e3",
           "state": "ready",
-          "updated_at": "2026-07-29T16:41:12.756954Z",
+          "updated_at": "2026-07-31T08:22:07.023811Z",
           "version": 7
         },
-        "run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+        "run_id": "7f0bc352-c915-4b8d-9d24-46318a601df9",
         "state": "succeeded",
-        "updated_at": "2026-07-29T16:41:12.757638+00:00"
+        "updated_at": "2026-07-31T08:22:07.024362+00:00"
       },
       "stage": "status_terminal",
       "tool": "get_run_status"
@@ -611,16 +611,16 @@
     {
       "error": null,
       "ok": true,
-      "request_id": "644ef94e-6717-40a4-b2b1-384734c0d0ea",
+      "request_id": "920fd054-3f6d-42e0-950d-93dee199d9dd",
       "result": {
         "raw_substrate_output_exposed": false,
-        "run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
+        "run_id": "7f0bc352-c915-4b8d-9d24-46318a601df9",
         "state": "succeeded",
         "summary": {
           "application": {
             "application_id": "cp2n2-biopattern-gate",
-            "application_run_id": "f4893df3-77f2-4620-adda-e92e26d43dba",
-            "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+            "application_run_id": "7f0bc352-c915-4b8d-9d24-46318a601df9",
+            "application_source_sha256": "fca1d699d09a57816ce7fefe073170c4a09e146155379bec0339d4119a26bbf7",
             "application_status": "complete",
             "biological_claim": false,
             "config_sha256": "5fccaac3022e223fc181508833eaad38755279556b43b6b2df4e2f7e032a08e4",
@@ -634,27 +634,27 @@
           },
           "artifact_references": [
             {
-              "artifact_id": "biopattern-gate-result-af813f7ddcb25e18",
+              "artifact_id": "biopattern-gate-result-05c7cb70b9682d66",
               "kind": "biopattern_gate_result_summary",
               "media_type": "application/json",
               "metadata": {
-                "application_source_sha256": "4229151b731c8685e35ff46534f955cb48f040ca3307335f168b792b71bd09e4",
+                "application_source_sha256": "fca1d699d09a57816ce7fefe073170c4a09e146155379bec0339d4119a26bbf7",
                 "application_status": "complete",
                 "biological_claim": false,
                 "completed_trial_count": 14,
                 "evidence_level": "E3",
                 "runtime_kind": "sdk_simulator",
-                "sha256": "af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+                "sha256": "05c7cb70b9682d664f8adb437ae4083874a445958aaf376e4a72a624b8547333"
               },
-              "uri": "memory://biopattern-gate/af813f7ddcb25e18f21272e7bb2a02b8e5a84fc761bdb46aa1bfea897c8d8381"
+              "uri": "memory://biopattern-gate/05c7cb70b9682d664f8adb437ae4083874a445958aaf376e4a72a624b8547333"
             }
           ],
           "confidence": null,
           "error_code": null,
           "error_message": null,
           "evidence_level": "E3",
-          "execution_latency_ms": 1.3996999987284653,
-          "orchestration_correlation_id": "9d4c0ddc-ef72-47b7-a526-9b606a9386b5",
+          "execution_latency_ms": 2.367000008234754,
+          "orchestration_correlation_id": "787334fa-c665-4302-b722-dad036b29573",
           "preset_id": "pattern_gate_v1",
           "raw_output_included": false,
           "runtime_kind": "sdk_simulator",

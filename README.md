@@ -7,6 +7,23 @@ as **phys-MCP**. The technical ASCII identifier is `cp2n2`; see the
 The accepted scope, evidence boundaries, completed work, and gated next steps
 are maintained in the versioned [project master plan](docs/project-masterplan.md).
 
+## Release v5.1.0
+
+Version 5.1.0 adds the provider-facing BioPattern Gate execution path through
+the documented Cortical Labs CL API. It includes stimulation-responsive SDK
+simulation, atomic stimulation acknowledgement checks, native HDF5 evidence,
+online/offline result comparison, cooperative-abort preservation, and an
+updated live visualizer. The path remains deliberately restricted to the SDK
+Simulator until Cortical Labs approves the Cloud lifecycle and a physical
+CL1 preset. See the
+[v5.1.0 release checklist](docs/release-v5.1.0-checklist.md).
+
+The implementation, complete local runner command, and remaining E5 boundary
+are documented in the
+[CL API execution guide](docs/cl-api-biopattern-gate-execution.md). Questions
+requiring authoritative Cortical Cloud answers are maintained in the
+[Cloud onboarding checklist](docs/cortical-labs-cloud-onboarding-questions.md).
+
 ## Release v5.0
 
 Version 5.0 adds the BioPattern Gate E3 application and audited
