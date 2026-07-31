@@ -61,20 +61,20 @@ Record the immutable publication values after the release is created:
 
 | Field | Frozen value |
 |---|---|
-| Commit | |
+| Commit | `fbbe726d0ce86c0b5d967b3b3568b861c006156d` |
 | Test result | 146 passed |
 | BioPattern E3 fixture verification | passed in the complete release suite |
 | Native CL HDF5 verification | complete and cooperative-abort paths passed |
-| Source ZIP SHA-256 | |
-| GitHub release URL | |
+| Source ZIP SHA-256 | `6ce4a9da9e8fcf4f904228fa1b5d7508f6cf03a8d2adc47417008a030d165b88` |
+| GitHub release URL | `https://github.com/fischesn/cp2n2/releases/tag/v5.1.0` |
 | Zenodo DOI | |
 
 ## Publish and bind
 
-- [ ] Create an annotated `v5.1.0` tag at the recorded commit.
-- [ ] Push the tag and publish the GitHub release with the generated archive,
+- [x] Create an annotated `v5.1.0` tag at the recorded commit.
+- [x] Push the tag and publish the GitHub release with the generated archive,
   checksum file, and release manifest.
-- [ ] Record the immutable commit, archive hash, and release URL above on
+- [x] Record the immutable commit, archive hash, and release URL above on
   post-release `main`.
 - [ ] If this version is cited by the paper, archive the exact release on
   Zenodo and bind its DOI and commit to the non-anonymous manuscript.

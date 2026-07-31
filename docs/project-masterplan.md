@@ -1754,7 +1754,7 @@ and artifact release.
   evidence-verification suite, and generate checksummed release artifacts.
 - [x] Publish CP²N² v5.0 on GitHub from the verified commit with its source
   archive, checksum file, and release manifest.
-- [ ] Freeze and publish CP²N² v5.1.0 with the provider-facing CL API
+- [x] Freeze and publish CP²N² v5.1.0 with the provider-facing CL API
   execution bridge, native HDF5 verification, refreshed E3 evidence, and the
   unchanged non-biological evidence boundary.
 - [ ] Archive the exact v5.0 release on Zenodo and bind its DOI and commit to
