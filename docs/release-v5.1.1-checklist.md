@@ -34,18 +34,18 @@ Cloud authentication and lifecycle contract.
 - [x] Selector names and values are synchronized across code, artifacts, and
   manuscript text.
 - [x] The complete headless test suite passes with 146 tests.
-- [ ] The source and evidence archives verify against release checksums.
-- [ ] The annotated tag and GitHub release are published.
-- [ ] The manuscript points to the published v5.1.1 release.
+- [x] The source and evidence archives verify against release checksums.
+- [x] The annotated tag and GitHub release are published.
+- [x] The manuscript points to the published v5.1.1 release.
 
 ## Immutable publication values
 
 | Field | Frozen value |
 |---|---|
-| Tag commit | pending |
+| Tag commit | `36fbae002b0a9e066416ea9cafbb966a33fe53bb` |
 | Test result | 146 passed |
-| Source ZIP SHA-256 | pending |
-| Evidence ZIP SHA-256 | pending |
+| Source ZIP SHA-256 | `552943e9b3d51f8201cf7b46d58e4d1d09de53e762770cd7daf017246d1f6b22` |
+| Evidence ZIP SHA-256 | `6b55c66a956d3c2c58971bc531da0d9421e0a3f4ac1d018212b8d0823ce27916` |
 | GitHub release URL | `https://github.com/fischesn/cp2n2/releases/tag/v5.1.1` |
 
 If any published identifier or artifact differs, issue a corrected release
