@@ -17,6 +17,9 @@
   and its verified per-file SHA-256 manifest.
 - Bound the A6 archive and synchronized selector reference run to one v5.1.1
   evidence package and checksum set.
+- Archived the tagged source snapshot and combined source-and-evidence bundle
+  at version DOI `10.5281/zenodo.21887895` (concept DOI
+  `10.5281/zenodo.19595082`).
 
 ### Verification and release boundary
 

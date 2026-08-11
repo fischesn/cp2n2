@@ -1,5 +1,7 @@
 # CP²N²
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19595082.svg)](https://doi.org/10.5281/zenodo.19595082)
+
 **CP²N² — Control Plane for Physical Neural Networks** was formerly published
 as **phys-MCP**. The technical ASCII identifier is `cp2n2`; see the
 [naming-migration guide](docs/naming-migration.md) for compatibility details.
@@ -7,16 +9,15 @@ as **phys-MCP**. The technical ASCII identifier is `cp2n2`; see the
 The accepted scope, evidence boundaries, completed work, and gated next steps
 are maintained in the versioned [project master plan](docs/project-masterplan.md).
 
-## Release v5.1.0
+## Release v5.1.1
 
-Version 5.1.0 adds the provider-facing BioPattern Gate execution path through
-the documented Cortical Labs CL API. It includes stimulation-responsive SDK
-simulation, atomic stimulation acknowledgement checks, native HDF5 evidence,
-online/offline result comparison, cooperative-abort preservation, and an
-updated live visualizer. The path remains deliberately restricted to the SDK
-Simulator until Cortical Labs approves the Cloud lifecycle and a physical
-CL1 preset. See the
-[v5.1.0 release checklist](docs/release-v5.1.0-checklist.md).
+Version 5.1.1 publishes the complete A6/RQ2 reference-run archive and
+synchronizes selector code, frozen artifacts, and manuscript results. It is an
+evidence-publication patch release and changes no control-plane behaviour. The
+Cortical Labs path remains restricted to the SDK Simulator until the Cloud
+lifecycle and a physical CL1 preset are approved. See the
+[v5.1.1 release checklist](docs/release-v5.1.1-checklist.md) and the
+[Zenodo record](docs/zenodo-v5.1.1-record.md).
 
 The implementation, complete local runner command, and remaining E5 boundary
 are documented in the

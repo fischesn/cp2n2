@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use CP²N², please cite the archived software release below."
+title: "CP²N² — Control Plane for Physical Neural Networks"
+abstract: >-
+  CP²N² is a substrate-neutral control plane for discovering, admitting,
+  selecting, leasing, invoking, validating, recovering, and auditing
+  heterogeneous physical neural network resources through constrained
+  agent-facing interfaces.
+version: 5.1.1
+date-released: 2026-08-11
+type: software
+license: MIT
+authors:
+  - given-names: Stefan
+    family-names: Fischer
+    affiliation: University of Lübeck, Institute of Telematics
+    orcid: "https://orcid.org/0000-0003-1292-8925"
+  - given-names: Maliheh
+    family-names: Hariri
+    affiliation: University of Lübeck, Institute of Telematics
+  - given-names: Sebastian
+    family-names: Otte
+    affiliation: University of Lübeck, Institute of Robotics and Cognitive Systems
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.21887895"
+repository-code: "https://github.com/fischesn/cp2n2"
+url: "https://doi.org/10.5281/zenodo.21887895"
+keywords:
+  - physical neural networks
+  - control plane
+  - Model Context Protocol
+  - agentic systems
+  - resource orchestration
+  - digital twins

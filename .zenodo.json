@@ -1,0 +1,38 @@
+{
+  "title": "CP²N² — Control Plane for Physical Neural Networks (v5.1.1)",
+  "description": "CP²N² is a substrate-neutral control plane for heterogeneous physical neural network resources. Version v5.1.1 publishes the complete A6/RQ2 same-host reference run and synchronizes the selector artifacts with the current implementation. The Cortical Labs integration remains E3 SDK-simulator evidence; this release makes no claim of physical CL1 execution or biological performance.",
+  "creators": [
+    {
+      "name": "Fischer, Stefan",
+      "affiliation": "University of Lübeck",
+      "orcid": "0000-0003-1292-8925"
+    },
+    {
+      "name": "Hariri, Maliheh",
+      "affiliation": "University of Lübeck"
+    },
+    {
+      "name": "Otte, Sebastian",
+      "affiliation": "University of Lübeck"
+    }
+  ],
+  "version": "v5.1.1",
+  "access_right": "open",
+  "license": "mit",
+  "upload_type": "software",
+  "language": "eng",
+  "keywords": [
+    "physical neural networks",
+    "control plane",
+    "Model Context Protocol",
+    "agentic AI",
+    "reproducible systems"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/fischesn/cp2n2/releases/tag/v5.1.1",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    }
+  ]
+}

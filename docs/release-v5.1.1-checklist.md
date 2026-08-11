@@ -37,6 +37,8 @@ Cloud authentication and lifecycle contract.
 - [x] The source and evidence archives verify against release checksums.
 - [x] The annotated tag and GitHub release are published.
 - [x] The manuscript points to the published v5.1.1 release.
+- [x] The Zenodo record contains the tagged source snapshot and the combined
+  source-and-evidence archive under the version-specific DOI.
 
 ## Immutable publication values
 
@@ -46,7 +48,10 @@ Cloud authentication and lifecycle contract.
 | Test result | 146 passed |
 | Source ZIP SHA-256 | `552943e9b3d51f8201cf7b46d58e4d1d09de53e762770cd7daf017246d1f6b22` |
 | Evidence ZIP SHA-256 | `6b55c66a956d3c2c58971bc531da0d9421e0a3f4ac1d018212b8d0823ce27916` |
+| Combined Zenodo ZIP SHA-256 | `aaeb13a608fa2ae94d61dbce2df19bfbd5a9669d6c61e1b64b1337753ffedaa7` |
 | GitHub release URL | `https://github.com/fischesn/cp2n2/releases/tag/v5.1.1` |
+| Zenodo version DOI | `10.5281/zenodo.21887895` |
+| Zenodo concept DOI | `10.5281/zenodo.19595082` |
 
 If any published identifier or artifact differs, issue a corrected release
 rather than silently replacing files.
