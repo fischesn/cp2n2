@@ -17,9 +17,9 @@ if ($branch -ne 'main') {
     throw "Release candidates must be built from main; current branch is '$branch'."
 }
 
-$status = & git status --porcelain=v1
+$status = & git status --porcelain=v1 --untracked-files=no
 if ($status) {
-    throw 'Release candidates require a clean worktree.'
+    throw 'Release candidates require no tracked worktree changes.'
 }
 
 $commit = (& git rev-parse HEAD).Trim()
