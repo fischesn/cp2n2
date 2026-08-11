@@ -13,6 +13,8 @@ __pycache__/
 *.debug
 *.h5
 evaluation/results/run-*/
+# Published A6 release input; retained locally and distributed as a release asset.
+/evaluation/results/a6-rq2-reference-run-v5.1.0-20260804/
 cl-apps/.run-output/
 cl-apps/*.zip
 
