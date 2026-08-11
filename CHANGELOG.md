@@ -1,5 +1,34 @@
 # Changelog
 
+## v5.1.1 — 2026-08-11
+
+### Changed
+
+- Synchronized the frozen selector artifacts with the current five-policy
+  evaluation: static priority, constraint based, random admissible, weighted
+  comparison, and the principal CP²N² lexicographic policy.
+- Added a versioned selector reference run with holdout results and 32 seeded
+  weighted-heuristic perturbations.
+
+### Published evidence
+
+- Added the complete A6/RQ2 reference-run archive as a release asset, including
+  all 945 request records, 30 aggregate cells, configurations, traces, figures,
+  and its verified per-file SHA-256 manifest.
+- Bound the A6 archive and synchronized selector reference run to one v5.1.1
+  evidence package and checksum set.
+
+### Verification and release boundary
+
+- This is an evidence-publication patch release; it does not change control-plane
+  behaviour or the E3 evidence boundary.
+- The selector conformance suite records 7/7 for the principal lexicographic and
+  weighted-comparison policies and 6/7 for each of the three simpler baselines.
+- The four-case holdout suite records 4/4, and the principal selection remains
+  unchanged across all 32 seeded weight perturbations.
+- A6 remains a controlled same-host software experiment and is not physical-CL1
+  or biological-performance evidence.
+
 ## v5.1.0 — 2026-07-31
 
 ### Added
