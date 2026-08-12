@@ -1,11 +1,16 @@
 <main class="pattern-gate" data-pattern-gate-root>
   <header class="demo-header">
     <div>
-      <p class="eyebrow">CP2N2 / BioPattern Gate</p>
-      <h1>Temporal signals. One governed decision.</h1>
-      <p class="lede">
+      <p class="eyebrow title-default">CP2N2 / BioPattern Gate</p>
+      <p class="eyebrow title-publication">CP<sup>2</sup>N<sup>2</sup> control-plane evidence</p>
+      <h1 class="title-default">Temporal signals. One governed decision.</h1>
+      <h1 class="title-publication">BioPattern Gate — Audited E3 Simulator Replay</h1>
+      <p class="lede title-default">
         A frozen readout routes each blinded temporal pattern while the
         control plane keeps evidence, lifecycle, and authority visible.
+      </p>
+      <p class="lede title-publication">
+        Frozen Trial 2 readout with verified lifecycle and MCP evidence.
       </p>
     </div>
     <div class="evidence-stack" aria-label="Evidence classification">
@@ -133,14 +138,22 @@
           </p>
         </div>
       </div>
-      <section class="control-section">
+      <div class="publication-evidence" aria-label="Recorded control-plane evidence summary">
+        <div><span>MCP requests</span><strong data-bind="audit-request-count">—</strong></div>
+        <div><span>Audit events</span><strong data-bind="audit-event-count">—</strong></div>
+        <div><span>Lifecycle</span><strong>7 / 7 states</strong></div>
+        <div><span>Exclusive lease</span><strong data-bind="lease-state">—</strong></div>
+        <div><span>Audit chain</span><strong data-bind="audit-chain">—</strong></div>
+        <div><span>Raw agent output</span><strong data-bind="raw-output-state">—</strong></div>
+      </div>
+      <section class="control-section control-section--lifecycle">
         <div class="section-heading">
           <h3>Resource lifecycle</h3>
           <span data-bind="correlation-id">—</span>
         </div>
         <ol class="lifecycle" data-lifecycle></ol>
       </section>
-      <section class="control-section">
+      <section class="control-section control-section--mcp">
         <div class="section-heading">
           <h3>MCP request evidence</h3>
           <span><strong data-bind="audit-request-count">—</strong> requests</span>

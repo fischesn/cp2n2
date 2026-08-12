@@ -20,8 +20,29 @@ const LIFECYCLE = [
 ];
 
 function text(root, name, value) {
-  const element = root.querySelector(`[data-bind="${name}"]`);
-  if (element) element.textContent = value ?? "—";
+  root.querySelectorAll(`[data-bind="${name}"]`).forEach((element) => {
+    element.textContent = value ?? "—";
+  });
+}
+
+function configurePresentation(root, search = globalThis.location?.search ?? "") {
+  const parameters = new URLSearchParams(search);
+  if (parameters.get("view") !== "publication") {
+    return { view: "demo", layout: null, trialIndex: 0 };
+  }
+
+  const layout = parameters.get("layout") === "wide" ? "wide" : "compact";
+  const requestedTrial = Number.parseInt(parameters.get("trial") ?? "2", 10);
+  const trialIndex = Number.isFinite(requestedTrial)
+    ? Math.max(0, requestedTrial - 1)
+    : 1;
+  root.dataset.view = "publication";
+  root.dataset.layout = layout;
+  root.setAttribute(
+    "aria-label",
+    `BioPattern Gate publication view, ${layout} layout, frozen Trial ${trialIndex + 1}`
+  );
+  return { view: "publication", layout, trialIndex };
 }
 
 function shortHash(value) {
@@ -305,11 +326,15 @@ class PatternGateDashboard {
 }
 
 async function mountReplayDemo(root, bundleUrl) {
+  const presentation = configurePresentation(root);
   const dashboard = new PatternGateDashboard(root);
   try {
     const response = await fetch(bundleUrl, { cache: "no-store" });
     if (!response.ok) throw new Error(`Replay request failed (${response.status}).`);
     dashboard.load(await response.json());
+    if (presentation.view === "publication") {
+      dashboard.show(presentation.trialIndex);
+    }
   } catch (error) {
     text(root, "run-status", "FAILED");
     text(root, "demo-status", error.message);
@@ -361,6 +386,7 @@ function createVisualiser(uniqueId, div) {
 
 export {
   PatternGateDashboard,
+  configurePresentation,
   createVisualiser,
   dataStreams,
   mountReplayDemo,

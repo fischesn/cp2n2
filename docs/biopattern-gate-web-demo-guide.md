@@ -37,6 +37,37 @@ It can also be started without activating the virtual environment:
 .\.venv\Scripts\python.exe scripts\serve_biopattern_gate_demo.py
 ```
 
+## Publication view
+
+The same replay also provides a static, print-oriented view for screenshots
+used in papers and presentations. It changes only the visual arrangement; all
+values still come from the checked-in E3 replay bundle.
+
+Open the compact 4:3 candidate at:
+
+```text
+http://127.0.0.1:8765/?view=publication&layout=compact&trial=2
+```
+
+Capture this variant with a `1200 × 900` CSS-pixel viewport.
+
+Open the wide 16:9 candidate at:
+
+```text
+http://127.0.0.1:8765/?view=publication&layout=wide&trial=2
+```
+
+Capture this variant with a `1400 × 788` CSS-pixel viewport. This is the
+recommended two-column paper figure because it retains readable panel text
+while using substantially less vertical page space than the full demo.
+
+The publication view uses a light background, removes the interactive replay
+controls, disables animation, and reduces low-level audit detail to the key
+facts required to interpret the figure. The normal dark replay remains the
+primary interactive demo. `trial=2` fixes the displayed state; another
+one-based trial number may be supplied when a different archived trial is
+needed.
+
 ## Labels in the header
 
 The colored labels in the upper-right corner state how the displayed evidence

@@ -7,6 +7,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import sys
 import threading
+from urllib.parse import urlsplit
 import webbrowser
 
 
@@ -28,7 +29,7 @@ def build_demo_page(fragment: str) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="dark light">
   <title>CP2N2 BioPattern Gate · E3 Replay</title>
   <link rel="stylesheet" href="/assets/vis.css">
 </head>
@@ -48,6 +49,7 @@ class DemoRequestHandler(BaseHTTPRequestHandler):
     server_version = "CP2N2Demo/1.0"
 
     def do_GET(self) -> None:  # noqa: N802
+        request_path = urlsplit(self.path).path
         routes = {
             "/assets/vis.css": (
                 WEB_ROOT / "vis.css",
@@ -62,16 +64,16 @@ class DemoRequestHandler(BaseHTTPRequestHandler):
                 "application/json; charset=utf-8",
             ),
         }
-        if self.path in {"/", "/index.html"}:
+        if request_path in {"/", "/index.html"}:
             payload = build_demo_page(
                 (WEB_ROOT / "vis.html").read_text(encoding="utf-8")
             ).encode("utf-8")
             self._respond(200, "text/html; charset=utf-8", payload)
             return
-        if self.path == "/health":
+        if request_path == "/health":
             self._respond(200, "text/plain; charset=utf-8", b"ready\n")
             return
-        route = routes.get(self.path)
+        route = routes.get(request_path)
         if route is None:
             self._respond(404, "text/plain; charset=utf-8", b"not found\n")
             return

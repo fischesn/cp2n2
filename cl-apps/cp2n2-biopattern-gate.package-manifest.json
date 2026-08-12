@@ -3,8 +3,8 @@
   "application_version": "0.2.0",
   "archive": {
     "filename": "cp2n2-biopattern-gate.zip",
-    "sha256": "fc14d07955e84a204de6427c4a78c22a922113b4b5a1043bd69365344bb05728",
-    "size_bytes": 41896
+    "sha256": "b36488f55ec88fb6f2df0d7b88acca633106f33752c027d15e78b36f65bc57d1",
+    "size_bytes": 44119
   },
   "entries": {
     "cp2n2-biopattern-gate/default.json": {
@@ -112,16 +112,16 @@
       "size_bytes": 905
     },
     "cp2n2-biopattern-gate/web/vis.css": {
-      "sha256": "d2d7b591dcc64a1ec7d9df0f9ab4a0701c52b22a9c3ed2ea355d96b5073a80e6",
-      "size_bytes": 13894
+      "sha256": "211e1046bcf11052ac7139c7271e994e3f63c49eeef405dbcd623b82ea35ef92",
+      "size_bytes": 25160
     },
     "cp2n2-biopattern-gate/web/vis.html": {
-      "sha256": "548c931412ab9aa5492272734b651265278b17496f2dfda8679470964799eeec",
-      "size_bytes": 6934
+      "sha256": "68734351b27e5294f6026249ee9008d22e397cfab5fd199424605f7562b04aed",
+      "size_bytes": 7992
     },
     "cp2n2-biopattern-gate/web/vis.mjs": {
-      "sha256": "78b346816fb806fa45f5c0f381ef21bea0dd9e9d907f73697c8cce9f54406b32",
-      "size_bytes": 13411
+      "sha256": "b473c09722a27c920b9c9f56ed9de0921bbd678379898cebdc73f4cf13a8537f",
+      "size_bytes": 14350
     }
   },
   "manifest_version": "1.0"

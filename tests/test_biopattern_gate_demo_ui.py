@@ -101,9 +101,16 @@ def test_visualizer_contains_four_coordinated_panels_and_replay_controls() -> No
     assert "REPLAY" in html
     assert "MCP AUDITED" in html
     assert "Recorded CP2N2 execution" in html
+    assert "BioPattern Gate — Audited E3 Simulator Replay" in html
+    assert "publication-evidence" in html
     assert "data-mcp-flow" in html
     assert "@media (prefers-reduced-motion: reduce)" in css
+    assert '[data-view="publication"]' in css
+    assert '[data-layout="compact"]' in css
+    assert '[data-layout="wide"]' in css
     assert "validateReplayBundle" in javascript
+    assert "configurePresentation" in javascript
+    assert 'parameters.get("trial") ?? "2"' in javascript
     assert "mountReplayDemo" in javascript
     assert "renderLifecycleEvidence" in javascript
     assert "renderMcpFlow" in javascript
@@ -128,3 +135,4 @@ def test_local_demo_page_uses_the_same_cl_visualizer_assets() -> None:
     assert 'href="/assets/vis.css"' in page
     assert 'from "/assets/vis.mjs"' in page
     assert 'mountReplayDemo(root, "/data/demo.json")' in page
+    assert 'content="dark light"' in page
