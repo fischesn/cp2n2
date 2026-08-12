@@ -10,6 +10,12 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 
+# Preserve the existing colour cycle while making every series distinguishable
+# when the figures are printed in greyscale. The order is deterministic because
+# profiles are plotted alphabetically below.
+PROFILE_MARKERS = ("o", "s", "^", "D", "X")
+
+
 def regenerate(summary_csv: str | Path, output_dir: str | Path) -> list[Path]:
     summary_csv = Path(summary_csv)
     output_dir = Path(output_dir)
@@ -23,12 +29,18 @@ def regenerate(summary_csv: str | Path, output_dir: str | Path) -> list[Path]:
 
     latency_path = output_dir / "rq2-p95-latency.png"
     plt.figure(figsize=(8.5, 4.8))
-    for profile_id, profile_rows in sorted(grouped.items()):
+    for profile_index, (profile_id, profile_rows) in enumerate(
+        sorted(grouped.items())
+    ):
+        marker = PROFILE_MARKERS[profile_index % len(PROFILE_MARKERS)]
         ordered = sorted(profile_rows, key=lambda row: int(row["client_count"]))
         plt.plot(
             [int(row["client_count"]) for row in ordered],
             [float(row["p95_latency_ms"]) for row in ordered],
-            marker="o",
+            marker=marker,
+            markersize=8,
+            markeredgewidth=1.6,
+            markerfacecolor="none",
             label=profile_id,
         )
     plt.xlabel("Competing clients")
@@ -42,12 +54,18 @@ def regenerate(summary_csv: str | Path, output_dir: str | Path) -> list[Path]:
 
     success_path = output_dir / "rq2-success-rate.png"
     plt.figure(figsize=(8.5, 4.8))
-    for profile_id, profile_rows in sorted(grouped.items()):
+    for profile_index, (profile_id, profile_rows) in enumerate(
+        sorted(grouped.items())
+    ):
+        marker = PROFILE_MARKERS[profile_index % len(PROFILE_MARKERS)]
         ordered = sorted(profile_rows, key=lambda row: int(row["client_count"]))
         plt.plot(
             [int(row["client_count"]) for row in ordered],
             [float(row["success_rate"]) for row in ordered],
-            marker="o",
+            marker=marker,
+            markersize=8,
+            markeredgewidth=1.6,
+            markerfacecolor="none",
             label=profile_id,
         )
     plt.xlabel("Competing clients")
