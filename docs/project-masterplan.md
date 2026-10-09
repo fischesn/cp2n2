@@ -4,6 +4,38 @@
 **Status:** Accepted project plan — 23 July 2026  
 **Purpose:** Executable development, experiment, and publication plan for the next, substantially strengthened version of CP²N².
 
+### Current revision overlay — 9 October 2026
+
+The next work is governed by the
+[reviewer-driven revision roadmap](ieee-access-revision-roadmap.md), following
+the IEEE Access decision on `Access-2026-43996`. It defines four bounded
+packages: R1 claims/novelty/contracts, R2 continuous executing E3 integration,
+R3 active enforcement, and R4 stronger evaluation methodology, preceded by a
+baseline freeze and followed by paper/artifact integration.
+
+The A–D streams, completed checkboxes, and earlier submission milestones below
+remain intact as project history. The roadmap supersedes older venue choices
+and immediate-next-action lists for current revision work; it does not mark
+historical unchecked tasks complete. In particular, policy enforcement must
+not be equated with physical safety, and E3 evidence must not fill E5 gaps.
+
+Real-substrate feasibility (BrainScaleS-2 and the additional DECIPHER
+alternatives) is a separate H1 track. The current revision does not wait for
+Cortical Cloud or assume another provider is already available. A substantial
+physical study can become a follow-up paper rather than an implicit expansion
+of the systems-paper revision.
+
+**Revision checkpoint — 9 October 2026:** the confirmed original submission,
+published software baseline, and existing evidence have been preserved; see
+the [baseline inventory](revision/baseline-inventory.md). R0 inventory is
+complete, while protocol freezes and editor follow-up remain pending. R1's
+claims, comparison and contract specification are complete; see the
+[claim matrix](revision/r1-claim-evidence-matrix.md). R2 (continuous executing
+E3 integration) is next. No new results or runtime functions were added in R1.
+An Access resubmission requires a comprehensive all-comment reviewer
+response, highlighted revised PDF, and matching clean PDF/LaTeX package;
+these are explicit R5 outputs, not optional documentation.
+
 ## 1. Project position and target
 
 CP²N² is a **general control plane for heterogeneous Physical Neural Networks (PNNs)**. It is not a Cortical Labs integration project. A Cortical Labs CL1 is one representative, real biological PNN scenario through which the control-plane claims can be tested; other PNNs, neuromorphic devices, simulators, and physical substrates remain equally in scope.

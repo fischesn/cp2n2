@@ -1,5 +1,19 @@
 # Lifecycle, Leases, and Error Semantics
 
+## R1 scope and execution acceptance criteria
+
+The current atomicity boundary is one in-process `TwinRegistry` and the clients
+or orchestrators sharing it. Lease/lifecycle/idempotency state is not durable or
+replicated. Expiry rejects later use but is not cancellation of an already
+running worker. A caller timeout therefore cannot justify automatic reuse;
+unknown completion requires authoritative reconciliation. These are software
+protocol guarantees in the tested scope, not a proof of physical safety.
+
+The [R1 binding and invariant specification](revision/r1-binding-contracts-and-invariants.md)
+defines the R2 task-to-native-SDK-run identity chain and R3 independently observed
+effect tests. It labels proposed tests and semantic validators separately from
+existing regressions. R1 changes documentation, not runtime behavior.
+
 ## Scope
 
 A2 turns the CP²N² invocation path into an explicit execution protocol.

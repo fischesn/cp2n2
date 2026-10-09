@@ -1,0 +1,158 @@
+{
+  "schema_version": "1.0",
+  "date": "2026-10-09",
+  "manuscript_id": "Access-2026-43996",
+  "submission_confirmed_by_author": true,
+  "paper_commit": "16738dfe4827ce5cccc1375e591b4ba220e61962",
+  "software_worktree_commit": "ab4144a3a00a6794d4e76a8a0f95f1ace8a38d33",
+  "release_commit": "36fbae002b0a9e066416ea9cafbb966a33fe53bb",
+  "version_doi": "10.5281/zenodo.21887895",
+  "preserved_inputs": 317,
+  "archive": {
+    "relative_path": "revision-baselines/access-2026-43996/original-submission.zip",
+    "bytes": 58683946,
+    "sha256": "cdd10b6285cda2d89a1ef34caa20c2e3141c2e5b08247403658f06ea97ad026a",
+    "snapshot_manifest_sha256": "977e99189c16fecfed90af8454519de45a58dfbb1ea4e3b3e33ec128f7a0e687",
+    "verification_sha256": "787a7576fa7a1c5b602aa845da8644b7a0ce655c1dbb6e5558cc905c40f9035f"
+  },
+  "verification": {
+    "schema_version": "1.0",
+    "snapshot_checks": {
+      "entries": 317,
+      "mismatches": []
+    },
+    "submission": {
+      "pages": 17,
+      "members": 62,
+      "local_source_members_checked": 60,
+      "local_source_mismatches": [],
+      "zip_hash_matches_manifest": true,
+      "pdf_hash_matches_manifest": true
+    },
+    "release_archives": {
+      "cp2n2-v5.1.1-source.zip": {
+        "sha256": "552943e9b3d51f8201cf7b46d58e4d1d09de53e762770cd7daf017246d1f6b22",
+        "matches": true
+      },
+      "cp2n2-v5.1.1-evidence.zip": {
+        "sha256": "6b55c66a956d3c2c58971bc531da0d9421e0a3f4ac1d018212b8d0823ce27916",
+        "matches": true
+      },
+      "evidence-manifest.json": {
+        "sha256": "dc636b81b297b844d66d94af1ee377a85ded59b77494b2085fbd3d0676b50fad",
+        "matches": true
+      },
+      "cp2n2-v5.1.1-zenodo.zip": {
+        "sha256": "aaeb13a608fa2ae94d61dbce2df19bfbd5a9669d6c61e1b64b1337753ffedaa7",
+        "matches": true
+      }
+    },
+    "a6_published_zip": {
+      "entries": 47,
+      "mismatches": []
+    },
+    "a6_local_copy": {
+      "entries": 47,
+      "mismatches": []
+    },
+    "a6_requests": 945,
+    "a6_cells": 30,
+    "selector_published_zip": {
+      "entries": 9,
+      "mismatches": []
+    },
+    "selector_local_copy": {
+      "entries": 9,
+      "mismatches": []
+    },
+    "agent_campaigns": [
+      {
+        "directory": "agent-20260730T093002Z",
+        "fixture_version": "1.1",
+        "source_commit": null,
+        "trials": 40,
+        "oracle_pass_rate": 0.55,
+        "substrate_execution_count": 0,
+        "execute_e3": false,
+        "model_id": "minimax-m2.7",
+        "artifact_checks": {
+          "entries": 5,
+          "mismatches": []
+        },
+        "audit_file_checks": {
+          "entries": 40,
+          "mismatches": []
+        },
+        "audit_chains_verified": 40,
+        "audit_events": 100
+      },
+      {
+        "directory": "agent-20260730T094108Z",
+        "fixture_version": "1.2",
+        "source_commit": null,
+        "trials": 8,
+        "oracle_pass_rate": 0.875,
+        "substrate_execution_count": 0,
+        "execute_e3": false,
+        "model_id": "minimax-m2.7",
+        "artifact_checks": {
+          "entries": 5,
+          "mismatches": []
+        },
+        "audit_file_checks": {
+          "entries": 8,
+          "mismatches": []
+        },
+        "audit_chains_verified": 8,
+        "audit_events": 20
+      },
+      {
+        "directory": "agent-20260730T100138Z",
+        "fixture_version": "1.2",
+        "source_commit": "49c8c49a347f5380084722ae9545c6acc796b462",
+        "trials": 160,
+        "oracle_pass_rate": 0.88125,
+        "substrate_execution_count": 0,
+        "execute_e3": false,
+        "model_id": "minimax-m2.7",
+        "artifact_checks": {
+          "entries": 5,
+          "mismatches": []
+        },
+        "audit_file_checks": {
+          "entries": 160,
+          "mismatches": []
+        },
+        "audit_chains_verified": 160,
+        "audit_events": 400
+      }
+    ],
+    "control_plane_e3": {
+      "steps": 9,
+      "request_ids": 8,
+      "audit_events_verified": 16,
+      "client_kind": "deterministic_non_llm",
+      "last_lifecycle_state": "ready"
+    },
+    "sdk_e3": {
+      "runtime_kind": "sdk_simulator",
+      "evidence_ceiling": "E3",
+      "substrate_executed": false,
+      "biological_claim": false,
+      "trial_count": 14,
+      "scored_trial_count": 12,
+      "sham_trial_count": 2,
+      "run_id": "cl-local-technical-e3",
+      "recording_sha256": "0651c5ab2d6a2318732a911ed2345351a06a9318161b1b9a814f7d8be1349bac",
+      "recording_metadata": {
+        "filename": "2026-07-31_08-13-46.977+00-00_cp2n2-cl-local-technical-e3.h5",
+        "online_offline_match": true,
+        "spike_count": 60,
+        "stim_count": 24,
+        "terminal_state": "complete"
+      },
+      "recording_content_reconstructed_in_this_step": false
+    },
+    "note": "Read-only verification of preserved evidence; no new SDK, LLM, network, or physical execution."
+  }
+}

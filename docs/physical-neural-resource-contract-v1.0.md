@@ -1,5 +1,24 @@
 # Physical Neural Resource Contract v1.0
 
+## Implementation boundaries clarified in R1
+
+The October 2026 claim audit distinguishes schema declarations from executable
+checks. See the [concrete binding contracts and R2/R3 acceptance tests](revision/r1-binding-contracts-and-invariants.md).
+Generic admission checks runtime/evidence, permission, supervision, exclusivity,
+lifecycle and health; it does not automatically validate arbitrary input units,
+every declared hard limit or optional calibration validity. Base adapters publish
+a 30 s telemetry validity interval, but the schema permits `valid_until=None`,
+which alone does not expire the observation. Non-physical generic admission can
+accept a declared `unknown` health value; stricter known-health/age requirements
+must be explicit binding/task gates.
+
+Twin confidence and drift/calibration proxies are synthetic or configured.
+`attestation_method` describes runtime provenance, not cryptographic proof of
+hardware or physical truth. Required field presence is not complete semantic
+validation. Unknown or unsupported physical units/ranges must not be promoted
+to an approved physical preset. R1 documents these limits without changing the
+contract schema or software behavior.
+
 ## Purpose and scope
 
 The Physical Neural Resource Contract (PNRC) is the substrate-neutral

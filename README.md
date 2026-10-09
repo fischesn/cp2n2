@@ -9,6 +9,16 @@ as **phys-MCP**. The technical ASCII identifier is `cp2n2`; see the
 The accepted scope, evidence boundaries, completed work, and gated next steps
 are maintained in the versioned [project master plan](docs/project-masterplan.md).
 
+The current reviewer-driven work is organized in the
+[revision roadmap](docs/ieee-access-revision-roadmap.md): four bounded
+systems-paper packages and a separate optional physical-substrate track.
+
+R1 now documents the [claim/evidence boundaries](docs/revision/r1-claim-evidence-matrix.md),
+[binding contracts and proposed execution tests](docs/revision/r1-binding-contracts-and-invariants.md),
+and [related-work/citation decisions](docs/revision/r1-comparison-and-citation-log.md).
+It changes no software functionality. R2 is the next implementation package;
+the legacy agent campaign withheld all substrate execution.
+
 ## Release v5.1.1
 
 Version 5.1.1 publishes the complete A6/RQ2 reference-run archive and
