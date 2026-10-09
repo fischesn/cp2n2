@@ -3,7 +3,7 @@
 **Date:** 9 October 2026
 
 **Status:** Original submission/evidence preserved; R1 text and specification
-complete; R2–R5 and new experiments pending
+complete; R2 execution bridge validated in development; R2 recovery and R3–R5 pending
 
 **Trigger:** IEEE Access decision on manuscript `Access-2026-43996`
 
@@ -15,7 +15,7 @@ complete; R2–R5 and new experiments pending
 |---|---|---|
 | R0 | Preserve the original submission and inventory its evidence | Inventory complete; protocol freezes/editor reply pending |
 | R1 | Make claims, novelty, and contracts precise | COMPLETE — text/specification; no new results |
-| R2 | Connect MCP admission to one actual SDK Simulator execution | NEXT |
+| R2 | Connect MCP admission to one actual SDK Simulator execution | IN PROGRESS — bridge/native checks work; recovery experiments pending |
 | R3 | Demonstrate enforcement using permitted and forbidden backend effects | TODO |
 | R4 | Strengthen selection, measurement, contention, and fault experiments | TODO |
 | R5 | Integrate the evidence, revise both manuscript views, and prepare the resubmission | TODO |
@@ -210,34 +210,41 @@ or narrowed; all R2/R3 admission and execution postconditions are specified.
 
 ## 5. R2 — Continuous MCP-to-CL-SDK execution at E3
 
-**Status:** TODO. **Purpose:** close the gap between the two existing E3 traces.
+**Status:** IN PROGRESS. **Purpose:** close the gap between the two existing E3 traces.
+
+**First checkpoint:** the MCP path now launches a fresh official SDK Simulator
+run and validates decisions independently from native stimulation/spike tables.
+The success manifest and offline verifier are implemented; the legacy traces
+remain unchanged. See the [R2 execution protocol](revision/r2-sdk-execution.md).
+Cooperative abort, dedicated recovery bundles and confirmatory recovery analysis
+are still pending; R2 is not complete.
 
 ### R2.1 Implement the real execution bridge
 
-- [ ] Map an admitted high-level BioPattern Gate task to a constrained,
+- [x] Map an admitted high-level BioPattern Gate task to a constrained,
   versioned CL application configuration. An agent must not invent primitive
   stimulation settings or override approved bounds.
-- [ ] Have the MCP execution path start a **new** official SDK Simulator run
+- [x] Have the MCP execution path start a **new** official SDK Simulator run
   through the provider-facing application path. Importing an old result or
   replaying a Web Demo bundle is not execution.
-- [ ] Run discovery/selection, admission, lease acquisition, lifecycle start,
+- [x] Run discovery/selection, admission, lease acquisition, lifecycle start,
   SDK execution, native HDF5 validation, sanitized result delivery, and
   finalization under the documented contract.
-- [ ] Keep the simulator guard and E3 label. The bridge must not enable Cloud
+- [x] Keep the simulator guard and E3 label. The bridge must not enable Cloud
   or physical execution by accident.
 
 ### R2.2 Bind and verify the complete trace
 
-- [ ] Bind the principal, MCP request/task, resource, lease, execution attempt,
+- [x] Bind the principal, MCP request/task, resource, lease, execution attempt,
   SDK run, configuration/decoder/source hashes, native recording, validated
   result, and audit events in one manifest.
-- [ ] Use provider identifiers where actually supplied; label controller-
+- [x] Use provider identifiers where actually supplied; label controller-
   assigned local identifiers as such. An ID or file hash is not provider
   attestation of biological execution.
-- [ ] Reconstruct the result independently from native HDF5 and compare it
+- [x] Reconstruct the result independently from native HDF5 and compare it
   with the delivered sanitized result. Reject mismatched configuration,
   substituted artifacts, partial data disguised as success, and bad checksums.
-- [ ] Record observed MCP-call and audit-event counts. Do not force the new
+- [x] Record observed MCP-call and audit-event counts. Do not force the new
   run to retain the legacy eight-call/16-event counts.
 
 ### R2.3 Execution and recovery cases
@@ -245,7 +252,11 @@ or narrowed; all R2/R3 admission and execution postconditions are specified.
 - [ ] Cover successful execution, invalid configuration rejected before
   launch, cooperative abort, failed SDK launch, validation failure, lost reply,
   and duplicate/retried request.
-- [ ] Define timeout behavior: either establish termination and reconcile, or
+  Development tests cover all listed cases except cooperative abort; full
+  case-specific experiment bundles remain pending. Lost-reply recovery uses
+  the existing status/result tools; a repeated terminal `run_assay` is rejected,
+  not replayed as a second execution.
+- [x] Define timeout behavior: either establish termination and reconcile, or
   retain an explicit unresolved/quarantined state. Do not release a resource
   for reuse merely because the caller timed out.
 - [ ] Specify which retry operations are idempotent and how execution attempts
@@ -546,8 +557,9 @@ At every checkpoint:
 5. ask for the next implementation package and, separately, any commit/push
    or external action the authors want.
 
-**Next action:** R1, using the completed R0 baseline inventory. Freeze each
-new experiment's protocol before its confirmatory runs; editor-scope tracking
+**Next action:** finish R2 recovery: cooperative SDK cancellation, independently
+checked timeout/abort/lost-reply bundles and a frozen confirmatory protocol.
+Freeze each new experiment's protocol before its confirmatory runs; editor-scope tracking
 remains pending. Do not start H1 adapter code, buy hardware time, or expand
 the software into a replicated scheduler as an implicit consequence of this
 roadmap.

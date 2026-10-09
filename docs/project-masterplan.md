@@ -31,7 +31,12 @@ the [baseline inventory](revision/baseline-inventory.md). R0 inventory is
 complete, while protocol freezes and editor follow-up remain pending. R1's
 claims, comparison and contract specification are complete; see the
 [claim matrix](revision/r1-claim-evidence-matrix.md). R2 (continuous executing
-E3 integration) is next. No new results or runtime functions were added in R1.
+E3 integration) is in progress: a fresh official SDK execution now follows an
+MCP task, with independent native spike reconstruction and an identity-bound
+success bundle. The [R2 execution protocol](revision/r2-sdk-execution.md) records
+the first checkpoint and remaining cancellation/recovery work. No new results
+or runtime functions were added in R1; the R2 checkpoint is new development
+evidence, not a completed confirmatory campaign.
 An Access resubmission requires a comprehensive all-comment reviewer
 response, highlighted revised PDF, and matching clean PDF/LaTeX package;
 these are explicit R5 outputs, not optional documentation.

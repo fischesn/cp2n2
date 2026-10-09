@@ -16,8 +16,11 @@ systems-paper packages and a separate optional physical-substrate track.
 R1 now documents the [claim/evidence boundaries](docs/revision/r1-claim-evidence-matrix.md),
 [binding contracts and proposed execution tests](docs/revision/r1-binding-contracts-and-invariants.md),
 and [related-work/citation decisions](docs/revision/r1-comparison-and-citation-log.md).
-It changes no software functionality. R2 is the next implementation package;
-the legacy agent campaign withheld all substrate execution.
+It changes no software functionality. R2 is now in progress: the
+[continuous MCP/official SDK path](docs/revision/r2-sdk-execution.md) starts
+fresh simulator runs and validates their native spike recordings before
+successful delivery. Cancellation/recovery experiments remain pending. The
+legacy agent campaign withheld all substrate execution and is unchanged.
 
 ## Release v5.1.1
 

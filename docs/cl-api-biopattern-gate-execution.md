@@ -134,6 +134,26 @@ The script synchronizes the canonical core into the self-contained
 application, invokes `cl.app.pack`, and records per-entry and archive SHA-256
 values.
 
+## Continuous MCP execution in R2
+
+The new development runner connects the constrained MCP surface to the official
+SDK application runner and validates native spike-derived decisions during the
+control plane's `VALIDATING` phase. It uses a separate opt-in adapter; the
+historical MCP and standalone SDK commands above retain their original behavior.
+
+With the virtual environment active:
+
+```powershell
+python scripts\run_biopattern_gate_sdk_e3.py --output .cp2n2\r2-sdk-my-run
+python scripts\run_biopattern_gate_sdk_e3.py --verify .cp2n2\r2-sdk-my-run
+```
+
+The output directory must be new. Verification does not launch another SDK run.
+The [R2 protocol and checkpoint](revision/r2-sdk-execution.md) describes the
+identity manifest, independent native-event checks and remaining recovery work.
+This path remains local E3 development evidence, with no active provider abort
+yet. A timeout or uncertain SDK cleanup keeps the resource quarantined.
+
 ## Remaining CL1 boundary
 
 The following items remain blocked:

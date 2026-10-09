@@ -732,11 +732,14 @@ class CP2N2Orchestrator:
             list[str],
         ]:
             telemetry = adapter.collect_telemetry()
-            return telemetry, self._validate_postconditions(
+            failures = self._validate_postconditions(
                 task,
                 invocation,
                 telemetry,
             )
+            if not failures:
+                failures.extend(adapter.validate_result(task, invocation))
+            return telemetry, failures
 
         validation_outcome = run_with_timeout(validate, task.validation_timeout_ms)
         if validation_outcome.timed_out:

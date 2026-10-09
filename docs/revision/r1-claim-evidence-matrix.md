@@ -53,6 +53,16 @@ reviewer-response source records actual text changes without claiming that
 R2--R4 experiments are complete. R1 does not alter software functionality,
 baseline metrics, the oracle, figures, or retained experiment files.
 
+### R2 development handoff
+
+R1's audit above describes the preserved submission and its corrections. The
+new [R2 execution checkpoint](r2-sdk-execution.md) adds a continuous MCP-to-SDK
+development path with independent native-event reconstruction. It does not
+retroactively connect the two historical E3 traces, replace the old agent
+campaign, or add a completed R2 result to the manuscript. Recovery experiments
+remain pending, and the comprehensive reviewer response will incorporate the
+new evidence through R5 after the required packages are complete.
+
 ## Verification
 
 - Existing software regression suite: **146 passed**, one external dependency

@@ -737,6 +737,12 @@ class MCPControlSurface:
                 "scored_trial_count",
                 "sham_trial_count",
                 "pipeline_assertion_accuracy",
+                "execution_attempt_id",
+                "sdk_run_id",
+                "sdk_run_id_origin",
+                "sdk_application_source_sha256",
+                "native_recording_sha256",
+                "native_validation_verified",
             }
             payload = invocation.output_payload if invocation else {}
             application = payload.get("application_summary", {})

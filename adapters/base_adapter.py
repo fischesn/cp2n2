@@ -303,6 +303,16 @@ class BaseAdapter:
         """Return the latest runtime telemetry snapshot."""
         return self._runtime.telemetry()
 
+    def validate_result(
+        self, task: TaskRequest, invocation: AdapterInvocationResult,
+    ) -> list[str]:
+        """Apply binding-specific result checks during VALIDATING.
+
+        Existing adapters retain their generic postconditions. Bindings that
+        publish native artifacts can reject them before successful delivery.
+        """
+        return []
+
     def reset(self, mode: ResetMode | None = None) -> bool:
         """Reset or recover the bound runtime."""
         return self._runtime.reset(mode=mode)

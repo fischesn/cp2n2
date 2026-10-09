@@ -1,7 +1,5 @@
 """Substrate-side runtime implementations for the A5 architecture."""
 
-from runtimes.base_runtime import SubstrateRuntime
-
 __all__ = [
     "ChemicalTwinRuntime",
     "CorticalLabsRuntime",
@@ -15,6 +13,10 @@ __all__ = [
 def __getattr__(name: str):
     """Keep optional/provider runtimes out of the generic import path."""
 
+    if name == "SubstrateRuntime":
+        from runtimes.base_runtime import SubstrateRuntime
+
+        return SubstrateRuntime
     if name == "CorticalLabsRuntime":
         from runtimes.cortical_labs_runtime import CorticalLabsRuntime
 
