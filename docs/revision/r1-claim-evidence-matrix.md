@@ -59,9 +59,12 @@ R1's audit above describes the preserved submission and its corrections. The
 new [R2 execution checkpoint](r2-sdk-execution.md) adds a continuous MCP-to-SDK
 development path with independent native-event reconstruction. It does not
 retroactively connect the two historical E3 traces, replace the old agent
-campaign, or add a completed R2 result to the manuscript. Recovery experiments
-remain pending, and the comprehensive reviewer response will incorporate the
-new evidence through R5 after the required packages are complete.
+campaign, or add a completed R2 result to the manuscript. R2 recovery is now
+complete in the local Windows E3 scope: the [result report](r2-recovery-results.md)
+records 18/18 verified conditions and 179 passing regression tests. The
+comprehensive reviewer response will incorporate the new evidence through R5
+after the required packages are complete. This handoff note does not change
+the historical R1 verification counts below.
 
 ## Verification
 

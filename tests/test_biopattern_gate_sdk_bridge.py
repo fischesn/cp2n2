@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 import json
+import os
 from pathlib import Path
 import shutil
 from threading import Event
@@ -22,6 +23,8 @@ from mcp_surface.catalog import get_preset
 
 @pytest.fixture(scope="module")
 def sdk_bundle(tmp_path_factory):
+    if os.name != "nt":
+        pytest.skip("R2 confirmed process containment currently requires Windows")
     directory = tmp_path_factory.mktemp("r2-sdk") / "bundle"
     report = run_bundle(directory)
     return directory, report
@@ -155,6 +158,7 @@ def test_failed_sdk_start_cannot_deliver_success_and_uses_truthful_reconciliatio
     assert runtime.reset() is (failure == "launch")
 
 
+@pytest.mark.skipif(os.name != "nt", reason="confirmed SDK process containment requires Windows")
 def test_validation_failure_cannot_deliver_success(tmp_path, monkeypatch):
     def reject(*args, **kwargs):
         raise ValueError("injected independent validation failure")
@@ -169,6 +173,7 @@ def test_validation_failure_cannot_deliver_success(tmp_path, monkeypatch):
     assert summary["artifact_references"] == []
 
 
+@pytest.mark.skipif(os.name != "nt", reason="confirmed SDK process containment requires Windows")
 def test_lost_reply_retrieval_and_duplicate_run_do_not_start_another_sdk(tmp_path, monkeypatch):
     surface = build_sdk_surface(tmp_path)
     run_id = _prepare(surface)
@@ -195,7 +200,24 @@ def test_timeout_quarantines_until_observed_termination(tmp_path, monkeypatch):
         def poll(self):
             return 7 if exited.is_set() else None
 
+    class UnconfirmableGuard:
+        def __init__(self, process):
+            pass
+
+        def observe(self):
+            return {"active_process_count": 0 if exited.is_set() else 1, "termination_confirmed": exited.is_set()}
+
+        def wait_empty(self, timeout_s):
+            return exited.is_set()
+
+        def terminate(self):
+            pass
+
+        def close_if_empty(self):
+            return exited.is_set()
+
     monkeypatch.setattr("runtimes.biopattern_gate_sdk_runtime.subprocess.Popen", lambda *a, **k: WaitingChild())
+    monkeypatch.setattr("runtimes.biopattern_gate_sdk_runtime.SDKProcessGuard", UnconfirmableGuard)
     surface = build_sdk_surface(tmp_path)
     runtime = surface.orchestrator.registry.get_adapter(BACKEND_ID).runtime
     task = _task().model_copy(update={"lease_id": None, "expected_lease_version": None, "invocation_timeout_ms": 250})

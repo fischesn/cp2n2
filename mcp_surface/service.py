@@ -551,6 +551,10 @@ class MCPControlSurface:
         state = RunState(record.state)
         if state in {RunState.SUCCEEDED, RunState.FAILED, RunState.ABORTED}:
             return {"run_id": run_id, "state": state.value, "already_terminal": True}
+        self.orchestrator.registry.lease_store.validate(
+            record.lease_id, record.resource_id, self.principal.principal_id,
+        )
+        self.run_store.request_abort(run_id)
         if state == RunState.PREPARED:
             result = self.orchestrator.release_lease(
                 record.resource_id,

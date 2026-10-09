@@ -24,6 +24,7 @@ from .biopattern_gate.config import BioPatternGateConfig
 from .biopattern_gate.decoder import load_decoder
 from .biopattern_gate.runner import run_session
 from .config import BioPatternGateApplicationConfig
+from .recovery import ControlledSDKPort, SDKRunCancelled, write_control_json
 
 
 class BioPatternGateApplication(
@@ -67,7 +68,7 @@ class BioPatternGateApplication(
         if decoder.sha256() != config.decoder_sha256:
             raise RuntimeError("bundled decoder hash mismatch")
 
-        port = CLApiBioPatternGatePort(
+        port = ControlledSDKPort(
             run_id=config.run_id,
             output_directory=output,
             runtime_config=technical_e3_runtime_config(
@@ -77,12 +78,27 @@ class BioPatternGateApplication(
                 )
             ),
         )
-        result = run_session(
-            run_id=config.run_id,
-            config=core_config,
-            decoder=decoder,
-            port=port,
-        )
+        try:
+            result = run_session(
+                run_id=config.run_id,
+                config=core_config,
+                decoder=decoder,
+                port=port,
+            )
+        except SDKRunCancelled:
+            # run_session has already aborted and closed the native recording.
+            partial = {
+                "sdk_run_id": config.run_id, "application_status": "aborted",
+                "runtime_kind": "sdk_simulator", "evidence_level": "E3",
+                "biological_claim": False, "success": False,
+                "completed_decision_count": port.completed_decisions,
+                "recording_filename": port.recording_path.name if port.recording_path else None,
+                "config_sha256": core_config.sha256(), "decoder_sha256": decoder.sha256(),
+            }
+            write_control_json(output / "partial-result.json", partial)
+            return RunSummary(type=OutputType.MARKDOWN,
+                              content="SDK run cancelled; incomplete native evidence retained.",
+                              runtime_kind="sdk_simulator", evidence_ceiling="E3", success=False)
         if port.recording_path is None:
             raise RuntimeError("CL SDK run produced no recording path")
         recording_evidence = reconstruct_cl_recording(

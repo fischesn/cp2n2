@@ -1294,6 +1294,23 @@ class CP2N2Orchestrator:
         timeout_ms: float,
         uncertain: bool,
     ) -> tuple[list[str], LifecycleSnapshot]:
+        # Shared adapter lock also covers orchestrators sharing one registry.
+        with adapter.finalization_lock:
+            current = self._registry.lifecycle_store.snapshot(lease.resource_id)
+            active = self._registry.lease_store.current(lease.resource_id)
+            if active is not None and active.lease_id != lease.lease_id:
+                return ["Original lease superseded; newer execution left untouched."], current
+            if active is None and ResourceLifecycleState(current.state) not in ACTIVE_STATES | {ResourceLifecycleState.ABORTING}:
+                return ["Original execution already finalized; no duplicate abort."], current
+            return self._abort_and_reconcile_locked(
+                adapter, lease, owner_id, correlation_id,
+                timeout_ms=timeout_ms, uncertain=uncertain,
+            )
+
+    def _abort_and_reconcile_locked(
+        self, adapter: BaseAdapter, lease: ResourceLease, owner_id: str,
+        correlation_id: str, *, timeout_ms: float, uncertain: bool,
+    ) -> tuple[list[str], LifecycleSnapshot]:
         backend_id = lease.resource_id
         actions: list[str] = []
         current = self._registry.lifecycle_store.snapshot(backend_id)

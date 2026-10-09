@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+from threading import RLock
 from typing import Any
 
 from adapters.contracts import (
@@ -56,6 +57,7 @@ class BaseAdapter:
         attestation_method: str = "in_process_adapter_construction",
         telemetry_source: ObservationSource = ObservationSource.ESTIMATED,
     ) -> None:
+        self.finalization_lock = RLock()
         self._descriptor = descriptor
         self._runtime = runtime
         self._capability_declaration = capability_declaration

@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
-from threading import RLock
+from threading import Event, RLock
 from time import perf_counter
 from uuid import uuid4
 
@@ -27,20 +27,23 @@ from descriptors.resource_contract import RuntimeKind
 from runtimes.biopattern_gate_e3_runtime import (
     BioPatternGateE3Runtime, PROJECT_ROOT, application_source_digest,
 )
+from runtimes.sdk_process_guard import SDKProcessGuard
 
 
 SDK_APP_ROOT = PROJECT_ROOT / "cl-apps" / "cp2n2-biopattern-gate"
 
 
 def write_json(path: Path, value: dict) -> None:
-    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    temporary = path.with_name(f"{path.name}.{uuid4()}.pending")
+    temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    temporary.replace(path)
 
 
 class BioPatternGateSDKRuntime(BioPatternGateE3Runtime):
     """Launch the official runner; never treat a timed-out child as stopped.
 
-    This first checkpoint has no cooperative provider abort. An active child
-    therefore keeps the resource unavailable until its exit is observed.
+    Cancellation is cooperative between trials. Resource reuse requires a
+    confirmed empty owned process job, not merely the SDK parent's exit.
     """
 
     def __init__(self, output_directory: Path, *, backend_id: str = BACKEND_ID) -> None:
@@ -50,6 +53,13 @@ class BioPatternGateSDKRuntime(BioPatternGateE3Runtime):
         self._process: subprocess.Popen | None = None
         self._executing = False
         self._cleanup_unknown = False
+        self._guard: SDKProcessGuard | None = None
+        self._termination: dict | None = None
+        self._termination_lock = RLock()
+        self._worker_done = Event()
+        self._worker_done.set()
+        self._python_executable = sys.executable
+        self._diagnostic_pause_after_decisions: int | None = None
         self.attempt_directory: Path | None = None
         self.attempt: dict | None = None
         self.sdk_application_source_sha256 = application_source_digest(SDK_APP_ROOT / "src")
@@ -58,9 +68,9 @@ class BioPatternGateSDKRuntime(BioPatternGateE3Runtime):
             runtime_kind=RuntimeKind.SDK_SIMULATOR,
             execution_location=ExecutionLocation.SAME_HOST_SERVICE,
             operations={RuntimeOperation.PREPARE, RuntimeOperation.EXECUTE, RuntimeOperation.TELEMETRY,
-                        RuntimeOperation.RESET, RuntimeOperation.ARTIFACTS},
-            artifact_kinds=["cl_native_recording", "native_validation_report"],
-            time_critical_execution_local=True, provider_abort_supported=False,
+                        RuntimeOperation.RESET, RuntimeOperation.ARTIFACTS, RuntimeOperation.ABORT},
+            artifact_kinds=["cl_native_recording", "native_validation_report", "partial_cl_native_recording"],
+            time_critical_execution_local=True, provider_abort_supported=True,
         )
 
     def _check_sources(self) -> None:
@@ -82,6 +92,8 @@ class BioPatternGateSDKRuntime(BioPatternGateE3Runtime):
             self.attempt_directory = None
             self.attempt = None
             self._process = None
+            self._guard = None
+            self._termination = None
             return result
 
     def execute(self, task: TaskRequest) -> AdapterInvocationResult:
@@ -95,6 +107,7 @@ class BioPatternGateSDKRuntime(BioPatternGateE3Runtime):
             if self._executing or self.attempt is not None:
                 raise RuntimeError("execution attempt already exists; retry through the control plane")
             self._executing = True
+            self._worker_done.clear()
             self._last_status = "running"
         started = perf_counter()
         try:
@@ -125,6 +138,11 @@ class BioPatternGateSDKRuntime(BioPatternGateE3Runtime):
                 "status": "launching",
             }
             write_json(directory / "attempt.json", self.attempt)
+            if self._diagnostic_pause_after_decisions is not None:
+                write_json(directory / "diagnostic-control.json", {
+                    "sdk_run_id": sdk_run_id,
+                    "pause_after_decisions": self._diagnostic_pause_after_decisions,
+                })
             env = dict(os.environ)
             env.update(PYTHONUTF8="1", CL_SDK_VISUALISATION="0", CL_SDK_ACCELERATED_TIME="1")
             with (directory / "sdk.log").open("w", encoding="utf-8") as log:
@@ -132,22 +150,39 @@ class BioPatternGateSDKRuntime(BioPatternGateE3Runtime):
                     if self._aborted:
                         raise RuntimeError("execution cancelled before SDK launch")
                     process = subprocess.Popen(
-                        [sys.executable, "-m", "cl.app.run", str(SDK_APP_ROOT),
+                        [self._python_executable, "-m", "runtimes.cl_sdk_worker", str(SDK_APP_ROOT),
                          str(directory / "sdk-config.json"), str(directory / "sdk-output")],
                         cwd=PROJECT_ROOT, env=env, stdout=log, stderr=subprocess.STDOUT,
                         creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
                     )
                     self._process = process
+                    try:
+                        self._guard = SDKProcessGuard(process)
+                    except Exception:
+                        self._cleanup_unknown = True
+                        # The worker has not been authorized to enter the SDK.
+                        process.terminate()
+                        process.wait(timeout=2)
+                        self._cleanup_unknown = False
+                        self._termination = {"mechanism": "gated_parent_no_sdk_start",
+                                             "termination_confirmed": True, "active_process_count": 0}
+                        write_json(directory / "termination.json", self._termination)
+                        raise
+                    write_json(directory / "containment.json", self._guard.observe())
+                    write_json(directory / "launch-authorized.json", {"sdk_run_id": sdk_run_id, "contained": True})
                 code = process.wait()
-            self.attempt.update(status="exited", exit_code=code)
+            confirmed = self._settle_process_group()
+            self.attempt.update(status="exited", exit_code=code, termination_confirmed=confirmed)
             write_json(directory / "attempt.json", self.attempt)
+            partial_path = directory / "sdk-output" / "partial-result.json"
+            if partial_path.exists() or self._aborted:
+                self._last_status = "aborted"
+                raise RuntimeError("official CL SDK run was cancelled; no complete result")
             if code != 0:
-                # A failed parent process does not confirm SDK child cleanup.
-                # Keep quarantine until a future provider reconciliation path
-                # can establish termination, rather than infer it from exit.
-                self._cleanup_unknown = True
                 self._last_status = "failed"
                 raise RuntimeError(f"official CL SDK runner exited with code {code}")
+            if not confirmed:
+                raise RuntimeError("SDK process group termination is not confirmed")
             self._last_status = "awaiting_validation"
             return AdapterInvocationResult(
                 backend_id=self.backend_id, task_id=task.task_id,
@@ -165,14 +200,47 @@ class BioPatternGateSDKRuntime(BioPatternGateE3Runtime):
                 }},
             )
         except Exception:
-            self._last_status = "failed"
+            self._last_status = "aborted" if self._aborted else "failed"
             if self.attempt is not None:
-                self.attempt["status"] = "failed"
+                self.attempt["status"] = self._last_status
                 write_json(self.attempt_directory / "attempt.json", self.attempt)
+                self._retain_partial_artifacts()
             raise
         finally:
             with self._lock:
                 self._executing = False
+                self._worker_done.set()
+
+    def _settle_process_group(self) -> bool:
+        with self._termination_lock:
+            if self._guard is None:
+                return not self._cleanup_unknown and self._process is None
+            try:
+                if not self._guard.wait_empty(0.15):
+                    self._guard.terminate()
+                confirmed = self._guard.wait_empty(1.0)
+                self._termination = self._guard.observe()
+                write_json(self.attempt_directory / "termination.json", self._termination)
+                self._cleanup_unknown = not confirmed
+                if confirmed:
+                    self._guard.close_if_empty()
+                return confirmed
+            except Exception:
+                self._cleanup_unknown = True
+                return False
+
+    def _retain_partial_artifacts(self) -> None:
+        if self.attempt_directory is None or self._cleanup_unknown:
+            return
+        from evaluation.biopattern_gate_native import file_sha256
+        output = self.attempt_directory / "sdk-output"
+        self._artifacts = [RuntimeArtifact(
+            artifact_id=f"{self.attempt['execution_attempt_id']}:partial:{path.name}",
+            kind="partial_cl_native_recording", uri=f"evidence://r2/{self.attempt['execution_attempt_id']}/{path.name}",
+            media_type="application/x-hdf5", metadata={"sha256": file_sha256(path), "validated": False,
+                "application_status": self._last_status, "runtime_kind": "sdk_simulator", "evidence_level": "E3",
+                "biological_claim": False, "termination_confirmed": True},
+        ) for path in output.glob("*.h5")]
 
     def telemetry(self) -> dict:
         with self._lock:
@@ -187,7 +255,25 @@ class BioPatternGateSDKRuntime(BioPatternGateE3Runtime):
     def abort(self) -> bool:
         with self._lock:
             self._aborted = True
-            return not self._cleanup_unknown and not self._executing and (self._process is None or self._process.poll() is not None)
+            process = self._process
+            directory = self.attempt_directory
+            if directory is not None and self.attempt is not None:
+                write_json(directory / "cancel-request.json", {
+                    "sdk_run_id": self.attempt["sdk_run_id"], "action": "cancel",
+                })
+        if process is None:
+            return self._worker_done.wait(0.5) and not self._cleanup_unknown
+        if self._guard is None:
+            return not self._cleanup_unknown and process.poll() is not None
+        try:
+            process.wait(timeout=2.5)
+        except subprocess.TimeoutExpired:
+            pass
+        except Exception:
+            return False
+        confirmed = self._settle_process_group()
+        # The original worker must finish before another attempt may prepare.
+        return confirmed and self._worker_done.wait(0.5)
 
     def reset(self, mode: ResetMode | None = None) -> bool:
         with self._lock:

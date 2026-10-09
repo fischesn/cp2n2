@@ -4,6 +4,11 @@
 The current-code descriptions below are not promises that every desired
 precondition already has a validator. No new runtime feature is introduced in R1.
 
+**Later R2 checkpoint:** the [continuous execution and recovery results](r2-recovery-results.md)
+now cover C08/C11 and the local SDK portions of C01/C07/C09/C10. The descriptions
+below remain the R1 specification; this does not mark the broader R3 enforcement,
+cross-binding or executing-LLM cases complete.
+
 ## Shared contract and current implementation
 
 PNRC v1.0 separates identity, runtime evidence, capabilities, dynamic state,

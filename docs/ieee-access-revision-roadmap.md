@@ -3,7 +3,7 @@
 **Date:** 9 October 2026
 
 **Status:** Original submission/evidence preserved; R1 text and specification
-complete; R2 execution bridge validated in development; R2 recovery and R3–R5 pending
+complete; R2 execution/recovery complete at local Windows E3; R3–R5 pending
 
 **Trigger:** IEEE Access decision on manuscript `Access-2026-43996`
 
@@ -15,7 +15,7 @@ complete; R2 execution bridge validated in development; R2 recovery and R3–R5 
 |---|---|---|
 | R0 | Preserve the original submission and inventory its evidence | Inventory complete; protocol freezes/editor reply pending |
 | R1 | Make claims, novelty, and contracts precise | COMPLETE — text/specification; no new results |
-| R2 | Connect MCP admission to one actual SDK Simulator execution | IN PROGRESS — bridge/native checks work; recovery experiments pending |
+| R2 | Connect MCP admission to one actual SDK Simulator execution | COMPLETE — native validation and 18/18 recovery conditions verified |
 | R3 | Demonstrate enforcement using permitted and forbidden backend effects | TODO |
 | R4 | Strengthen selection, measurement, contention, and fault experiments | TODO |
 | R5 | Integrate the evidence, revise both manuscript views, and prepare the resubmission | TODO |
@@ -120,6 +120,8 @@ not a rewrite of the old results.
 - [ ] R0.6 Freeze new case definitions, oracle construction, seeds, repetition
   counts, metric definitions, failure criteria, and analysis scripts before
   confirmatory runs. Separate development/pilot runs from final evidence.
+  R2's recovery protocol and source snapshot are frozen and its 18 executions
+  verified; R3/R4 protocols remain pending, so this overall item stays open.
 - [ ] R0.7 Track the scope-clarification email as `drafted`, `sent`, or
   `answered`, with the actual answer if available. R1 need not wait for it.
 
@@ -210,14 +212,20 @@ or narrowed; all R2/R3 admission and execution postconditions are specified.
 
 ## 5. R2 — Continuous MCP-to-CL-SDK execution at E3
 
-**Status:** IN PROGRESS. **Purpose:** close the gap between the two existing E3 traces.
+**Status:** COMPLETE at local Windows E3, 9 October 2026.
+**Purpose:** close the gap between the two existing E3 traces.
 
 **First checkpoint:** the MCP path now launches a fresh official SDK Simulator
 run and validates decisions independently from native stimulation/spike tables.
 The success manifest and offline verifier are implemented; the legacy traces
 remain unchanged. See the [R2 execution protocol](revision/r2-sdk-execution.md).
-Cooperative abort, dedicated recovery bundles and confirmatory recovery analysis
-are still pending; R2 is not complete.
+Cooperative abort, owned-process termination, truthful partial evidence,
+timeout/quarantine and retry bundles are now verified under the separately
+frozen [recovery protocol](revision/r2-recovery-protocol.md). The
+[result report](revision/r2-recovery-results.md) records 18/18 passing conditions,
+110 MCP calls, 220 audit events, 14 SDK starts, offline verification and 179
+passing regression tests. This does not enable Cloud/physical execution or
+constitute a new LLM campaign. Paper integration remains R5 work.
 
 ### R2.1 Implement the real execution bridge
 
@@ -249,19 +257,19 @@ are still pending; R2 is not complete.
 
 ### R2.3 Execution and recovery cases
 
-- [ ] Cover successful execution, invalid configuration rejected before
+- [x] Cover successful execution, invalid configuration rejected before
   launch, cooperative abort, failed SDK launch, validation failure, lost reply,
   and duplicate/retried request.
-  Development tests cover all listed cases except cooperative abort; full
-  case-specific experiment bundles remain pending. Lost-reply recovery uses
+  All nine frozen conditions pass twice with case-specific bundles, including
+  a deliberate parent crash and confirmed/unconfirmed timeout. Lost-reply recovery uses
   the existing status/result tools; a repeated terminal `run_assay` is rejected,
   not replayed as a second execution.
 - [x] Define timeout behavior: either establish termination and reconcile, or
   retain an explicit unresolved/quarantined state. Do not release a resource
   for reuse merely because the caller timed out.
-- [ ] Specify which retry operations are idempotent and how execution attempts
+- [x] Specify which retry operations are idempotent and how execution attempts
   are distinguished. Demonstrate no duplicate backend commit where guaranteed.
-- [ ] Preserve partial recordings with truthful terminal status. Verify lease
+- [x] Preserve partial recordings with truthful terminal status. Verify lease
   release on established completion and the documented treatment of unknown
   completion.
 
@@ -557,8 +565,10 @@ At every checkpoint:
 5. ask for the next implementation package and, separately, any commit/push
    or external action the authors want.
 
-**Next action:** finish R2 recovery: cooperative SDK cancellation, independently
-checked timeout/abort/lost-reply bundles and a frozen confirmatory protocol.
+**Next action:** R3 — independently observe permitted and forbidden backend
+effects, freeze direct enforcement cases and then the bounded executing-agent
+campaign. Keep the original dry-run campaign unchanged. R2 evidence is ready
+for later R5 integration, not yet inserted into the paper.
 Freeze each new experiment's protocol before its confirmatory runs; editor-scope tracking
 remains pending. Do not start H1 adapter code, buy hardware time, or expand
 the software into a replicated scheduler as an implicit consequence of this

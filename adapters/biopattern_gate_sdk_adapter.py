@@ -23,7 +23,7 @@ class BioPatternGateSDKAdapter(BaseAdapter):
                 adapter_id=f"{type(self).__module__}.{type(self).__qualname__}",
                 descriptor=descriptor, runtime=runtime.capabilities,
                 evidence_ceiling=EvidenceLevel.E3_SDK_SIMULATOR,
-                notes="Fresh official SDK runner with native spike reconstruction; no active provider abort yet.",
+                notes="Fresh official SDK runner, native spike reconstruction and confirmed local process-job cancellation.",
             ),
             runtime_kind=RuntimeKind.SDK_SIMULATOR, provider_id="cortical-labs-sdk-simulator",
             attestation_method="local_sdk_simulator_guard_and_native_recording_validation",

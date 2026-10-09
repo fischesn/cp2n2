@@ -136,7 +136,7 @@ values.
 
 ## Continuous MCP execution in R2
 
-The new development runner connects the constrained MCP surface to the official
+The opt-in R2 runner connects the constrained MCP surface to the official
 SDK application runner and validates native spike-derived decisions during the
 control plane's `VALIDATING` phase. It uses a separate opt-in adapter; the
 historical MCP and standalone SDK commands above retain their original behavior.
@@ -150,9 +150,22 @@ python scripts\run_biopattern_gate_sdk_e3.py --verify .cp2n2\r2-sdk-my-run
 
 The output directory must be new. Verification does not launch another SDK run.
 The [R2 protocol and checkpoint](revision/r2-sdk-execution.md) describes the
-identity manifest, independent native-event checks and remaining recovery work.
-This path remains local E3 development evidence, with no active provider abort
-yet. A timeout or uncertain SDK cleanup keeps the resource quarantined.
+identity manifest and independent native-event checks. The SDK shell now checks
+run-bound cancellation between trials and retains truthful aborted partial
+recordings. The controller authorizes SDK launch only after establishing an
+owned Windows process job and confirms zero active processes before reuse.
+Uncertain cleanup keeps the resource quarantined; late cleanup requires explicit
+reconciliation. This is a local E3 mechanism, not a Cloud abort or CL1 emergency
+stop. Other platforms fail closed rather than claiming the same guarantee.
+
+The [frozen recovery campaign and results](revision/r2-recovery-results.md)
+cover nine conditions twice, with offline verification. With the environment
+active on Windows:
+
+```powershell
+python scripts\run_r2_sdk_recovery.py --output .cp2n2\r2-recovery-new-run
+python scripts\run_r2_sdk_recovery.py --verify .cp2n2\r2-recovery-new-run
+```
 
 ## Remaining CL1 boundary
 

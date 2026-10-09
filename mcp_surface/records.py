@@ -29,6 +29,7 @@ class AssayRunRecord(BaseModel):
     lease_id: str
     lease_version: int
     approval_required: bool
+    abort_requested: bool = False
     state: RunState = RunState.PREPARED
     created_at: datetime
     updated_at: datetime
@@ -86,6 +87,8 @@ class RunRecordStore:
             state = RunState(record.state)
             if state == RunState.ABORTED:
                 final_state = RunState.ABORTED
+            elif record.abort_requested and not result.success and result.final_lifecycle is not None and result.final_lifecycle.state in {"ready", "degraded"}:
+                final_state = RunState.ABORTED
             elif state != RunState.RUNNING:
                 raise ValueError(f"Run '{run_id}' is not running.")
             else:
@@ -100,6 +103,14 @@ class RunRecordStore:
                     "summary": dict(summary),
                 }
             )
+            self._records[run_id] = updated
+            return updated.model_copy(deep=True)
+
+    def request_abort(self, run_id: str) -> AssayRunRecord:
+        """Record cancellation intent separately from confirmed termination."""
+        with self._lock:
+            record = self._records[run_id]
+            updated = record.model_copy(update={"abort_requested": True})
             self._records[run_id] = updated
             return updated.model_copy(deep=True)
 
