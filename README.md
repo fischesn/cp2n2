@@ -37,11 +37,20 @@ on one Windows host. A [separate-container extension](docs/revision/r4-container
 adds 21 trials and 57 execute attempts on that same physical host. The suite
 has 286 passing tests. Restart duplicates,
 generic early HTTP errors and ambiguous-drift admission are retained as
-implementation limits. The container deployment gate is complete; human
-oracle sign-off remains open. The
+implementation limits. R4 is complete within its bounded scope, including the
+container deployment gate and Stefan Fischer's post-run
+[approval of twelve oracle sample outcomes](docs/revision/r4-oracle-approval.md). The
 [frozen archive index](evaluation/fixtures/r4-confirmatory-20261010.json) and
 `scripts/run_r4_evaluation.py` provide local reproduction/verification paths;
-public raw-archive publication and manuscript integration remain R5 work.
+R5 has integrated these results into both manuscript views and prepared the
+22-concern reviewer-response draft; see the
+[R5 integration report](docs/revision/r5-integration-results.md). The bounded
+clean-checkout workflow passes 286 tests and verifies the local evidence
+candidate. Independent co-author reproduction, privacy/publication approval,
+the editor's scope answer and the submission decision remain open.
+The [reviewer-material folder](docs/revision/ieee-access/README.md) versions all
+22 response drafts as Markdown/Word/PDF, the official checklist, and a concise
+[ten-item resubmission status](docs/revision/ieee-access/RESUBMISSION-CHECKLIST-STATUS.md).
 The container campaign has a [separate frozen index](evaluation/fixtures/r4-container-confirmatory-20261010.json)
 and runner `scripts/run_r4_container_evaluation.py`. Multi-host, packet-level
 and physical-substrate claims are not inferred from container separation.

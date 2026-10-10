@@ -32,11 +32,13 @@ only its separate production bridge imports BackendMatcher. Hard limits use
 latency <= budget, age <= maximum age, cost <= budget, and drift < 0.95.
 The independently authored review fixture records 12 analytical boundary/tie
 checks with reasons. The authoring agent performed these checks before scoring;
-human author approval or second-author validation remains pending. Expected
+human author approval or second-author validation was pending at freeze. Expected
 outcomes are not adapted to observed production results. The original frozen
 protocol copies used the imprecise label "single-researcher review". This
 post-run wording clarification does not change any case, expectation, count,
-policy, measurement or archived input.
+policy, measurement or archived input. The subsequent post-run
+[author approval of twelve sample outcomes](r4-oracle-approval.md) is recorded
+separately; archived protocol copies remain unchanged.
 
 Five policies receive the identical descriptors, task and runtime information:
 lexicographic, latency-first, locality/cost-first, static priority [b,a], and

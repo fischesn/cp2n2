@@ -6,7 +6,9 @@
 complete; R2 execution/recovery complete at local Windows E3; R3 direct/state
 and live Qwen campaigns complete in bounded local scope, with planner failures
 retained; R4 selection/contention/timing, bounded TCP and separate-container
-results verified; human oracle sign-off open; R5 pending
+results verified; twelve oracle sample outcomes approved by Stefan Fischer;
+R4 complete in bounded scope; R5 technical draft prepared, with author,
+independent-reproduction and publication gates still open
 
 **Trigger:** IEEE Access decision on manuscript `Access-2026-43996`
 
@@ -18,26 +20,31 @@ results verified; human oracle sign-off open; R5 pending
 |---|---|---|
 | R0 | Preserve the original submission and inventory its evidence | Inventory and measured-package freezes complete; editor reply pending |
 | R1 | Make claims, novelty, and contracts precise | COMPLETE — text/specification; no new results |
-| R2 | Connect MCP admission to one actual SDK Simulator execution | COMPLETE — native validation and 18/18 recovery conditions verified |
+| R2 | Connect MCP admission to one actual SDK Simulator execution | COMPLETE — native validation and 18/18 trials across nine recovery conditions verified |
 | R3 | Demonstrate enforcement using permitted and forbidden backend effects | COMPLETE — direct/state and live Qwen evidence verified; eight planner deviations retained |
-| R4 | Strengthen selection, measurement, contention, and fault experiments | Measurements and container extension verified; human oracle sign-off open |
-| R5 | Integrate the evidence, revise both manuscript views, and prepare the resubmission | TODO |
+| R4 | Strengthen selection, measurement, contention, and fault experiments | COMPLETE in bounded scope — measurements verified and twelve oracle sample outcomes author-approved |
+| R5 | Integrate the evidence, revise both manuscript views, and prepare the resubmission | IN_PROGRESS — local paper/22-response/package draft prepared; author and publication gates open |
 | H1 | Explore real-substrate access as an optional follow-up | Separate; not a revision dependency |
 
 **Mandatory for an IEEE Access resubmission — not optional:**
 
-- [ ] A comprehensive **response to every reviewer comment**: introductory
+- [x] A comprehensive **draft response to every reviewer comment**: introductory
   note, summary of completed changes, and 22 individual concern/response/action
   entries with manuscript locations and evidence. Reasoned disagreement must
   also receive a substantive answer.
-- [ ] A revised **highlighted PDF**, marking all changes, including grammar,
+- [x] A revised **highlighted PDF**, marking all changes, including grammar,
   against the preserved original submission.
-- [ ] A **clean revised PDF and matching LaTeX source package**.
+- [x] A **clean revised PDF and matching LaTeX source package**.
 - [ ] Author-approved response, checklist, evidence, and submission decision.
 
 The paper repository's `IEEE-ACCESS-RESPONSE-TO-REVIEWERS.md` is the working
-response source/matrix; it is not yet a finished rebuttal. The verified starting
+response source; all 22 substantive drafts are exported into the supplied
+official Word template, but author approval is pending. The verified starting
 point is documented in the [baseline inventory](revision/baseline-inventory.md).
+The [versioned reviewer-material folder](revision/ieee-access/README.md)
+mirrors the draft as Markdown, Word and PDF, and preserves the official
+checklist. Its [ten-item status overview](revision/ieee-access/RESUBMISSION-CHECKLIST-STATUS.md)
+tracks final checks and upload categories without marking author boxes complete.
 
 ## 1. Decision and evidence boundary
 
@@ -369,10 +376,11 @@ from enforcement failures. Any observed failure is retained and explained.
 
 ## 7. R4 — Selection, overhead, contention, and fault methodology
 
-**Status:** PARTIAL, 10 October 2026. R4.1–R4.3 measurement packages and the
-bounded same-host TCP and separate-container extensions are verified; human
-oracle sign-off remains open. This is not a production-
-platform redesign. See the [protocol](revision/r4-protocol.md),
+**Status:** COMPLETE in bounded scope, 10 October 2026. R4.1–R4.3 measurement
+packages and the bounded same-host TCP and separate-container extensions are
+verified. Stefan Fischer approved the twelve frozen oracle sample outcomes
+after the runs; see the [approval record](revision/r4-oracle-approval.md).
+This is not a production-platform redesign. See the [protocol](revision/r4-protocol.md),
 [results and negative findings](revision/r4-evaluation-results.md), and
 [exact archive index](../evaluation/fixtures/r4-confirmatory-20261010.json).
 The container extension has its own [report](revision/r4-container-results.md)
@@ -380,7 +388,7 @@ and [frozen index](../evaluation/fixtures/r4-container-confirmatory-20261010.jso
 
 | Part | Measured result | Remaining gate |
 | --- | --- | --- |
-| R4.1 | 64 cases, five policies, reversed-order checks; 19 active sensitivity conditions | Human author/second-author approval of oracle sample |
+| R4.1 | 64 cases, five policies, reversed-order checks; 19 active sensitivity conditions | Twelve sample outcomes approved by Stefan Fischer; not independent validation of all 64 cases |
 | R4.2 | Three resources, 225 requests, 60 completions, 165 busy rejections, zero overlaps | No shared-capacity or scheduler claim |
 | R4.3 | 16,000 measured operations; trial-level intervals and separate MCP measurement | Single-machine scope retained |
 | R4.4 | 21 Windows TCP and 21 Linux container trials; restart duplicates in 3/3 trials of each | Single-host boundary; no durable restart guarantee |
@@ -394,8 +402,10 @@ and [frozen index](../evaluation/fixtures/r4-container-confirmatory-20261010.jso
 - [x] Derive expected admissible sets and tie outcomes independently of the
   production selector. Twelve analytical sample checks by the authoring agent
   are frozen; this is not human author approval.
-- [ ] Obtain human author or second-author sign-off on the twelve frozen
-  oracle sample outcomes before manuscript integration/publication.
+- [x] Obtain human author or second-author sign-off on the twelve frozen
+  oracle sample outcomes before manuscript integration/publication. Stefan
+  Fischer confirmed admissible sets and selections on 10 October 2026;
+  this is post-run author review, not pre-run human validation.
 - [x] Define fair, explicit baselines and a common information budget. Do not
   silently give one baseline telemetry or hard constraints the others lack.
 - [x] Archive every case, expected set, selected outcome, rejection rationale,
@@ -477,29 +487,38 @@ were tested. Unsupported generality is removed rather than inferred.
 
 ## 8. R5 — Integrate, reproduce, and decide the submission route
 
-**Status:** TODO. No new submission is authorized by this roadmap.
+**Status:** IN_PROGRESS — technical draft prepared, 10 October 2026. See the
+[R5 integration report](revision/r5-integration-results.md). No new submission
+is authorized by this roadmap.
 
-- [ ] Review R1–R4 results, including negative results and remaining gaps.
+- [x] Review R1–R4 results, including negative results and remaining gaps.
   Update the claim matrix before writing stronger conclusions.
-- [ ] Revise the IEEE Access source `cp2n2.tex`; regenerate the neutral arXiv
+- [x] Revise the IEEE Access source `cp2n2.tex`; regenerate the neutral arXiv
   source using `prepare_arxiv_submission.py`. Keep scientific content aligned,
   while retaining publisher-specific front/back matter only where required.
-- [ ] Replace stale result tables/captions and clarify historical versus new
-  experiments. Bind the manuscript to the exact revision commit and archive.
-- [ ] Complete and export the comprehensive response-to-reviewers document:
+- [x] Replace stale result tables/captions and clarify historical versus new
+  experiments. Bind the manuscript to the exact evaluated source checkpoint
+  and local archives. Public archival reference remains explicitly pending.
+- [x] Complete and export the comprehensive response-to-reviewers draft:
   introduction, completed-change summary, all 22 individual concerns,
   substantive responses, actual remedial actions, manuscript locations,
   measurements/artifact IDs, and reasoned responses to unimplemented requests.
   No planned action or pending placeholder may be presented as completed work.
-- [ ] Obtain the official response template and resubmission checklist named
-  in the decision email; their attachments have not yet been located locally.
-- [ ] Produce the all-changes-highlighted revised PDF, including grammar
+- [x] Obtain the official response template and resubmission checklist named
+  in the decision email; use the two author-supplied attachments. Preserve
+  checklist requirements and leave author checkboxes unchecked.
+- [x] Produce the all-changes-highlighted revised PDF, including grammar
   changes, against the frozen original. Verify its scientific identity with
   the clean revised PDF and matching LaTeX package.
-- [ ] Run software tests, artifact verification, clean-checkout reproduction,
+- [x] Run software tests, artifact verification, clean-checkout reproduction,
   both PDF builds, visual inspection, bibliography checks, and source/package
-  consistency checks. No credentials or private provider/proposal documents
-  may enter public artifacts.
+  consistency checks. The bounded local workflow passed 286 tests/18 jobs;
+  it reused the host/environment and did not rerun live LLM/container/timing
+  campaigns. See the report for these limits.
+- [ ] Approve privacy treatment and publish the new immutable evidence archive.
+  The local candidate preserves provider budget metadata for author review;
+  it is not a public-ready sanitized release. No credentials or private
+  provider/proposal documents may enter public artifacts.
 - [ ] Have a co-author reproduce the key execution and enforcement results
   without relying on undocumented local state and review every response for
   accuracy, completeness, and appropriate tone.
@@ -511,9 +530,11 @@ were tested. Unsupported generality is removed rather than inferred.
   venue if needed. Previous fallback candidates were *Computer Standards &
   Interfaces*, *SN Computer Science*, *Future Internet*, and *Computers*;
   this is a decision list, not a commitment or acceptance prediction.
-- [ ] Only after author review and explicit authorization: commit/push,
-  publish a new immutable software/evidence release, update archival records,
-  and generate the final submission/arXiv packages.
+- [x] Record the author's 10 October authorization to commit/push the working
+  revision and reviewer documents. This is not release or submission approval.
+- [ ] Only after author review and explicit authorization: publish a new
+  immutable software/evidence release, update archival records, and generate
+  the final submission/arXiv packages.
 
 **Done when:** the revised manuscript, response, source, release, evidence,
 and submission packages agree, and the authors approve the submission route.
@@ -622,11 +643,15 @@ At every checkpoint:
 5. ask for the next implementation package and, separately, any commit/push
    or external action the authors want.
 
-**Next action:** obtain human review of the twelve frozen selector-oracle
-sample cases, then proceed to R5 evidence/manuscript/reviewer-response integration.
+**Next action:** review the R5 manuscript/response drafts and arrange independent
+co-author reproduction. The twelve frozen selector-oracle
+sample outcomes now have [human author approval](revision/r4-oracle-approval.md).
 R2–R4 measurements, including the separate-container extension, are ready in
-their documented bounded scopes and have not yet been inserted into the paper.
-Keep the original dry-run campaign unchanged and retain the eight strict
+their documented bounded scopes and are now integrated into both manuscript
+views. The new executing Qwen study is the main agent evaluation; old dry-run
+tables are omitted, with unchanged historical evidence and the original scores
+explicit in the reviewer response. Do not describe this as a controlled model
+improvement. Keep the original dry-run campaign unchanged and retain the eight strict
 planner-oracle deviations, generic early HTTP errors, ambiguous-drift admission
 and observed restart duplicates. Independent reproduction and public archive
 publication remain R5 gates; editor-scope tracking remains pending.

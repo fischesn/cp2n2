@@ -74,7 +74,7 @@ The historical claim audit above remains the R1 baseline. The later
 
 | Claim boundary | New measured evidence | Required R5 interpretation |
 | --- | --- | --- |
-| Selector conformance | 64 synthetic cases, five common-information policies and 19 active sensitivity conditions | Not optimal placement or physical calibration; human oracle-sample approval pending |
+| Selector conformance | 64 synthetic cases, five common-information policies and 19 active sensitivity conditions | Twelve sample sets/selections have post-run author approval; not independent validation of all cases, optimal placement or physical calibration |
 | Contention and overhead | Three capacity-one resources, 225 requests; 16,000 timed operations and trial-level intervals | No queue/fairness, shared-capacity or multi-environment performance claim |
 | Transport faults | 21 Windows process trials plus 21 separate-container trials/57 additional attempts | Actual HTTP/TCP byte-stream faults; same physical host, not packets, WAN or MCP-network latency |
 | Idempotency and recovery | Same-process reply/retry protection; duplicates in 3/3 restart trials in each topology | Explicitly exclude durable restart safety; trace persistence is not state restoration |
@@ -85,7 +85,29 @@ label is changed by this handoff. The comprehensive reviewer response must
 incorporate these results and limits during R5 rather than report all expected
 negative controls as safety successes.
 
-## Verification
+## R5 integration audit — 10 October 2026
+
+The R1 audit and verification below remain historical. The new evidence is
+integrated in both manuscript views, and all 22 reviewer-response drafts
+distinguish completed work, bounded results and declined/unimplemented requests.
+See [R5 integration results](r5-integration-results.md).
+
+| Revised claim | Evidence now reported | Retained limit/negative result |
+| --- | --- | --- |
+| Continuous MCP-to-SDK execution | 18 trials across nine conditions; 110 MCP calls, 220 audit events, 14 SDK starts | E3 simulator only; independent native consistency, not biological learning |
+| Active enforcement | 80 ordinary direct cases and four detector controls; 464 bounded state transitions | Finite cases/bounds, not arbitrary concurrency or physical safety |
+| Executing agent integration | Qwen: 24/32 strict matches, 6/8 permitted executions, two SDK runs, two active stale-health blocks | All eight deviations retained; model-visible freshness limitation; no cross-model improvement claim |
+| Selection/systems behavior | 64 synthetic cases, five policies, 225 contention requests, 16,000 timed operations, process/container TCP faults | Author-defined cases; one host/performance environment; no fairness/WAN/replicated architecture claim |
+| Recovery/idempotency | Reply-loss/duplicate handling in process; observed restart duplicates in both topologies | No durable restart idempotency; early HTTP 500s remain unstructured |
+| Reproduction/availability | Clean local source checkpoint, 286 tests and 18 zero-exit reproduction/verification jobs; hash/CRC-checked candidate | Same host/environment; no new LLM/container/timing campaign; independent reproduction and public archive pending |
+
+The old non-executing campaign is unchanged in its archive. Its detailed tables
+are removed from the main paper, while the response explicitly retains
+141/160 aggregate conformity and 1/20 in the physical-execution prompt class.
+The new campaign is the main evaluation because it exercises backend effects,
+not because results can be compared as a controlled improvement.
+
+## R1 verification (historical)
 
 - Existing software regression suite: **146 passed**, one external dependency
   deprecation warning. This is not a new evaluation campaign.

@@ -9,10 +9,12 @@ committed operation. None is a new physical-substrate result.
 The [separate-container extension](r4-container-results.md) now adds 21 trials
 and 57 execute attempts on the same physical host, after the authorized Docker
 repair/update. It confirms three restart duplicates and 18 generic early HTTP
-500 responses. Human author sign-off on the oracle sample and independent
-clean-checkout reproduction remain pending. The journal and arXiv
+500 responses. Stefan Fischer subsequently
+[approved the twelve oracle sample outcomes](r4-oracle-approval.md);
+independent clean-checkout reproduction remains pending. The journal and arXiv
 manuscripts have not changed; integration and the full reviewer response are
-R5 work. No commit, push or release was made in R4.
+R5 work. The R3/R4 checkpoint was subsequently committed and pushed as
+`f5802a3`; no release was made.
 
 ## Frozen evidence and reproduction
 
@@ -80,7 +82,10 @@ The twelve analytical sample checks in the review fixture were performed by
 the authoring agent before scoring. They are not human author approval or
 second-author validation. The original frozen review text called this
 "single-researcher review"; current documentation clarifies that label without
-changing the archived expectations or any result. Human sign-off remains open.
+changing the archived expectations or any result. On 10 October 2026, Stefan
+Fischer separately [approved those twelve admissible sets and selections](r4-oracle-approval.md).
+This post-run human review does not retroactively make the pre-run checks human
+validation or independently validate all 64 cases.
 
 `missing_telemetry-2` deliberately contains the string `unknown` as drift.
 The selector admits it: required telemetry currently means present/non-null,
@@ -202,7 +207,8 @@ The complete suite now passes **286 tests**, with two dependency deprecation
 warnings. New evaluation code does not change production control-plane
 behavior. Figures have been visually checked; the manuscript is unchanged.
 
-- Human author/second-author review of the twelve frozen oracle sample cases.
+- The twelve frozen oracle sample outcomes have human author approval;
+  no further sign-off is required for that R4.1 gate.
 - Multi-host and packet-level external validity remain unmeasured; the
   separate-container deployment requirement is fulfilled within one host.
 - R5 clean-checkout reproduction, raw-archive publication, manuscript/figure

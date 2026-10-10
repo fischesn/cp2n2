@@ -1,0 +1,32 @@
+{
+  "schema": "cp2n2-review-material-v1",
+  "manuscript_id": "Access-2026-43996",
+  "status": "working draft; author approval and submission pending",
+  "canonical_response": "Paper repository: IEEE-ACCESS-RESPONSE-TO-REVIEWERS.md",
+  "files": {
+    "cp2n2-response-to-reviewers.docx": {
+      "bytes": 25196,
+      "sha256": "42d6f2f63520546f2ed8bc6c93635d614bb4846262de21aa2e553023a3461682"
+    },
+    "cp2n2-response-to-reviewers.pdf": {
+      "bytes": 304456,
+      "sha256": "3eea3a226689acf1c13959fd4d547c5f9e6acc97ede05aba4d32a7e042e4cda5"
+    },
+    "cp2n2-resubmission-checklist.docx": {
+      "bytes": 117236,
+      "sha256": "3906c4c31e2c3eb82ad570af6b599fbb310ba6ae2353ffe596c792b0d4247ee3"
+    },
+    "cp2n2-resubmission-checklist.pdf": {
+      "bytes": 228009,
+      "sha256": "43f4241bafb7e1d265052d64608eebac397b7bc1bc1a14bc03340f0a2c7c742e"
+    },
+    "RESPONSE-TO-REVIEWERS.md": {
+      "bytes": 27454,
+      "sha256": "b8e91145399ceebf5576398d9315c20f2d8960ff7cf09ecfbd793a0793f043dd"
+    },
+    "RESUBMISSION-CHECKLIST-STATUS.md": {
+      "bytes": 3888,
+      "sha256": "8dab85f76ad5cd9c6393901e368441bf6f8949948faea6f019252efc9617f66f"
+    }
+  }
+}

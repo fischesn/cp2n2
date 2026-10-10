@@ -113,7 +113,9 @@ available for inspection.
 
 The complete software suite passes 286 tests, with the two previously known
 dependency deprecation warnings. R4's container deployment gate is satisfied.
-Human approval of the twelve selector-oracle sample cases still remains open.
+Stefan Fischer's post-run [approval of the twelve selector-oracle sample outcomes](r4-oracle-approval.md)
+closes the remaining R4.1 gate.
 Independent clean-checkout reproduction, public raw-archive release, manuscript
 integration and the full reviewer response are R5 work. The journal and arXiv
-sources are unchanged. No commit, push or release was made for this extension.
+sources are unchanged. The R3/R4 checkpoint including this extension was
+subsequently committed and pushed as `f5802a3`; no release was made.

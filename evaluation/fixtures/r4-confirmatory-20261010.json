@@ -1,7 +1,8 @@
 {
   "schema": "r4-confirmatory-index-v1",
   "date": "2026-10-10",
-  "status": "R4.1-R4.3 and same-host TCP/container extensions measured; human oracle sign-off pending; multi-host external validity not claimed",
+  "status": "R4 complete in bounded scope; R4.1-R4.3 and same-host TCP/container extensions measured; twelve oracle sample outcomes author-approved after the runs; multi-host external validity not claimed",
+  "human_oracle_approval": "docs/revision/r4-oracle-approval.md",
   "container_extension_index": "r4-container-confirmatory-20261010.json",
   "public_artifacts": false,
   "frozen_protocol_sha256": "ceff7c0eabf955868139b99918da622175dd7e076c8a0ccd3e784fd57637aa18",
@@ -63,7 +64,7 @@
       "multi_host": false
     }
   ],
-  "review_clarification": "The twelve pre-run analytical sample checks were performed by the authoring agent, not approved by a human co-author. Frozen earlier metadata uses an imprecise single-researcher label. Expectations and archived bytes remain unchanged.",
+  "review_clarification": "The twelve pre-run analytical sample checks were performed by the authoring agent, without human approval at freeze. Stefan Fischer subsequently approved those twelve admissible sets and selections on 2026-10-10. This is post-run author review, not pre-run human validation or independent validation of all 64 cases. Frozen earlier metadata uses an imprecise single-researcher label. Expectations and archived bytes remain unchanged.",
   "negative_results": [
     "Nonnumeric present drift is admitted by the descriptor selector, whose rule checks presence and numeric thresholds rather than full numeric validity.",
     "Provider partition/interruption before invocation produces generic HTTP 500 errors, not structured CP2N2 lifecycle failures; no-effect results do not prove quarantine in those cases.",

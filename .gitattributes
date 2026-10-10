@@ -7,3 +7,5 @@ evaluation/fixtures/biopattern-gate-*.jsonl text eol=lf
 evaluation/results/agent-to-pnn-*/** text eol=lf
 # CSV files are checksum-bearing artefacts; preserve their exact bytes.
 evaluation/results/agent-to-pnn-*/trials.csv binary
+# Reviewer-material manifests hash exact bytes, including Markdown line endings.
+docs/revision/ieee-access/** -text

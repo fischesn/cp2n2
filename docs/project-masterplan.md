@@ -56,14 +56,25 @@ physical host. The current suite has 286 passing tests.
 The [R4 results](revision/r4-evaluation-results.md) retain nonnumeric-drift
 admission, 18 pre-invocation HTTP 500 responses and duplicate provider effects
 after restart in 3/3 Windows and 3/3 container negative-control trials. The
-container deployment gate is complete after the authorized Docker update;
-human oracle sign-off remains open. This is not multi-host or physical
-evidence. No durable scheduler architecture was added.
-R2–R4 manuscript integration remains R5 work, and the
-paper has not been changed during R2/R3/R4 software/evaluation work.
+container deployment gate is complete after the authorized Docker update.
+Stefan Fischer's post-run [approval of the twelve oracle sample outcomes](revision/r4-oracle-approval.md)
+closes the remaining R4.1 gate; R4 is complete in its bounded scope. This is not
+independent validation of all 64 cases, multi-host or physical evidence.
+No durable scheduler architecture was added.
+R2–R4 evidence is now integrated during R5 into the authoritative journal source
+and generated neutral arXiv view. See the
+[R5 integration report](revision/r5-integration-results.md). The current clean
+and yellow-marked journal previews are 19 pages; arXiv is 27 pages. The full
+22-concern response draft uses the author-supplied official Word template.
 An Access resubmission requires a comprehensive all-comment reviewer
 response, highlighted revised PDF, and matching clean PDF/LaTeX package;
-these are explicit R5 outputs, not optional documentation.
+these local R5 drafts are prepared, not yet author-approved. Independent
+co-author reproduction, privacy/public-archive approval, editor scope and the
+submission decision remain open. The existing DOI covers historical evidence;
+commit/push was authorized on 10 October 2026, but release/publication and
+submission remain separate gates. The
+[versioned reviewer material](revision/ieee-access/README.md) includes all 22
+responses and the [ten-item resubmission status](revision/ieee-access/RESUBMISSION-CHECKLIST-STATUS.md).
 
 ## 1. Project position and target
 
