@@ -1,0 +1,8 @@
+{
+  "record_id": 23281161,
+  "doi": "10.5281/zenodo.23281161",
+  "metadata_only_clarification_published": true,
+  "archived_files_unchanged": true,
+  "clarification": "<p>Privacy clarification: the redaction covers the structured provider-account budget objects and the two budget-only JSON logs. Previously published budget summaries in the GitHub revision documentation and byte-preserved source snapshots remain present. In particular, the historical Qwen report states provider-unit spend and a weekly account maximum. This is not a claim that every already-public textual budget reference has been removed. No API credentials are included. The archived ZENODO-METADATA.json is the initial deposit-metadata snapshot; this record description includes the subsequent clarification.</p>",
+  "initial_metadata_json_unchanged": true
+}

@@ -20,7 +20,7 @@ checked; it does not mean that the authors have approved or uploaded it.
 | 5. Include videos in peer review, if any | No video is planned for the current package. | Not applicable unless a video is added; then include it in review and respect the 100 MB limit. |
 | 6. Supply response to reviewers | Markdown source plus a 10-page Word/PDF response in the supplied official template. | After approval, upload as **Author's Response Files**. |
 | 7. Highlight all changes | A cumulative yellow-marked 19-page journal PDF is prepared against the confirmed original submission. Deleted/replaced material is explained in the response. | Final comparison against the original, including grammar changes; upload as **Highlighted PDF**. |
-| 8. Supply supplementary ZIP, if used | A hash-verified local evidence candidate exists. It retains provider budget metadata and is not yet public-ready. | Privacy review, immutable archive publication and supplementary-file decision are open. Any publication supplement must be included in peer review. |
+| 8. Supply supplementary ZIP, if used | Public evidence version `R5-2026-10-10` is published under DOI `10.5281/zenodo.23281161` and cited in the manuscript/response. Structured budget objects and two budget-only logs are removed with disclosed transformations; previously public textual summaries remain. Scientific payloads are unchanged. | The journal supplementary-file decision remains open. If supplied, use the public sanitized ZIP, not the private candidate, and include it in peer review. |
 | 9. Supply editable manuscript with author biographies/photos | A matching clean LaTeX source ZIP is prepared; all three biographies/photos are included. | After approval, upload as **Main Manuscript**. |
 | 10. Supply double-column, single-spaced manuscript PDF | The matching clean 19-page IEEE Access PDF is prepared. | After approval, upload as **Main Manuscript – PDF**. |
 
@@ -32,13 +32,15 @@ software repository. See the reviewer-material README for source ownership.
 ## Additional project gates (not extra official checklist items)
 
 - Independent co-author reproduction of the key execution/enforcement results.
-- Privacy approval and a new versioned software/evidence archive covering R2–R4
-  and R5 reproduction. The historical v5.1.1 DOI does not cover these results.
-- Update the manuscript's publication-pending note only after verifying the
-  new archive identifier and its exact contents.
+- Public evidence archival is complete: DOI `10.5281/zenodo.23281161` covers
+  R2–R4 and R5 reproduction; the historical v5.1.1 files remain unchanged.
+- DOI integration is complete in both manuscript views and the reviewer
+  response; matching clean/marked journal, neutral arXiv and response exports
+  have been rebuilt and checked. This is not final author approval.
 - Resolve the submission route: the editor has not yet answered the scope
   question about a revision without real-substrate execution.
-- Explicit final author approval for release/publication and submission.
+- Explicit final author approval for any separate GitHub release and submission.
 
-Commit and push were authorized on 10 October 2026. This authorization does
-not approve a release, Zenodo publication, manuscript upload or resubmission.
+Commit/push and Zenodo evidence publication were separately authorized on
+10 October 2026. Neither authorizes a GitHub release, manuscript upload or
+resubmission, or marks the ten official checklist boxes complete.

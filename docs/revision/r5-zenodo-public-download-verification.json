@@ -1,0 +1,32 @@
+{
+  "public_unauthenticated_downloads_verified": true,
+  "doi": "10.5281/zenodo.23281161",
+  "record_id": 23281161,
+  "files": [
+    {
+      "file": "cp2n2-r5-2026-10-10-public-evidence.zip",
+      "bytes": 134633211,
+      "sha256": "a57b98f0a2afc2a2b39ad3557bdb1733b1f995041011466cf6a082c17ed7cf0a"
+    },
+    {
+      "file": "PUBLIC-PACKAGE-VERIFICATION.json",
+      "bytes": 918,
+      "sha256": "8856087b90b3e1cc652b1ab70a412f3393e285aefabc7a9bd2b961803fa8bc97"
+    },
+    {
+      "file": "PUBLIC-CAMPAIGN-VERIFICATION.json",
+      "bytes": 2044,
+      "sha256": "05d804f4832315b9ddec0b15b19391608aa025927a02d43c150b8286b02e249c"
+    },
+    {
+      "file": "ZENODO-METADATA.json",
+      "bytes": 4124,
+      "sha256": "0eec79684695fd7f12d3b1236341fe44e8ceb10dfc0907b61c384c0dca03fbc2"
+    },
+    {
+      "file": "ZENODO-SHA256SUMS.txt",
+      "bytes": 392,
+      "sha256": "40bcd514fac38d1c7946f95ea170b8feb5ee58775c488dcbbff8c26885649aac"
+    }
+  ]
+}

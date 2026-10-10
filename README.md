@@ -46,8 +46,12 @@ R5 has integrated these results into both manuscript views and prepared the
 22-concern reviewer-response draft; see the
 [R5 integration report](docs/revision/r5-integration-results.md). The bounded
 clean-checkout workflow passes 286 tests and verifies the local evidence
-candidate. Independent co-author reproduction, privacy/publication approval,
-the editor's scope answer and the submission decision remain open.
+candidate. The [public revision evidence](docs/revision/r5-zenodo-publication.md)
+is now archived under [DOI 10.5281/zenodo.23281161](https://doi.org/10.5281/zenodo.23281161),
+with disclosed budget-metadata redactions and unchanged scientific payloads.
+The exact evidence DOI is integrated in the manuscript and reviewer response;
+matching exports/source packages are rebuilt. Independent co-author
+reproduction, the editor's scope answer and the submission decision remain open.
 The [reviewer-material folder](docs/revision/ieee-access/README.md) versions all
 22 response drafts as Markdown/Word/PDF, the official checklist, and a concise
 [ten-item resubmission status](docs/revision/ieee-access/RESUBMISSION-CHECKLIST-STATUS.md).

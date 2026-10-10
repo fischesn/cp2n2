@@ -1,9 +1,11 @@
 # R5 integration results — 10 October 2026
 
-**Status:** local technical draft prepared. Author review, independent
-reproduction, new public evidence archival and submission approval are open.
-Commit/push was authorized on 10 October 2026. Release, DOI update,
-public evidence upload and external submission remain separate approval gates.
+**Status:** technical draft prepared; public evidence archive published on
+10 October 2026 as DOI `10.5281/zenodo.23281161`. Author review, independent
+reproduction and submission approval
+remain open. See the [publication record](r5-zenodo-publication.md).
+Commit/push was authorized separately; Zenodo publication does not authorize
+a GitHub release or external manuscript submission.
 
 ## What is prepared
 
@@ -84,13 +86,25 @@ container export-inventory repair is preserved/disclosed; underlying measurement
 and nested manifests are unchanged. Existing v5.1.1/Zenodo references cover
 historical evidence, not the new local campaigns.
 
+The subsequent [public evidence version](r5-zenodo-publication.md) is a
+separate sanitized copy. It removes provider-account budget metadata and
+explicitly rebinds affected metadata hashes; scientific trial payloads remain
+unchanged. All ten campaign verifiers passed again, with the same output-log
+hashes as the original verification. The private candidate above is still
+unchanged and must not be substituted for the public ZIP.
+
+The public transformations remove structured account-budget objects and two
+budget-only logs. Already-public textual spend/account-cap summaries remain;
+the publication does not claim that all budget-related text was removed.
+
 ## Manuscript and document verification
 
-- All 78 output pages were visually reviewed: 19 clean journal, 19 marked
-  journal, 27 arXiv, 10 response and 3 checklist. After the final count/wording
-  corrections, all unchanged journal pages were pixel-identical to the earlier
-  reviewed render; the five changed journal pages were inspected again.
-- Nine manuscript markup/generator tests pass; the checked-in neutral source
+- After integrating DOI `10.5281/zenodo.23281161`, all 78 rebuilt output pages
+  were visually reviewed: 19 clean journal, 19 marked journal, 27 arXiv,
+  10 response and 3 checklist. The current local QA receipt is
+  `tmp/r5-doi-qa/verification.json` in the paper repository.
+- Fifteen manuscript markup/generator, DOI integration and synchronization-guard
+  tests pass; the checked-in neutral source
   exactly matches the generator. Both journal ZIPs contain the exact current
   authoritative source; arXiv contains the generator's intended flat form,
   with the bibliography/figure-path transformations checked.
@@ -101,21 +115,25 @@ historical evidence, not the new local campaigns.
   all ten checklist checkboxes still unchecked.
 - `git diff --check` passes in both repositories (Windows line-ending notices
   only). Root-level comparison PDFs and unrelated temporary files were untouched.
+- The current software regression suite passes 296 tests with two dependency
+  deprecation warnings, including ten new public-packaging tests. This check is
+  distinct from the frozen 286-test reproduction above and adds no new campaign
+  observation or independent reproduction.
 
 Final manuscript PDF hashes (working drafts, not the original submission):
 
-- Clean journal: `6d15b89e7f46e4580dfd69544b0d401719d372024319aa98809c90c208bd13c4`.
-- Yellow-marked journal: `d8b54efed289a297a9663865ea3cec9025e8bf22ef40c0ab40e21840beef8b36`.
-- Neutral arXiv: `af7fbdc56caa38065c65b86d523b49066e9b0c610ec3de445a3a8e7d1c73daa2`.
+- Clean journal: `511222f1128b7dc14e2901b0b3aaf554f1c62bb04e0f5bd968d314349a0b3cbf`.
+- Yellow-marked journal: `af545a67a86d79fe85d655a5e603271e91fe49d6fdae3d5c2cf2ae492d54b896`.
+- Neutral arXiv: `5b169f4fa48997f8cf74157adbf14b6f0d11fd1dcc0e8c96f35d3fe4d9f74232`.
 
 ## Remaining gates
 
 1. Author review of manuscripts, responses, tone and unchecked checklist.
 2. Independent co-author reproduction of key execution/enforcement results.
 3. Editor response and explicit venue decision; the author reports no reply yet.
-4. Privacy treatment and authorized immutable software/evidence publication;
-   then update the manuscript with the actual new archive identifier.
-5. Explicit authorization for release/publication and final packaging/submission.
-   Commit/push authorization is recorded separately and does not close R5.
+4. Review the regenerated manuscript/response packages, which now cite the
+   published version DOI. Public archival and DOI integration are complete.
+5. Final author approval for packaging/submission and any separate GitHub release.
+   Commit/push and Zenodo authorization do not close the remaining R5 gates.
 
 Until these pass, R5 remains `IN_PROGRESS`, not a completed resubmission.

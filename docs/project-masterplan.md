@@ -69,10 +69,12 @@ and yellow-marked journal previews are 19 pages; arXiv is 27 pages. The full
 An Access resubmission requires a comprehensive all-comment reviewer
 response, highlighted revised PDF, and matching clean PDF/LaTeX package;
 these local R5 drafts are prepared, not yet author-approved. Independent
-co-author reproduction, privacy/public-archive approval, editor scope and the
-submission decision remain open. The existing DOI covers historical evidence;
-commit/push was authorized on 10 October 2026, but release/publication and
-submission remain separate gates. The
+co-author reproduction, editor scope and the submission decision remain open.
+The new [public evidence archive](revision/r5-zenodo-publication.md), DOI
+`10.5281/zenodo.23281161`, covers R2–R5; the historical DOI/files are unchanged.
+Manuscript/response DOI integration and matching rebuilds are complete. Commit/push and Zenodo
+publication were separately authorized on 10 October 2026; a GitHub software
+release and manuscript submission remain separate gates. The
 [versioned reviewer material](revision/ieee-access/README.md) includes all 22
 responses and the [ten-item resubmission status](revision/ieee-access/RESUBMISSION-CHECKLIST-STATUS.md).
 

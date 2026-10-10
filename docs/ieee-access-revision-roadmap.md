@@ -498,7 +498,8 @@ is authorized by this roadmap.
   while retaining publisher-specific front/back matter only where required.
 - [x] Replace stale result tables/captions and clarify historical versus new
   experiments. Bind the manuscript to the exact evaluated source checkpoint
-  and local archives. Public archival reference remains explicitly pending.
+  and local archives. The public archive is now published and its exact new
+  DOI is integrated into the matching manuscript/response exports.
 - [x] Complete and export the comprehensive response-to-reviewers draft:
   introduction, completed-change summary, all 22 individual concerns,
   substantive responses, actual remedial actions, manuscript locations,
@@ -515,10 +516,14 @@ is authorized by this roadmap.
   consistency checks. The bounded local workflow passed 286 tests/18 jobs;
   it reused the host/environment and did not rerun live LLM/container/timing
   campaigns. See the report for these limits.
-- [ ] Approve privacy treatment and publish the new immutable evidence archive.
-  The local candidate preserves provider budget metadata for author review;
-  it is not a public-ready sanitized release. No credentials or private
-  provider/proposal documents may enter public artifacts.
+- [x] Publish the new evidence archive after the author authorized Zenodo
+  publication and provider-budget privacy transformations: DOI
+  `10.5281/zenodo.23281161`, version `R5-2026-10-10`. All ten campaign verifiers
+  pass on the public copy; scientific payloads and private originals are
+  unchanged. See the [publication record](revision/r5-zenodo-publication.md).
+- [x] Replace publication-pending wording with verified DOI
+  `10.5281/zenodo.23281161` in the manuscript and reviewer response; rebuild
+  and check the clean/marked journal, neutral arXiv and response exports.
 - [ ] Have a co-author reproduce the key execution and enforcement results
   without relying on undocumented local state and review every response for
   accuracy, completeness, and appropriate tone.
@@ -532,9 +537,9 @@ is authorized by this roadmap.
   this is a decision list, not a commitment or acceptance prediction.
 - [x] Record the author's 10 October authorization to commit/push the working
   revision and reviewer documents. This is not release or submission approval.
-- [ ] Only after author review and explicit authorization: publish a new
-  immutable software/evidence release, update archival records, and generate
-  the final submission/arXiv packages.
+- [ ] After final author review and explicit authorization, generate the final
+  submission/arXiv packages and decide whether a separate GitHub software tag
+  is needed. The Zenodo evidence version does not create a GitHub release.
 
 **Done when:** the revised manuscript, response, source, release, evidence,
 and submission packages agree, and the authors approve the submission route.

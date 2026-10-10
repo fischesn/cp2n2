@@ -6,7 +6,7 @@ Title: CP²N²: A Control Plane for Heterogeneous Physical Neural Networks
 
 Date: 10 October 2026
 
-Status: Complete technical response draft. Author approval, independent co-author reproduction, public revision-archive release and the editorial scope decision remain open. Nothing has been submitted. Concern summaries below are not verbatim quotations and require final author comparison with the decision.
+Status: Complete technical response draft. The revision evidence is publicly archived. Author approval, independent co-author reproduction and the editorial scope decision remain open. Nothing has been submitted. Concern summaries below are not verbatim quotations and require final author comparison with the decision.
 
 ## Letter to the editor and reviewers
 
@@ -40,7 +40,9 @@ New experiments use software checkpoint f5802a3d1c2695637a5840ab5ed94d46ce64063c
 - R4-container: r4-container-confirmatory-20261010-01
 - R5-reproduction: r5-reproduction-20261010-01
 
-R1 contract/comparison documents live in docs/revision/ in the software repository. The revision evidence is prepared locally for author-approved publication; it is not yet in the historical release DOI.
+R1 contract/comparison documents live in docs/revision/ in the software repository. The public revision evidence is archived as version R5-2026-10-10 at https://doi.org/10.5281/zenodo.23281161. It includes the exact evaluated source snapshot and package/campaign verification receipts. The historical v5.1.1 DOI remains unchanged and does not cover the new experiments.
+
+The public copy omits two budget-only JSON logs and structured provider-account budget objects, with original/public hashes and transformations disclosed. Already-public textual budget summaries in historical documentation/source snapshots remain. All other 12,427 evidence payloads are byte-identical to the private frozen candidate, including prompts, oracles, measurements, failures and audit chains. All ten campaign verifiers passed on the public copy; complete unauthenticated downloads of the five new deposit files matched local SHA-256 values and sizes. This publication adds no new LLM, container, timing or physical observations and does not establish independent co-author reproduction.
 
 ## Reviewer 1
 
@@ -254,9 +256,9 @@ R1 contract/comparison documents live in docs/revision/ in the software reposito
 
 **Concern:** Improve LLM reproducibility by archiving prompts, system instructions, schemas, oracle, raw responses, request IDs, model/version metadata, and machine-verifiable pilot/confirmatory separation.
 
-**Author response:** The new live archive retains exact instructions/prompts, schemas, oracle, completions, parsed decisions, provider IDs, requested/returned model IDs, settings and audit/effect/native records. One capability probe is separate; no scored call was retried/replaced. Historical missing responses are not reconstructed. Provider weights, routing and reasoning-token counts are unavailable. A clean checkout passed 286 tests and eighteen verification/reproduction jobs without new LLM/physical calls. It reuses the same host/environment, not independent co-author reproduction. Container/hosted-model archives are verified, not rerun; overhead is recomputed, not remeasured. Public revision-evidence release requires author approval.
+**Author response:** The new live archive retains exact instructions/prompts, schemas, oracle, completions, parsed decisions, provider IDs, requested/returned model IDs, settings and audit/effect/native records. One capability probe is separate; no scored call was retried/replaced. Historical missing responses are not reconstructed. Provider weights, routing and reasoning-token counts are unavailable. A clean checkout passed 286 tests and eighteen verification/reproduction jobs without new LLM/physical calls. It reuses the same host/environment, not independent co-author reproduction. Container/hosted-model archives are verified, not rerun; overhead is recomputed, not remeasured. The revision evidence is publicly archived at https://doi.org/10.5281/zenodo.23281161; disclosed budget-object/log redaction leaves scientific trial payloads unchanged.
 
-**Author action:** Added provenance, archive verification and clean-checkout reproduction; separated historical/current/public evidence.
+**Author action:** Added provenance, archive verification and clean-checkout reproduction; published the revision evidence and separated it from the historical release.
 
 **Location:** Agent-to-PNN Protocol and Results; Threats to Validity and Limitations; Data Availability.
 
@@ -317,5 +319,5 @@ R1 contract/comparison documents live in docs/revision/ in the software reposito
 - Check concerns, responses and final manuscript locations against the decision/PDFs.
 - Obtain independent co-author reproduction; the automated same-host run does not satisfy this gate.
 - Decide on IEEE Access resubmission; the editor has not answered the physical-evidence scope question.
-- Approve/publish the revision archive and update Data Availability to its actual public location.
+- Public revision evidence is published at https://doi.org/10.5281/zenodo.23281161 and cited in Data Availability; review the matching rebuilt manuscript/response packages.
 - Approve the official checklist and upload categories. Nothing is uploaded without explicit authorization.
