@@ -66,6 +66,25 @@ comprehensive reviewer response will incorporate the new evidence through R5
 after the required packages are complete. This handoff note does not change
 the historical R1 verification counts below.
 
+### R4 measurement handoff
+
+The historical claim audit above remains the R1 baseline. The later
+[R4 results](r4-evaluation-results.md) and
+[container report](r4-container-results.md) add measured evidence for R5:
+
+| Claim boundary | New measured evidence | Required R5 interpretation |
+| --- | --- | --- |
+| Selector conformance | 64 synthetic cases, five common-information policies and 19 active sensitivity conditions | Not optimal placement or physical calibration; human oracle-sample approval pending |
+| Contention and overhead | Three capacity-one resources, 225 requests; 16,000 timed operations and trial-level intervals | No queue/fairness, shared-capacity or multi-environment performance claim |
+| Transport faults | 21 Windows process trials plus 21 separate-container trials/57 additional attempts | Actual HTTP/TCP byte-stream faults; same physical host, not packets, WAN or MCP-network latency |
+| Idempotency and recovery | Same-process reply/retry protection; duplicates in 3/3 restart trials in each topology | Explicitly exclude durable restart safety; trace persistence is not state restoration |
+| Pre-invocation provider failure | 18 HTTP 500 responses in each topology, zero effects | No-effect observation is not structured quarantine; retain the error-handling limitation |
+
+No journal/arXiv text, historical R1 verification count or physical evidence
+label is changed by this handoff. The comprehensive reviewer response must
+incorporate these results and limits during R5 rather than report all expected
+negative controls as safety successes.
+
 ## Verification
 
 - Existing software regression suite: **146 passed**, one external dependency

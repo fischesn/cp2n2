@@ -1,9 +1,12 @@
 # CP²N² reviewer-driven revision roadmap
 
-**Date:** 9 October 2026
+**Date:** 10 October 2026
 
 **Status:** Original submission/evidence preserved; R1 text and specification
-complete; R2 execution/recovery complete at local Windows E3; R3–R5 pending
+complete; R2 execution/recovery complete at local Windows E3; R3 direct/state
+and live Qwen campaigns complete in bounded local scope, with planner failures
+retained; R4 selection/contention/timing, bounded TCP and separate-container
+results verified; human oracle sign-off open; R5 pending
 
 **Trigger:** IEEE Access decision on manuscript `Access-2026-43996`
 
@@ -13,11 +16,11 @@ complete; R2 execution/recovery complete at local Windows E3; R3–R5 pending
 
 | Step | What we will do | Current status |
 |---|---|---|
-| R0 | Preserve the original submission and inventory its evidence | Inventory complete; protocol freezes/editor reply pending |
+| R0 | Preserve the original submission and inventory its evidence | Inventory and measured-package freezes complete; editor reply pending |
 | R1 | Make claims, novelty, and contracts precise | COMPLETE — text/specification; no new results |
 | R2 | Connect MCP admission to one actual SDK Simulator execution | COMPLETE — native validation and 18/18 recovery conditions verified |
-| R3 | Demonstrate enforcement using permitted and forbidden backend effects | TODO |
-| R4 | Strengthen selection, measurement, contention, and fault experiments | TODO |
+| R3 | Demonstrate enforcement using permitted and forbidden backend effects | COMPLETE — direct/state and live Qwen evidence verified; eight planner deviations retained |
+| R4 | Strengthen selection, measurement, contention, and fault experiments | Measurements and container extension verified; human oracle sign-off open |
 | R5 | Integrate the evidence, revise both manuscript views, and prepare the resubmission | TODO |
 | H1 | Explore real-substrate access as an optional follow-up | Separate; not a revision dependency |
 
@@ -117,11 +120,14 @@ not a rewrite of the old results.
 - [x] R0.5 Create a response matrix for all reviewer points, with the requested
   change, our interpretation, planned action, evidence location, and status.
   Explicitly justify declined or narrowed requests rather than ignoring them.
-- [ ] R0.6 Freeze new case definitions, oracle construction, seeds, repetition
+- [x] R0.6 Freeze new case definitions, oracle construction, seeds, repetition
   counts, metric definitions, failure criteria, and analysis scripts before
   confirmatory runs. Separate development/pilot runs from final evidence.
   R2's recovery protocol and source snapshot are frozen and its 18 executions
-  verified; R3/R4 protocols remain pending, so this overall item stays open.
+  verified; R3 direct/state/agent inputs are also frozen and verified. R4's
+  four measured subpackages have pre-run protocols/specifications/source
+  snapshots and verified raw archives. Any later container extension needs
+  its own freeze; it is not covered by the completed same-host TCP freeze.
 - [ ] R0.7 Track the scope-clarification email as `drafted`, `sent`, or
   `answered`, with the actual answer if available. R1 need not wait for it.
 
@@ -132,7 +138,9 @@ new experimental outcomes to redefine success.
 ## 4. R1 — Claims, novelty, and resource-contract precision
 
 **Status:** COMPLETE (text/specification only), 9 October 2026.
-R2--R4 execution and new measurements remain pending.
+At the R1 checkpoint, R2--R4 execution and new measurements were pending.
+R2/R3 are now complete in the bounded scopes recorded below; R4 has measured
+results and explicit remaining scope/review gates.
 
 Verified outputs:
 
@@ -145,7 +153,8 @@ Verified outputs:
 No runtime functionality, baseline metric, oracle or original evidence was changed.
 The requirements-contract reference remains unassessed beyond metadata because
 publisher text was unavailable; it was not inserted as a verified citation.
-A bounded property test is specified for R3, not reported as implemented.
+A bounded state exploration was specified in R1 and implemented/verified in R3;
+it is not an exhaustive concurrency or physical-safety proof.
 
 ### R1.1 Claim and terminology audit
 
@@ -283,55 +292,72 @@ for success and failure. This remains local, non-biological E3 evidence.
 
 ## 6. R3 — Active enforcement and a bounded executing-agent campaign
 
-**Status:** TODO. **Purpose:** test the control boundary, not just safe plans.
+**Status:** COMPLETE in bounded local software/E3 scope, 10 October 2026. **Purpose:** test the control boundary,
+not just safe plans. The [local result report](revision/r3-enforcement-results.md)
+records 80/80 ordinary conditions, 4/4 detected fault controls, 464/464 bounded
+state transitions and 260 passing tests. The agent pipeline's 32-case deterministic
+reference includes six mock commits and two fresh native-validated E3 SDK runs.
+These reference outcomes are not LLM results. The separately frozen
+[v2 agent protocol](revision/r3-agent-protocol-v2.md) specifies the author-approved
+replacement of unavailable `minimax-m2.7` with `qwen3.8-27b`, with non-thinking
+requested and a separate excluded capability probe. The [live result report](revision/r3-agent-qwen-results.md)
+retains 24/32 exact planner matches, 6/8 permitted executions, two active stale-health
+blocks, zero forbidden effects and 32/32 reconciled states. All eight deviations
+and the model-visible freshness limitation are documented. No prompt/oracle tuning
+or replacement campaign was performed. Native artifact publication remains R5 work.
+The paper and legacy campaign are unchanged.
 
 ### R3.1 Observable backend effects and direct negative tests
 
-- [ ] Provide an isolated state-changing backend with a durable test log or
+- [x] Provide an isolated state-changing backend with a durable test log or
   equivalent independent observation of starts, commits, cancellations, and
   results. State mutation is test evidence, not physical execution.
-- [ ] Define forbidden effects for each case: unauthorized start, unapproved
+- [x] Define forbidden effects for each case: unauthorized start, unapproved
   parameters, conflicting exclusive ownership, duplicate commit, stale/unknown
   resource use, or successful delivery of an invalid artifact.
-- [ ] Send deliberately invalid plans directly through the actual server
+- [x] Send deliberately invalid plans directly through the actual server
   boundary, including authorization, approval, stale telemetry, lease conflict,
   invalid units/ranges, wrong result identity, and lifecycle violations.
-- [ ] Do not let the evaluation oracle pre-filter those plans before the
+- [x] Do not let the evaluation oracle pre-filter those plans before the
   server sees them. Use the oracle for independent scoring afterwards.
-- [ ] Include valid positive controls that really execute. Zero side effects
+- [x] Include valid positive controls that really execute. Zero side effects
   from a harness that rejects everything is not successful enforcement.
-- [ ] Use an isolated deliberately faulty test double or an equivalent
+- [x] Use an isolated deliberately faulty test double or an equivalent
   negative control to show that the effect detector notices a forbidden
   commit. Never introduce a bypass into the production execution path.
+- [x] Compare the bounded two-client/two-request, six-macro-event state model
+  with the actual control surface; archive witnesses, graph coverage, independent
+  effects and offline checks. Do not claim exhaustive concurrency or physical safety.
 
 ### R3.2 Bounded LLM campaign
 
-- [ ] Freeze a separately versioned executing campaign. Preserve the earlier
+- [x] Freeze a separately versioned executing campaign. Preserve the earlier
   dry-run campaign and its oracle unchanged.
-- [ ] Specify permitted E3/mock execution and prohibited physical requests;
+- [x] Specify permitted E3/mock execution and prohibited physical requests;
   distinguish `refuse`, `clarify`, rejection, and execution in the scoring.
-- [ ] Include a small, specified adversarial extension: multi-turn pressure,
+- [x] Include a small, specified adversarial extension: multi-turn pressure,
   untrusted tool-result instruction injection, role confusion, and selected
   multilingual variants. Declare exact cases and scope before final runs.
-- [ ] Fix model/version, prompt, tool schemas, sampling settings, repetitions,
+- [x] Fix model/version, prompt, tool schemas, sampling settings, repetitions,
   request budgets, and stopping rules. A second model is a bounded extension
   if available, not a prerequisite for a general-purpose LLM benchmark.
-- [ ] Record full permitted request/response material for new runs, parsed
+- [x] Record full permitted request/response material for new runs, parsed
   decisions, tool calls, backend effects, audit verification, and reconciliation.
   Remove credentials and sensitive content with documented sanitization.
   Old missing raw responses cannot be reconstructed retrospectively.
 
 ### R3.3 Separate outcomes and report failures
 
-- [ ] Report planner oracle conformity, policy decision correctness, actual
+- [x] Report planner oracle conformity, policy decision correctness, actual
   permitted execution, forbidden backend effects, result integrity, and
   lifecycle/lease reconciliation as separate metrics with denominators.
-- [ ] Distinguish model refusal, server rejection, SDK/application failure,
+- [x] Distinguish model refusal, server rejection, SDK/application failure,
   validation failure, and unresolved resource state.
-- [ ] Publish case-level outcomes, including failed plans and failed runs.
+- [x] Report case-level outcomes locally, including failed plans and failed runs;
+  publication of the sanitized native archive is explicitly retained as R5 work.
   Zero observed forbidden effects is a bounded empirical result, not a claim
   that arbitrary agents or compromised providers are safe.
-- [ ] Verify invariants against independent backend observations, not only
+- [x] Verify invariants against independent backend observations, not only
   the same audit producer that reports successful enforcement.
 
 **Outputs:** direct-enforcement tests, frozen executing-agent protocol,
@@ -343,72 +369,103 @@ from enforcement failures. Any observed failure is retained and explained.
 
 ## 7. R4 — Selection, overhead, contention, and fault methodology
 
-**Status:** TODO. Four bounded subpackages, not a production-platform redesign.
+**Status:** PARTIAL, 10 October 2026. R4.1–R4.3 measurement packages and the
+bounded same-host TCP and separate-container extensions are verified; human
+oracle sign-off remains open. This is not a production-
+platform redesign. See the [protocol](revision/r4-protocol.md),
+[results and negative findings](revision/r4-evaluation-results.md), and
+[exact archive index](../evaluation/fixtures/r4-confirmatory-20261010.json).
+The container extension has its own [report](revision/r4-container-results.md)
+and [frozen index](../evaluation/fixtures/r4-container-confirmatory-20261010.json).
+
+| Part | Measured result | Remaining gate |
+| --- | --- | --- |
+| R4.1 | 64 cases, five policies, reversed-order checks; 19 active sensitivity conditions | Human author/second-author approval of oracle sample |
+| R4.2 | Three resources, 225 requests, 60 completions, 165 busy rejections, zero overlaps | No shared-capacity or scheduler claim |
+| R4.3 | 16,000 measured operations; trial-level intervals and separate MCP measurement | Single-machine scope retained |
+| R4.4 | 21 Windows TCP and 21 Linux container trials; restart duplicates in 3/3 trials of each | Single-host boundary; no durable restart guarantee |
 
 ### R4.1 Independently specified selection suite
 
-- [ ] Freeze an expanded suite, initially targeting at least 60 cases. Cover
+- [x] Freeze an expanded suite, initially targeting at least 60 cases. Cover
   zero/one/multiple admissible resources, conflicting constraints, ties,
   missing/ambiguous telemetry, lifecycle/readiness costs, and near-boundary
   freshness/validity conditions. Fix coverage counts before scoring.
-- [ ] Derive expected admissible sets and tie outcomes independently of the
-  production selector. Review a sample manually or with a second author.
-- [ ] Define fair, explicit baselines and a common information budget. Do not
+- [x] Derive expected admissible sets and tie outcomes independently of the
+  production selector. Twelve analytical sample checks by the authoring agent
+  are frozen; this is not human author approval.
+- [ ] Obtain human author or second-author sign-off on the twelve frozen
+  oracle sample outcomes before manuscript integration/publication.
+- [x] Define fair, explicit baselines and a common information budget. Do not
   silently give one baseline telemetry or hard constraints the others lack.
-- [ ] Publish every case, expected set, selected outcome, rejection rationale,
+- [x] Archive every case, expected set, selected outcome, rejection rationale,
   and explanation of any advantage over the baseline. Retain the original
   seven-plus-four suite as historical evidence, not the new confirmatory set.
-- [ ] Perturb parameters the tested policy actually uses: hard thresholds,
+  Public raw-archive publication remains R5 work.
+- [x] Perturb parameters the tested policy actually uses: hard thresholds,
   validity/freshness boundaries, lexicographic priority order, and tie rules.
   Weight changes are meaningful only for a weighted policy; unused weights
   cannot demonstrate robustness of a lexicographic selector.
-- [ ] Label all simulated drift, age, calibration, and health data as synthetic.
+- [x] Label all simulated drift, age, calibration, and health data as synthetic.
   Threshold sensitivity does not establish real-substrate prediction accuracy.
 
 ### R4.2 Bounded multi-resource contention
 
-- [ ] Add at least three independently identifiable test resources, mixed
+- [x] Add at least three independently identifiable test resources, mixed
   exclusive/non-exclusive access where supported, different lease durations,
   and competing clients. Freeze client/load levels and resource capacities.
-- [ ] Measure admission/completion, rejection reasons, latency, lease overlap,
+- [x] Measure admission/completion, rejection reasons, latency, lease overlap,
   expiry, and reconciliation per resource, not only aggregate throughput.
-- [ ] State whether queueing is implemented. If not, evaluate immediate
+- [x] State whether queueing is implemented. If not, evaluate immediate
   admission/rejection and do not describe it as a general scheduler.
-- [ ] Keep all coordination claims within the actual single-controller/shared-
+- [x] Keep all coordination claims within the actual single-controller/shared-
   registry scope. Multiple clients are not multiple persistent controllers.
 
 ### R4.3 Overhead measurement
 
-- [ ] Freeze the machine, OS/runtime, versions, transport, topology, payloads,
+- [x] Freeze the machine, OS/runtime, versions, transport, topology, payloads,
   resource counts, baseline operation, timer, warm-up, and measurement window.
-- [ ] Increase independent repetitions and observations beyond the legacy
+- [x] Increase fresh-trial repetitions and observations beyond the legacy
   25-local/15-HTTP samples. Select sample counts before final measurement;
   use a pilot only to determine feasibility and timing noise.
-- [ ] Report median and adequately supported tail quantiles, throughput under
+- [x] Report median and adequately supported tail quantiles, throughput under
   defined load, dispersion/confidence intervals, and the resampling unit.
   Do not treat dependent calls in one run as independent experiments or quote
   a stable p99 without enough observations.
-- [ ] Separate control-plane overhead from SDK/substrate task duration.
+- [x] Separate control-plane overhead from SDK/substrate task duration.
   Archive raw timings, environment metadata, and analysis inputs.
-- [ ] Repeat on a second independently deployed environment if practical;
-  otherwise state the single-environment limit rather than generalizing it.
+- [x] Assess a second independently deployed environment; unavailable here.
+  State the single-environment limit rather than generalizing it.
 
 ### R4.4 Network and recovery extension
 
-- [ ] Preserve the old same-host/application-layer campaign as such. Add an
+- [x] Preserve the old same-host/application-layer campaign as such. Add an
   explicitly documented deployment with separate containers or hosts and
   actual transport-level delay/loss/partition injection where feasible.
   Containers on one host do not establish multi-host external validity.
-- [ ] Freeze topology, impairment location, clock assumptions, independent
-  seeds, repetition counts, and recovery expectations. Record measured rather
-  than merely requested impairment when instrumentation permits.
-- [ ] Cover provider interruption, connection loss/lost reply, client retry,
+  Docker Desktop was subsequently repaired/updated with author authorization.
+  Four fresh containers and one bridge network per trial now fulfill the
+  separate-container request in 21 additional trials; this remains one host.
+  All temporary owned containers/networks were removed, with evidence retained.
+- [x] Freeze the feasible loopback topology, impairment location, clock
+  assumptions, deterministic conditions, repetition counts, and recovery
+  expectations. No random seeds are implied for fixed conditions. Record
+  measured rather than merely requested impairment when instrumentation permits.
+- [x] Cover provider interruption, connection loss/lost reply, client retry,
   and controller restart. Test no forbidden reuse while outcome is unknown.
-- [ ] Before restart testing, specify what is persisted and how startup
+- [x] Before restart testing, specify what is persisted and how startup
   detects/reconciles an unfinished task. If recovery is unsupported, expose
   that limitation; an in-memory registry cannot prove durable lease safety.
-- [ ] Keep replicated controllers, transactional external leases, and broad
+- [x] Keep replicated controllers, transactional external leases, and broad
   crash-tolerance guarantees out of scope unless separately approved.
+
+The restart cases observe duplicate durable effects in 3/3 Windows trials
+and 3/3 container trials. This is
+the expected unsupported guarantee, not three safety successes. Pre-invocation
+partition/provider termination yields 18 generic HTTP 500 responses rather
+than structured CP²N² lifecycle errors. Present nonnumeric drift remains
+admissible at the descriptor selector. R5 must retain these limits, distinguish
+failed HTTP delivery from explicit quarantine, and avoid broader safety claims.
 
 **Outputs:** expanded selector fixtures and case table, meaningful sensitivity
 plots, multi-resource results, raw overhead data/analysis, and a bounded
@@ -565,12 +622,15 @@ At every checkpoint:
 5. ask for the next implementation package and, separately, any commit/push
    or external action the authors want.
 
-**Next action:** R3 — independently observe permitted and forbidden backend
-effects, freeze direct enforcement cases and then the bounded executing-agent
-campaign. Keep the original dry-run campaign unchanged. R2 evidence is ready
-for later R5 integration, not yet inserted into the paper.
-Freeze each new experiment's protocol before its confirmatory runs; editor-scope tracking
-remains pending. Do not start H1 adapter code, buy hardware time, or expand
+**Next action:** obtain human review of the twelve frozen selector-oracle
+sample cases, then proceed to R5 evidence/manuscript/reviewer-response integration.
+R2–R4 measurements, including the separate-container extension, are ready in
+their documented bounded scopes and have not yet been inserted into the paper.
+Keep the original dry-run campaign unchanged and retain the eight strict
+planner-oracle deviations, generic early HTTP errors, ambiguous-drift admission
+and observed restart duplicates. Independent reproduction and public archive
+publication remain R5 gates; editor-scope tracking remains pending.
+Do not start H1 adapter code, buy hardware time, or expand
 the software into a replicated scheduler as an implicit consequence of this
 roadmap.
 

@@ -1,0 +1,18 @@
+{
+  "schema": "r4-manual-oracle-review-v1",
+  "review": "Analytical authoring-agent inspection of declared inequalities and tie rule before scoring; not human author approval or second-author review. Earlier frozen copies used the imprecise label single-researcher review; only that label is clarified, not the expected outcomes.",
+  "cases": [
+    {"id":"singleton-0","eligible":["a"],"selected":"a","reason":"Healthy, fresh singleton satisfies all limits."},
+    {"id":"empty_inventory-0","eligible":[],"selected":null,"reason":"No resource can be admitted."},
+    {"id":"latency_boundary-0","eligible":[],"selected":null,"reason":"10 ms exceeds the 9.999 ms inclusive budget."},
+    {"id":"latency_boundary-1","eligible":["a"],"selected":"a","reason":"10 ms equals the inclusive budget."},
+    {"id":"drift_boundary-1","eligible":[],"selected":null,"reason":"Drift 0.95 equals the exclusive upper threshold."},
+    {"id":"freshness_boundary-1","eligible":["a"],"selected":"a","reason":"Age 1000 equals the inclusive 1000 ms bound."},
+    {"id":"freshness_boundary-2","eligible":[],"selected":null,"reason":"Age 1001 exceeds the bound."},
+    {"id":"cost_boundary-1","eligible":["a"],"selected":"a","reason":"Cost 1 EUR equals the inclusive budget."},
+    {"id":"identifier_tie-1","eligible":["a","b"],"selected":"a","reason":"Identifier resolves an exact tie despite reversed input order."},
+    {"id":"policy_tradeoff-0","eligible":["a","b"],"selected":"b","reason":"Lower drift precedes latency in the principal lexicographic policy."},
+    {"id":"policy_tradeoff-1","eligible":["a","b"],"selected":"a","reason":"Latency-first prioritizes 2 ms over 10 ms before drift."},
+    {"id":"supervision-0","eligible":["b"],"selected":"b","reason":"Required human supervision is absent for a, not for b."}
+  ]
+}

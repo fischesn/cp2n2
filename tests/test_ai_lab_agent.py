@@ -17,6 +17,7 @@ from agent.ai_lab_agent import (
     CP2N2AILabAgent,
     extract_agent_plan,
     strip_reasoning_wrapper,
+    completion_has_exposed_reasoning,
 )
 from agent.constrained_client import build_agent_surface
 
@@ -245,3 +246,49 @@ def test_ai_lab_agent_module_has_no_direct_backend_dependency() -> None:
     assert "import adapters" not in source
     assert "from backends" not in source
     assert "import backends" not in source
+
+
+def test_qwen_nonthinking_settings_and_nested_usage_are_retained() -> None:
+    session = FakeSession([FakeResponse({
+        "model": "Qwen/Qwen3.8-27B", "id": "probe-1",
+        "choices": [{"message": {"content": '{"status":"ok"}', "reasoning_content": None},
+                     "finish_reason": "stop"}],
+        "usage": {"total_tokens": 20, "completion_tokens_details": {"reasoning_tokens": 0}},
+    })])
+    client = OpenAICompatibleAILabClient(
+        AILabConfiguration(api_key="fake", model="qwen3.8-27b", enable_thinking=False, max_tokens=128),
+        session=session,
+    )
+    completion = client.complete([{"role": "user", "content": "Return JSON."}], temperature=0, json_mode=True)
+    assert session.calls[0]["json"]["chat_template_kwargs"] == {"enable_thinking": False}
+    assert session.calls[0]["json"]["max_tokens"] == 128
+    assert completion.reasoning_content_present is False and completion.reasoning_token_count == 0
+    assert completion.finish_reason == "stop"
+    assert completion.usage["completion_tokens_details"] == {"reasoning_tokens": 0}
+
+
+def test_default_client_does_not_change_existing_provider_settings() -> None:
+    session = FakeSession([FakeResponse({"choices": [{"message": {"content": "ok"}}]})])
+    client = OpenAICompatibleAILabClient(AILabConfiguration(api_key="fake"), session=session)
+    completion = client.complete([{"role": "user", "content": "Hello."}], temperature=0)
+    assert "chat_template_kwargs" not in session.calls[0]["json"]
+    assert "max_tokens" not in session.calls[0]["json"]
+    assert completion.reasoning_token_count is None
+
+
+def test_returned_reasoning_is_detected_without_retaining_private_trace() -> None:
+    session = FakeSession([FakeResponse({"choices": [{"message": {
+        "content": "ok", "reasoning_content": "private reasoning must not be retained"}}]})])
+    client = OpenAICompatibleAILabClient(AILabConfiguration(api_key="fake"), session=session)
+    completion = client.complete([{"role": "user", "content": "Hello."}], temperature=0)
+    assert completion.reasoning_content_present
+    assert "private reasoning" not in completion.model_dump_json()
+
+
+@pytest.mark.parametrize("content,observed", [
+    ('<think>\n</think>\n{"status":"ok"}', False),
+    ('<think>nonempty reasoning</think>\n{"status":"ok"}', True),
+    ('<think>unfinished reasoning', True),
+])
+def test_reasoning_wrapper_observation_distinguishes_empty_trace(content, observed):
+    assert completion_has_exposed_reasoning(AILabCompletion(content=content, requested_model="fake")) is observed

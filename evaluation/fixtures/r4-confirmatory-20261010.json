@@ -1,0 +1,72 @@
+{
+  "schema": "r4-confirmatory-index-v1",
+  "date": "2026-10-10",
+  "status": "R4.1-R4.3 and same-host TCP/container extensions measured; human oracle sign-off pending; multi-host external validity not claimed",
+  "container_extension_index": "r4-container-confirmatory-20261010.json",
+  "public_artifacts": false,
+  "frozen_protocol_sha256": "ceff7c0eabf955868139b99918da622175dd7e076c8a0ccd3e784fd57637aa18",
+  "source_file_content_map_sha256": "88cf43ee728bf5a8e3e56a8df4f9217950113fcf52287170562194659d2220d5",
+  "source_content_digest_method": "sha256 of canonical JSON mapping sorted ZIP entry names to sha256 of their bytes; separators comma/colon",
+  "snapshots_have_identical_contents": true,
+  "runs": [
+    {
+      "kind": "selection",
+      "directory": ".cp2n2/r4-selection-confirmatory-20261010-01",
+      "specification_sha256": "213ee450d0299de1947c8d4e47975bf172695b54669d4b906a23a8befd810ce7",
+      "source_snapshot_sha256": "a50f0d2cb9f18bf159dda17f29686b8d49580ca20c21be5596f9ec05f38e25fd",
+      "manifest_sha256": "bf127e83366b8185f73e8dee3b26dcfcf8079ec03031be77fde8d9e3646667dc",
+      "verification_sha256": "e1829cfafad5f279047b7c1a76145a6d682fc87343b4ded37cfad0c7c0f7fc90",
+      "cases": 64,
+      "families": 16,
+      "comparisons": 640,
+      "sensitivity_conditions": 19
+    },
+    {
+      "kind": "contention",
+      "directory": ".cp2n2/r4-contention-confirmatory-20261010-01",
+      "specification_sha256": "e862d8f277ed225e261945493bf786b63854278d10ccfc0a0837f3de7f522cc7",
+      "source_snapshot_sha256": "7f79214dd1fe43858a7fe19e1aa59ca92f81fb7e9f7e504a14859403340f01bb",
+      "manifest_sha256": "9e9ab8e0d6f9588af4619d67f6cd9e77a4abe955e0355d2395795a04daeeff20",
+      "verification_sha256": "30ef1e2568cd6e5ec3b95601e205702afa33794d88f868964b19c3b61b4f71fd",
+      "trials": 20,
+      "requests": 225,
+      "completions": 60,
+      "rejections": 165,
+      "overlaps": 0
+    },
+    {
+      "kind": "overhead",
+      "directory": ".cp2n2/r4-overhead-confirmatory-20261010-01",
+      "specification_sha256": "28e974cfe6ed6e1ec38cacbae80c27611d0e1493c0e71c217024dee6eb5bed93",
+      "source_snapshot_sha256": "9897d182d61b2f313e05fdecd33900a427b6d215a299988f5d334e7ec99ddb0b",
+      "manifest_sha256": "985ea3e18a0c60f8a4569f3949749eeee7b59badfca183d1392ff7e311d5e09e",
+      "verification_sha256": "dbdf1f4a57325703cab03529386096718f0ac5fb5fccef5f25bc7e591edacbf6",
+      "configurations": 4,
+      "trials_per_configuration": 10,
+      "measured_operations": 16000,
+      "warmup_operations": 1600,
+      "resampling_unit": "trial summary, not individual calls"
+    },
+    {
+      "kind": "transport",
+      "directory": ".cp2n2/r4-transport-confirmatory-20261010-01",
+      "specification_sha256": "af31f3a47819ee16b288fbd81360f65822d27a387bb2917bce26302c279a4ae3",
+      "source_snapshot_sha256": "bb821f1e87516853581655aca89e879bdb35a5a0af4f2c1138df18576a373475",
+      "manifest_sha256": "b91dda55cae8cd428215f6d3dd7e214aecd1f06965d05ec5bf09d30ae9df93b2",
+      "verification_sha256": "96c157b5d313c270720ab7c9d9c38c53542938519468720a3a3a239b3c3b18b4",
+      "trials": 21,
+      "expectation_matches": 21,
+      "restart_duplicate_effect_trials": 3,
+      "pre_invocation_http_500_responses": 18,
+      "containers": false,
+      "packet_impairment": false,
+      "multi_host": false
+    }
+  ],
+  "review_clarification": "The twelve pre-run analytical sample checks were performed by the authoring agent, not approved by a human co-author. Frozen earlier metadata uses an imprecise single-researcher label. Expectations and archived bytes remain unchanged.",
+  "negative_results": [
+    "Nonnumeric present drift is admitted by the descriptor selector, whose rule checks presence and numeric thresholds rather than full numeric validity.",
+    "Provider partition/interruption before invocation produces generic HTTP 500 errors, not structured CP2N2 lifecycle failures; no-effect results do not prove quarantine in those cases.",
+    "Controller restart loses in-memory idempotency/lifecycle state and can repeat an already committed provider effect."
+  ]
+}

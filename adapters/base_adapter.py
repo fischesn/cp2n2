@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+import math
 from threading import RLock
 from typing import Any
 
@@ -310,10 +311,27 @@ class BaseAdapter:
     ) -> list[str]:
         """Apply binding-specific result checks during VALIDATING.
 
-        Existing adapters retain their generic postconditions. Bindings that
-        publish native artifacts can reject them before successful delivery.
+        Identity and finite numeric output are common obligations. Bindings
+        add semantic checks without forcing one neural schema onto another.
         """
-        return []
+        failures = []
+        if invocation.backend_id != self.backend_id():
+            failures.append("result backend identity does not match selected resource")
+        if invocation.task_id != task.task_id:
+            failures.append("result task identity does not match admitted task")
+        def finite(value):
+            if isinstance(value, float):
+                return math.isfinite(value)
+            if isinstance(value, dict):
+                return all(finite(item) for item in value.values())
+            if isinstance(value, (list, tuple)):
+                return all(finite(item) for item in value)
+            return True
+        if not finite(invocation.output_payload) or not math.isfinite(invocation.execution_latency_ms):
+            failures.append("result contains a non-finite numeric value")
+        if invocation.confidence is not None and not math.isfinite(invocation.confidence):
+            failures.append("result confidence is not finite")
+        return failures
 
     def reset(self, mode: ResetMode | None = None) -> bool:
         """Reset or recover the bound runtime."""

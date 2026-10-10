@@ -31,6 +31,9 @@ class BioPatternGateSDKAdapter(BaseAdapter):
         )
 
     def validate_result(self, task, invocation) -> list[str]:
+        common_failures = super().validate_result(task, invocation)
+        if common_failures:
+            return common_failures
         runtime = self.runtime
         summary = invocation.output_payload["application_summary"]
         try:

@@ -49,6 +49,8 @@ class AILabConfiguration(BaseModel):
     base_url: str = AI_LAB_BASE_URL
     model: str = AI_LAB_DEFAULT_MODEL
     timeout_s: float = Field(default=180.0, gt=0.0, le=600.0)
+    enable_thinking: bool | None = None
+    max_tokens: int | None = Field(default=None, gt=0, le=8192)
 
     @field_validator("api_key")
     @classmethod
@@ -100,7 +102,10 @@ class AILabCompletion(BaseModel):
     requested_model: str
     response_model: str | None = None
     request_id: str | None = None
-    usage: dict[str, int | float | None] = Field(default_factory=dict)
+    usage: dict[str, int | float | None | dict[str, int | float | None]] = Field(default_factory=dict)
+    finish_reason: str | None = None
+    reasoning_content_present: bool = False
+    reasoning_token_count: int | None = None
 
 
 class AILabLLM(Protocol):
@@ -113,6 +118,15 @@ class AILabLLM(Protocol):
         temperature: float,
         json_mode: bool = False,
     ) -> AILabCompletion: ...
+
+
+def completion_has_exposed_reasoning(completion: AILabCompletion) -> bool:
+    """Observe returned reasoning, without claiming access to internal inference."""
+    content = completion.content.strip()
+    wrapper = content.startswith("<think>") and (
+        "</think>" not in content or bool(content[7:content.index("</think>")].strip())
+    )
+    return completion.reasoning_content_present or (completion.reasoning_token_count or 0) > 0 or wrapper
 
 
 class AILabAPIError(RuntimeError):
@@ -186,6 +200,12 @@ class OpenAICompatibleAILabClient:
         }
         if json_mode:
             payload["response_format"] = {"type": "json_object"}
+        if self.configuration.enable_thinking is not None:
+            payload["chat_template_kwargs"] = {
+                "enable_thinking": self.configuration.enable_thinking
+            }
+        if self.configuration.max_tokens is not None:
+            payload["max_tokens"] = self.configuration.max_tokens
         response = self._request("POST", "/v1/chat/completions", json=payload)
         choices = response.get("choices")
         if not isinstance(choices, list) or not choices:
@@ -195,6 +215,8 @@ class OpenAICompatibleAILabClient:
         if not isinstance(content, str) or not content.strip():
             raise AILabAPIError("AI-Lab returned an empty completion")
         usage = response.get("usage")
+        details = usage.get("completion_tokens_details", {}) if isinstance(usage, dict) else {}
+        reasoning_tokens = details.get("reasoning_tokens") if isinstance(details, dict) else None
         return AILabCompletion(
             content=content.strip(),
             requested_model=self.model,
@@ -209,6 +231,18 @@ class OpenAICompatibleAILabClient:
                 else None
             ),
             usage=usage if isinstance(usage, dict) else {},
+            finish_reason=(
+                choices[0].get("finish_reason")
+                if isinstance(choices[0].get("finish_reason"), str)
+                else None
+            ),
+            reasoning_content_present=any(
+                bool(message.get(key)) for key in ("reasoning_content", "reasoning", "thinking")
+            ),
+            reasoning_token_count=(
+                reasoning_tokens if isinstance(reasoning_tokens, int)
+                and not isinstance(reasoning_tokens, bool) and reasoning_tokens >= 0 else None
+            ),
         )
 
     def list_models(self) -> list[str]:

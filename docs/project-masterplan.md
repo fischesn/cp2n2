@@ -4,7 +4,7 @@
 **Status:** Accepted project plan — 23 July 2026  
 **Purpose:** Executable development, experiment, and publication plan for the next, substantially strengthened version of CP²N².
 
-### Current revision overlay — 9 October 2026
+### Current revision overlay — 10 October 2026
 
 The next work is governed by the
 [reviewer-driven revision roadmap](ieee-access-revision-roadmap.md), following
@@ -25,10 +25,10 @@ Cortical Cloud or assume another provider is already available. A substantial
 physical study can become a follow-up paper rather than an implicit expansion
 of the systems-paper revision.
 
-**Revision checkpoint — 9 October 2026:** the confirmed original submission,
+**Revision checkpoints — 9–10 October 2026:** the confirmed original submission,
 published software baseline, and existing evidence have been preserved; see
 the [baseline inventory](revision/baseline-inventory.md). R0 inventory is
-complete, while protocol freezes and editor follow-up remain pending. R1's
+complete, as are the measured protocol freezes; editor follow-up remains pending. R1's
 claims, comparison and contract specification are complete; see the
 [claim matrix](revision/r1-claim-evidence-matrix.md). R2 (continuous executing
 E3 integration) is complete in the local Windows SDK Simulator scope: a fresh official SDK execution follows an
@@ -38,8 +38,29 @@ the execution bridge; the [recovery result report](revision/r2-recovery-results.
 records 18/18 verified conditions, including cooperative abort, crash cleanup,
 timeout quarantine and duplicate handling. The full suite has 179 passing tests.
 No new results or runtime functions were added in R1. R2 is new local E3 evidence;
-the next package is R3 active enforcement. R2–R4 manuscript integration remains
-R5 work, and the paper has not been changed during R2.
+R3 active enforcement now has a verified local checkpoint: 80 ordinary cases,
+four detector controls, and 464 bounded state transitions. The executing-agent
+reference completes eight real software/simulator execution opportunities; the
+actual AI-Lab campaign now uses the author-approved `qwen3.8-27b`, after a separate
+capability check and v2 pre-run freeze. Its 32 cases yield 24 exact planner matches,
+6/8 permitted executions, two active stale-health blocks, zero forbidden effects
+and 32 reconciled states. All failures and context limitations are retained in the
+[Qwen results](revision/r3-agent-qwen-results.md) and [R3 report](revision/r3-enforcement-results.md).
+The R3 checkpoint has 260 passing tests. R3 is complete in this bounded local
+scope. R4 now adds 64 selection cases, meaningful boundary/priority checks,
+three-resource contention (225 requests), 16,000 timed operations and 21
+same-host TCP/retry/restart trials. The later
+[container extension](revision/r4-container-results.md) adds 21 trials and
+57 execute attempts with four separate containers per trial, on that same
+physical host. The current suite has 286 passing tests.
+The [R4 results](revision/r4-evaluation-results.md) retain nonnumeric-drift
+admission, 18 pre-invocation HTTP 500 responses and duplicate provider effects
+after restart in 3/3 Windows and 3/3 container negative-control trials. The
+container deployment gate is complete after the authorized Docker update;
+human oracle sign-off remains open. This is not multi-host or physical
+evidence. No durable scheduler architecture was added.
+R2–R4 manuscript integration remains R5 work, and the
+paper has not been changed during R2/R3/R4 software/evaluation work.
 An Access resubmission requires a comprehensive all-comment reviewer
 response, highlighted revised PDF, and matching clean PDF/LaTeX package;
 these are explicit R5 outputs, not optional documentation.

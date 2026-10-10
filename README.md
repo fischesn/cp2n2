@@ -21,8 +21,30 @@ It changes no software functionality. R2 is complete at local Windows E3: the
 fresh simulator runs and validates their native spike recordings before
 successful delivery. The [recovery campaign](docs/revision/r2-recovery-results.md)
 verifies 18/18 conditions for cancellation, crashes, timeouts and duplicate
-requests; 179 regression tests pass. R3 active enforcement is next. The
+requests. R3's [local enforcement checkpoint](docs/revision/r3-enforcement-results.md)
+now verifies 80 ordinary cases, four detector controls and 464 bounded state
+transitions; 260 regression tests pass. The [live Qwen executing-agent campaign](docs/revision/r3-agent-qwen-results.md)
+records 24/32 exact planner matches and 6/8 permitted executions, including two
+native-validated E3 SDK runs. Two stale-health attempts were blocked before
+effects; zero forbidden starts/commits and 32/32 reconciled states were observed.
+R3 is complete within this bounded scope, with planner failures retained. The
 legacy agent campaign withheld all substrate execution and is unchanged.
+
+R4's [evaluation results](docs/revision/r4-evaluation-results.md) now include
+64 synthetic selector cases, three-resource contention with 225 requests,
+16,000 measured operations and 21 actual TCP connection/reply/restart trials
+on one Windows host. A [separate-container extension](docs/revision/r4-container-results.md)
+adds 21 trials and 57 execute attempts on that same physical host. The suite
+has 286 passing tests. Restart duplicates,
+generic early HTTP errors and ambiguous-drift admission are retained as
+implementation limits. The container deployment gate is complete; human
+oracle sign-off remains open. The
+[frozen archive index](evaluation/fixtures/r4-confirmatory-20261010.json) and
+`scripts/run_r4_evaluation.py` provide local reproduction/verification paths;
+public raw-archive publication and manuscript integration remain R5 work.
+The container campaign has a [separate frozen index](evaluation/fixtures/r4-container-confirmatory-20261010.json)
+and runner `scripts/run_r4_container_evaluation.py`. Multi-host, packet-level
+and physical-substrate claims are not inferred from container separation.
 
 ## Release v5.1.1
 
