@@ -63,7 +63,7 @@ independent validation of all 64 cases, multi-host or physical evidence.
 No durable scheduler architecture was added.
 R2–R4 evidence is now integrated during R5 into the authoritative journal source
 and generated neutral arXiv view. See the
-[R5 integration report](revision/r5-integration-results.md). The current clean
+[R5 integration report](revision/r5-integration-results.md). At the 10 October checkpoint, clean
 and yellow-marked journal previews are 19 pages; arXiv is 27 pages. The full
 22-concern response draft uses the author-supplied official Word template.
 An Access resubmission requires a comprehensive all-comment reviewer
@@ -79,6 +79,30 @@ release and manuscript submission remain separate gates. The
 responses and the [ten-item resubmission status](revision/ieee-access/RESUBMISSION-CHECKLIST-STATUS.md).
 
 ## 1. Project position and target
+
+**Supplementary revision checkpoint — 14 October 2026:** AP1 required-evidence
+validation, AP2 structured provider failures/explicit recovery, and AP3 paired
+timing/CPU observations are complete locally. Their campaigns verify 46 ordinary
+plus four detector trials, 18 process/TCP trials, and 32,000 measured operations;
+the later Gemini-harness checkpoint has 486 passing regression tests. See the
+[supplementary results](revision/ap1-ap3-results.md) and the roadmap's quick
+overview. These are new frozen sources and evidence, separate from the published
+R5 archive. Gemini-generated cases were withheld until the functional freeze,
+reviewed and author-approved before scoring. The [first frozen run](revision/gemini-selector-results.md)
+matches all four outcomes in 72/72 policy/order cells, with 36/36 invariant
+order pairs and unchanged functional source/expectations. This is twelve
+externally authored synthetic cases, not 72 independent workloads.
+[Paper/22-response/checklist integration](revision/supplementary-paper-integration.md)
+is complete locally: after meaning-preserving shortening, clean/marked journal
+20 pages each, arXiv 29 pages and the
+official-template response 13 pages. The
+[supplementary evidence version](revision/supplementary-zenodo-publication.md)
+is now public as DOI `10.5281/zenodo.23377537`, version
+`SUPPLEMENTARY-2026-10-14`. All four archived campaign verifiers pass, and all
+five new public files match their complete local SHA-256 hashes after anonymous
+download. The earlier R5 and v5.1.1 records remain unchanged. This closes the
+new raw-evidence publication gate, not independent co-author reproduction,
+final author/submission approval or any GitHub software-release gate.
 
 CP²N² is a **general control plane for heterogeneous Physical Neural Networks (PNNs)**. It is not a Cortical Labs integration project. A Cortical Labs CL1 is one representative, real biological PNN scenario through which the control-plane claims can be tested; other PNNs, neuromorphic devices, simulators, and physical substrates remain equally in scope.
 

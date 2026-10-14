@@ -14,6 +14,7 @@ from adapters.contracts import (
     RuntimeArtifact,
 )
 from core.task_model import TaskRequest
+from core.telemetry_validation import TelemetryPayloadError
 from descriptors.capability_schema import ResetMode, SubstrateDescriptor
 from descriptors.resource_contract import (
     CONTRACT_SCHEMA_VERSION,
@@ -125,6 +126,8 @@ class BaseAdapter:
 
         now = datetime.now(timezone.utc)
         telemetry = self.collect_telemetry()
+        if not isinstance(telemetry, dict) or any(not isinstance(name, str) for name in telemetry):
+            raise TelemetryPayloadError("provider telemetry must be an object with string property names")
         source = self._resource_contract_telemetry_source()
         units = {metric.name: metric.units for metric in self.descriptor.telemetry.metrics}
         valid_until = now + timedelta(seconds=30)
@@ -140,6 +143,17 @@ class BaseAdapter:
             for name, value in telemetry.items()
         }
 
+        # A provider/cache may carry the original timestamped observations.
+        # Preserve them verbatim: publishing a new envelope does not renew
+        # their observation time or validity interval.
+        supplied = self._resource_contract_observations()
+        if not isinstance(supplied, dict) or any(not isinstance(name, str) for name in supplied):
+            raise TelemetryPayloadError("supplied observations must be an object with string property names")
+        for name, observation in supplied.items():
+            if not isinstance(observation, TelemetryObservation):
+                raise TelemetryPayloadError("supplied contract observations must be TelemetryObservation instances")
+            observations[name] = observation.model_copy(deep=True)
+
         health_value = telemetry.get("health_status", "unknown")
         health_source = source if "health_status" in telemetry else ObservationSource.CONFIGURED
         health = self._make_observation(
@@ -149,6 +163,8 @@ class BaseAdapter:
             now=now,
             valid_until=valid_until,
         )
+        if "health_status" in supplied:
+            health = observations["health_status"].model_copy(deep=True)
         lifecycle_value = self._normalize_lifecycle_state(
             telemetry.get("readiness_state"),
             health_value,
@@ -165,6 +181,12 @@ class BaseAdapter:
             now=now,
             valid_until=valid_until,
         )
+        if "readiness_state" in supplied:
+            lifecycle = observations["readiness_state"].model_copy(update={
+                "value": self._normalize_lifecycle_state(
+                    observations["readiness_state"].value, health.value,
+                ),
+            }, deep=True)
 
         runtime_kind, evidence_level, method, attested_at, details = (
             self._resource_contract_runtime_evidence()
@@ -240,6 +262,16 @@ class BaseAdapter:
 
     def _resource_contract_telemetry_source(self) -> ObservationSource:
         return self._contract_telemetry_source
+
+    def _resource_contract_observations(self) -> dict[str, TelemetryObservation]:
+        """Return original provider/cache observations when available.
+
+        The default empty mapping preserves legacy synthetic snapshots, whose
+        estimated observations are newly sampled at publication. Real bindings
+        must override this hook when republishing cached observations; this
+        hook cannot reconstruct provenance absent from the provider payload.
+        """
+        return {}
 
     def _resource_contract_hard_limits(self) -> dict[str, SafetyLimit]:
         """Return explicitly known hard limits; an empty mapping means unknown."""

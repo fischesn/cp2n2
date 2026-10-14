@@ -59,6 +59,27 @@ The container campaign has a [separate frozen index](evaluation/fixtures/r4-cont
 and runner `scripts/run_r4_container_evaluation.py`. Multi-host, packet-level
 and physical-substrate claims are not inferred from container separation.
 
+The [14 October supplementary checkpoint](docs/revision/ap1-ap3-results.md)
+adds task-scoped required-evidence validation (AP1), structured provider errors
+with explicit recovery (AP2), and CPU-observed timing experiments (AP3). All new
+campaigns verify: 46 ordinary/four detector trials, 18 process/TCP trials, and
+32,000 measured operations. After adding the Gemini campaign harness, the final
+regression suite passes 486 tests. These use new frozen source snapshots, not
+the old published R5 source. [Manuscript and all-comment response integration](docs/revision/supplementary-paper-integration.md)
+is complete locally. The [supplementary public archive](docs/revision/supplementary-zenodo-publication.md)
+is now published as [DOI 10.5281/zenodo.23377537](https://doi.org/10.5281/zenodo.23377537),
+version `SUPPLEMENTARY-2026-10-14`. Its four archived campaign verifiers pass;
+all five new files were downloaded without authentication and match their
+complete SHA-256 hashes. The earlier R5 and v5.1.1 records are unchanged.
+This is an evidence version, not a software release or independent co-author
+reproduction; final author/submission approval remains open. The Gemini
+selection cases
+were withheld until the functional freeze, reviewed and author-approved before
+scoring. The [first frozen run](docs/revision/gemini-selector-results.md) agrees
+with all four expected outcomes in 72/72 policy/order cells; all 36 order pairs
+are invariant. These are twelve externally authored synthetic cases, not 72
+independent workloads. Functional source and expected outcomes were unchanged.
+
 ## Release v5.1.1
 
 Version 5.1.1 publishes the complete A6/RQ2 reference-run archive and

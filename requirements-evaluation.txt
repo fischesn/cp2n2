@@ -1,0 +1,5 @@
+# Convenience installation metadata added after the AP1-AP3 measurement freeze.
+# The archived environment records the package versions actually measured.
+-r requirements.txt
+numpy==2.5.1
+psutil==7.2.2

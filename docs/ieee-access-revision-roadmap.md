@@ -8,7 +8,8 @@ and live Qwen campaigns complete in bounded local scope, with planner failures
 retained; R4 selection/contention/timing, bounded TCP and separate-container
 results verified; twelve oracle sample outcomes approved by Stefan Fischer;
 R4 complete in bounded scope; R5 technical draft prepared, with author,
-independent-reproduction and publication gates still open
+independent-reproduction and submission gates still open; R5 and supplementary
+raw-evidence publication gates closed by separately verified Zenodo versions
 
 **Trigger:** IEEE Access decision on manuscript `Access-2026-43996`
 
@@ -23,8 +24,39 @@ independent-reproduction and publication gates still open
 | R2 | Connect MCP admission to one actual SDK Simulator execution | COMPLETE — native validation and 18/18 trials across nine recovery conditions verified |
 | R3 | Demonstrate enforcement using permitted and forbidden backend effects | COMPLETE — direct/state and live Qwen evidence verified; eight planner deviations retained |
 | R4 | Strengthen selection, measurement, contention, and fault experiments | COMPLETE in bounded scope — measurements verified and twelve oracle sample outcomes author-approved |
-| R5 | Integrate the evidence, revise both manuscript views, and prepare the resubmission | IN_PROGRESS — local paper/22-response/package draft prepared; author and publication gates open |
+| R5 | Integrate the evidence, revise both manuscript views, and prepare the resubmission | IN_PROGRESS — local paper/22-response/package draft prepared; raw evidence public; author, independent-reproduction and submission gates open |
 | H1 | Explore real-substrate access as an optional follow-up | Separate; not a revision dependency |
+
+### Supplementary packages completed on 14 October 2026
+
+The [supplementary results](revision/ap1-ap3-results.md) are a new source/evidence
+checkpoint after the published R5 archive, not a rewrite of historical results.
+
+| Package | Purpose | Status |
+| --- | --- | --- |
+| AP1 | Validate required telemetry, cached metadata and result confidence | COMPLETE locally — 46 ordinary and four detector trials verified |
+| AP2 | Normalize provider failures and require explicit recovery | COMPLETE locally — 18 separate-process/TCP trials verified |
+| AP3 | Report timing intervals and measured CPU context under bounded load | COMPLETE locally — 32,000 measured calls plus 3,200 warmups verified |
+| Externally authored selector cases | Evaluate cases generated separately by Gemini | COMPLETE locally — author-approved and frozen; all four outcomes agree in 72/72 policy/order cells; 36/36 invariant order pairs; see [results](revision/gemini-selector-results.md) |
+| R5 follow-up integration | Update both paper views, yellow markup, all 22 responses, checklist and artifacts | COMPLETE locally — after meaning-preserving compaction, 20-page clean/marked journal, 29-page arXiv and 13-page response rebuilt; [integration report](revision/supplementary-paper-integration.md); supplementary raw evidence public under DOI23377537; final author approval remains open |
+
+The Gemini-harness checkpoint passed 486 tests; the subsequent precommit
+regression suite passes 522, including 36 supplementary publication/packaging
+tests. These do not change the frozen campaign observations. The AP1–AP3 [source freeze](revision/ap1-ap3-source-freeze.json)
+and [evidence index](revision/ap1-ap3-evidence-index.json) bind those campaigns
+to the same 290 normalized source files. The [Gemini index](revision/gemini-selector-evidence-index.json)
+binds its 295-file snapshot, preserving all original 290 hashes. The twelve
+externally authored synthetic cases are not 72 independent workloads.
+No durable restart/competing-controller,
+physical-substrate or general replay-safety claim is added. The existing R5 DOI
+does not cover this new evidence. The [supplementary evidence version](revision/supplementary-zenodo-publication.md),
+DOI `10.5281/zenodo.23377537`, publishes the complete byte-preserved AP1–AP3 and
+Gemini archives, separately labelled AP2 development traces and historical R4
+offline analysis. All four archived campaign verifiers pass; all five new
+files were anonymously downloaded and match their complete SHA-256 hashes.
+The earlier R5 and v5.1.1 records are unchanged. Do not close independent
+reproduction, author approval or resubmission gates on the strength of archive
+publication and automated verification alone.
 
 **Mandatory for an IEEE Access resubmission — not optional:**
 
@@ -524,6 +556,18 @@ is authorized by this roadmap.
 - [x] Replace publication-pending wording with verified DOI
   `10.5281/zenodo.23281161` in the manuscript and reviewer response; rebuild
   and check the clean/marked journal, neutral arXiv and response exports.
+- [x] Publish the subsequent AP1–AP3/Gemini evidence after separate author
+  authorization: DOI `10.5281/zenodo.23377537`, version
+  `SUPPLEMENTARY-2026-10-14`. Four archived campaign verifiers pass; the full
+  ZIP and four supporting files match their local hashes after anonymous
+  download. Historical records and inherited files are unchanged. See the
+  [supplementary publication record](revision/supplementary-zenodo-publication.md).
+- [x] Integrate the supplementary DOI citation and technically verify matching
+  rebuilt journal, arXiv and reviewer-response packages. After author-requested
+  meaning-preserving shortening, all 85 output pages,
+  source/PDF bindings, template fidelity and reviewer mirrors pass; 25 paper
+  workflow and 36 supplementary publication/packaging tests pass. Final author
+  approval remains open.
 - [ ] Have a co-author reproduce the key execution and enforcement results
   without relying on undocumented local state and review every response for
   accuracy, completeness, and appropriate tone.
@@ -658,8 +702,10 @@ tables are omitted, with unchanged historical evidence and the original scores
 explicit in the reviewer response. Do not describe this as a controlled model
 improvement. Keep the original dry-run campaign unchanged and retain the eight strict
 planner-oracle deviations, generic early HTTP errors, ambiguous-drift admission
-and observed restart duplicates. Independent reproduction and public archive
-publication remain R5 gates; editor-scope tracking remains pending.
+and observed restart duplicates. R5 and supplementary raw archives are public
+under their separate verified version DOIs. Independent reproduction, author
+approval and the submission decision remain R5 gates; editor-scope tracking
+remains pending.
 Do not start H1 adapter code, buy hardware time, or expand
 the software into a replicated scheduler as an implicit consequence of this
 roadmap.

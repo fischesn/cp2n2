@@ -1,0 +1,30 @@
+{
+  "schema": "gemini-selector-provenance-v1",
+  "received_on": "2026-10-14",
+  "generation_date": null,
+  "model_display_name": "Gemini Flash 3.8",
+  "reasoning_effort": "high",
+  "metadata_source": "author confirmation in this conversation",
+  "author_reported_text": "Ja, unverändert, und es ist Gemini Flash 3.8 mit hohem Aufwand",
+  "first_response": true,
+  "response_unmodified": true,
+  "provider_api_model_id": null,
+  "provider_request_id": null,
+  "separate_context_without_code_or_previous_results": "not yet explicitly confirmed",
+  "prompt_source": {
+    "thread_id": "019f97f5-9d3c-7101-acc6-b96a4d2ea08a",
+    "turn_id": "01a13b36-6f52-77a0-9f6b-821a32449c99",
+    "turn_started_at": "2026-10-14T16:19:45.000Z",
+    "file": "prompt-issued.txt",
+    "note": "English prompt recovered from the original assistant message; not an archived Gemini API request."
+  },
+  "raw_response": {
+    "file": "gemini-response-original.json",
+    "sha256": "24ac85aa6f4266eef574cedbb42861931aa0907339d45b689b4669d18ef229a1",
+    "source": "user-pasted attachment"
+  },
+  "functional_source_before_receipt": "../ap1-ap3-source-freeze.json",
+  "status": "preexecution_review; author approval and dataset freeze pending",
+  "production_selector_executed": false,
+  "expected_outcomes_modified": false
+}

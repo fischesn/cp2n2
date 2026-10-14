@@ -6,7 +6,8 @@ not raw experiment data and not a submitted or author-approved resubmission.
 - [All 22 responses](RESPONSE-TO-REVIEWERS.md), with concern, response, action,
   manuscript location and evidence.
 - [Response Word](cp2n2-response-to-reviewers.docx) and
-  [response PDF](cp2n2-response-to-reviewers.pdf): 10 pages.
+  [response PDF](cp2n2-response-to-reviewers.pdf): 13 pages, incorporating the
+  14 October supplementary evidence and explicit partial-fulfillment reasoning.
 - [Official checklist Word](cp2n2-resubmission-checklist.docx) and
   [checklist PDF](cp2n2-resubmission-checklist.pdf): 3 pages, ten empty boxes.
 - [Ten-item checklist status](RESUBMISSION-CHECKLIST-STATUS.md): prepared
@@ -21,6 +22,7 @@ canonical source, rebuild and inspect document exports there, then synchronize;
 do not maintain a second independent response here.
 
 See the [R5 integration report](../r5-integration-results.md) for measured
-evidence and scope limits and the [revision roadmap](../../ieee-access-revision-roadmap.md)
+evidence and the [supplementary integration](../supplementary-paper-integration.md)
+for the new local checkpoint; the [revision roadmap](../../ieee-access-revision-roadmap.md)
 for remaining approval/publication gates. A Git push does not publish the new
 experiment bundle on Zenodo or submit the paper.

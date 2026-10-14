@@ -1,0 +1,1708 @@
+{
+"schema_version": "gemini-selector-blind-v1",
+"cases": [
+{
+"id": "case-01-all-candidates-disqualified",
+"scenario": "Industrial robotics emergency stop selector where all candidates are disqualified across distinct admission and feasibility rules.",
+"task": {
+"latency_budget": 20.0,
+"max_age": 100.0,
+"max_cost": 5.0,
+"required_telemetry": [
+"drift_score"
+],
+"supervision": false,
+"locality": "edge",
+"stochasticity_tolerance": 0.1,
+"reset_free": true
+},
+"resources": [
+{
+"id": "res-spikes-only",
+"latency": 10.0,
+"drift": 0.05,
+"age": 20.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 2.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"spikes"
+]
+},
+{
+"id": "res-unsupervised-mismatch",
+"latency": 12.0,
+"drift": 0.04,
+"age": 30.0,
+"health": "ready",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 3.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": true,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "res-offline-failed",
+"latency": 15.0,
+"drift": 0.1,
+"age": 50.0,
+"health": "offline",
+"lifecycle": "failed",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "res-budget-exceeded",
+"latency": 25.0,
+"drift": 0.05,
+"age": 80.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 7.5,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [],
+"rejections": {
+"res-spikes-only": {
+"stage": "admission",
+"failed_rules": [
+"A1"
+],
+"explanation": "Resource modalities ['spikes'] do not include digital_vector."
+},
+"res-unsupervised-mismatch": {
+"stage": "admission",
+"failed_rules": [
+"A3"
+],
+"explanation": "Resource requires supervision (supervision_required is true) but task supervision is false."
+},
+"res-offline-failed": {
+"stage": "feasibility",
+"failed_rules": [
+"F1",
+"F2"
+],
+"explanation": "Health is offline (fails F1) and lifecycle is failed (fails F2)."
+},
+"res-budget-exceeded": {
+"stage": "feasibility",
+"failed_rules": [
+"F5",
+"F8"
+],
+"explanation": "Latency 25.0 ms exceeds latency_budget 20.0 ms (fails F5) and cost 7.5 eur exceeds max_cost 5.0 eur (fails F8)."
+}
+},
+"rankings": {
+"lexicographic": [],
+"latency_first": [],
+"locality_cost_first": []
+},
+"selected": {
+"lexicographic": null,
+"latency_first": null,
+"locality_cost_first": null
+},
+"reasoning_by_policy": {
+"lexicographic": "No candidates are admissible; ranking is empty and selection is null.",
+"latency_first": "No candidates are admissible; ranking is empty and selection is null.",
+"locality_cost_first": "No candidates are admissible; ranking is empty and selection is null."
+}
+},
+"test_purpose": "Verify zero-admissible handling, ensuring admission rejections short-circuit feasibility and multi-rule failures at both stages are reported."
+},
+{
+"id": "case-02-lone-survivor-attractive-inadmissible",
+"scenario": "Automated driving edge perception where superficially high-performing candidates fail admission or feasibility, leaving a single viable candidate.",
+"task": {
+"latency_budget": 50.0,
+"max_age": 200.0,
+"max_cost": 1.0,
+"required_telemetry": [],
+"supervision": true,
+"locality": "edge",
+"stochasticity_tolerance": 0.5,
+"reset_free": false
+},
+"resources": [
+{
+"id": "edge-blazing-inadmissible",
+"latency": 4.0,
+"drift": 0.01,
+"age": 10.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 0.1,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": false,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "edge-aborting-lifecycle",
+"latency": 8.0,
+"drift": 0.02,
+"age": 20.0,
+"health": "healthy",
+"lifecycle": "aborting",
+"reservable": true,
+"cost": 0.2,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "cloud-unreservable",
+"latency": 25.0,
+"drift": 0.05,
+"age": 30.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": false,
+"cost": 0.5,
+"currency": "eur",
+"locality": "cloud",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "edge-workhorse",
+"latency": 45.0,
+"drift": 0.3,
+"age": 150.0,
+"health": "ready",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 0.85,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [
+"edge-workhorse"
+],
+"rejections": {
+"edge-blazing-inadmissible": {
+"stage": "admission",
+"failed_rules": [
+"A4"
+],
+"explanation": "contract_admissible is false."
+},
+"edge-aborting-lifecycle": {
+"stage": "feasibility",
+"failed_rules": [
+"F2"
+],
+"explanation": "Lifecycle state is aborting, which is rejected by F2."
+},
+"cloud-unreservable": {
+"stage": "feasibility",
+"failed_rules": [
+"F3"
+],
+"explanation": "reservable is false."
+}
+},
+"rankings": {
+"lexicographic": [
+"edge-workhorse"
+],
+"latency_first": [
+"edge-workhorse"
+],
+"locality_cost_first": [
+"edge-workhorse"
+]
+},
+"selected": {
+"lexicographic": "edge-workhorse",
+"latency_first": "edge-workhorse",
+"locality_cost_first": "edge-workhorse"
+},
+"reasoning_by_policy": {
+"lexicographic": "Only edge-workhorse is admissible; automatically ranked first.",
+"latency_first": "Only edge-workhorse is admissible; automatically ranked first.",
+"locality_cost_first": "Only edge-workhorse is admissible; automatically ranked first."
+}
+},
+"test_purpose": "Ensure attractive candidates with ultra-low latency or cost do not bypass contract admissibility (A4), lifecycle feasibility (F2), or reservability (F3)."
+},
+{
+"id": "case-03-three-way-policy-divergence",
+"scenario": "Multi-region inference task where candidates dominate different orthogonal dimensions, producing three distinct selections across three policies.",
+"task": {
+"latency_budget": 100.0,
+"max_age": 1000.0,
+"max_cost": 5.0,
+"required_telemetry": [
+"drift_score"
+],
+"supervision": true,
+"locality": "edge",
+"stochasticity_tolerance": 0.5,
+"reset_free": false
+},
+"resources": [
+{
+"id": "res-alpha-health",
+"latency": 85.0,
+"drift": 0.02,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 3.5,
+"currency": "eur",
+"locality": "cloud",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": true,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "res-beta-speed",
+"latency": 15.0,
+"drift": 0.15,
+"age": 200.0,
+"health": "degraded",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 4.0,
+"currency": "eur",
+"locality": "cloud",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "res-gamma-local",
+"latency": 60.0,
+"drift": 0.25,
+"age": 400.0,
+"health": "degraded",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 0.5,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [
+"res-alpha-health",
+"res-beta-speed",
+"res-gamma-local"
+],
+"rejections": {},
+"rankings": {
+"lexicographic": [
+"res-alpha-health",
+"res-beta-speed",
+"res-gamma-local"
+],
+"latency_first": [
+"res-beta-speed",
+"res-gamma-local",
+"res-alpha-health"
+],
+"locality_cost_first": [
+"res-gamma-local",
+"res-alpha-health",
+"res-beta-speed"
+]
+},
+"selected": {
+"lexicographic": "res-alpha-health",
+"latency_first": "res-beta-speed",
+"locality_cost_first": "res-gamma-local"
+},
+"reasoning_by_policy": {
+"lexicographic": "S group evaluates first. res-alpha-health has health_penalty 0, beating degraded health_penalty 1 of beta and gamma. Between beta and gamma, beta has lower drift (0.15 vs 0.25).",
+"latency_first": "L group evaluates first. Normalized latencies are beta (0.15), gamma (0.60), and alpha (0.85), yielding an unambiguous ascending ranking.",
+"locality_cost_first": "C group evaluates first. res-gamma-local has locality_penalty 0 (edge match), beating alpha and beta with locality_penalty 6. Between alpha and beta, alpha has lower cost (3.5 vs 4.0)."
+}
+},
+"test_purpose": "Demonstrate complete three-way policy divergence where lexicographic, latency_first, and locality_cost_first select three completely distinct resources."
+},
+{
+"id": "case-04-exact-feasibility-boundaries",
+"scenario": "Precision boundary evaluation testing exact equality on inclusive feasibility boundaries (latency, age, cost) and strict inequality on drift.",
+"task": {
+"latency_budget": 100.0,
+"max_age": 500.0,
+"max_cost": 10.0,
+"required_telemetry": [],
+"supervision": true,
+"locality": null,
+"stochasticity_tolerance": 0.5,
+"reset_free": false
+},
+"resources": [
+{
+"id": "node-exact-boundary",
+"latency": 100.0,
+"drift": 0.949,
+"age": 500.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 10.0,
+"currency": "eur",
+"locality": "cloud",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "node-drift-at-limit",
+"latency": 50.0,
+"drift": 0.95,
+"age": 200.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 5.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "node-latency-exceeded",
+"latency": 100.01,
+"drift": 0.1,
+"age": 200.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 5.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "node-age-exceeded",
+"latency": 50.0,
+"drift": 0.1,
+"age": 500.01,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 5.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "node-cost-exceeded",
+"latency": 50.0,
+"drift": 0.1,
+"age": 200.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 10.01,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [
+"node-exact-boundary"
+],
+"rejections": {
+"node-drift-at-limit": {
+"stage": "feasibility",
+"failed_rules": [
+"F6"
+],
+"explanation": "Drift 0.95 violates the strict inequality drift < 0.95."
+},
+"node-latency-exceeded": {
+"stage": "feasibility",
+"failed_rules": [
+"F5"
+],
+"explanation": "Latency 100.01 exceeds latency_budget 100.0."
+},
+"node-age-exceeded": {
+"stage": "feasibility",
+"failed_rules": [
+"F7"
+],
+"explanation": "Age 500.01 exceeds max_age 500.0."
+},
+"node-cost-exceeded": {
+"stage": "feasibility",
+"failed_rules": [
+"F8"
+],
+"explanation": "Cost 10.01 exceeds max_cost 10.0."
+}
+},
+"rankings": {
+"lexicographic": [
+"node-exact-boundary"
+],
+"latency_first": [
+"node-exact-boundary"
+],
+"locality_cost_first": [
+"node-exact-boundary"
+]
+},
+"selected": {
+"lexicographic": "node-exact-boundary",
+"latency_first": "node-exact-boundary",
+"locality_cost_first": "node-exact-boundary"
+},
+"reasoning_by_policy": {
+"lexicographic": "Only node-exact-boundary passes all feasibility thresholds; selected automatically.",
+"latency_first": "Only node-exact-boundary passes all feasibility thresholds; selected automatically.",
+"locality_cost_first": "Only node-exact-boundary passes all feasibility thresholds; selected automatically."
+}
+},
+"test_purpose": "Verify exact numerical boundary behaviors: inclusive <= for latency, age, and cost, versus strict < for drift (where drift=0.95 fails F6)."
+},
+{
+"id": "case-05-exact-id-tie-breaker",
+"scenario": "Clustered identical resources with identical S, Q, L, and C tuple values to test deterministic alphanumeric resource identifier tie-breaking.",
+"task": {
+"latency_budget": 50.0,
+"max_age": 200.0,
+"max_cost": 2.0,
+"required_telemetry": [
+"drift_score"
+],
+"supervision": true,
+"locality": "edge",
+"stochasticity_tolerance": 0.5,
+"reset_free": false
+},
+"resources": [
+{
+"id": "cluster-worker-b",
+"latency": 25.0,
+"drift": 0.1,
+"age": 100.0,
+"health": "ready",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "cluster-worker-a",
+"latency": 25.0,
+"drift": 0.1,
+"age": 100.0,
+"health": "ready",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "cluster-worker-c",
+"latency": 30.0,
+"drift": 0.1,
+"age": 100.0,
+"health": "ready",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [
+"cluster-worker-a",
+"cluster-worker-b",
+"cluster-worker-c"
+],
+"rejections": {},
+"rankings": {
+"lexicographic": [
+"cluster-worker-a",
+"cluster-worker-b",
+"cluster-worker-c"
+],
+"latency_first": [
+"cluster-worker-a",
+"cluster-worker-b",
+"cluster-worker-c"
+],
+"locality_cost_first": [
+"cluster-worker-a",
+"cluster-worker-b",
+"cluster-worker-c"
+]
+},
+"selected": {
+"lexicographic": "cluster-worker-a",
+"latency_first": "cluster-worker-a",
+"locality_cost_first": "cluster-worker-a"
+},
+"reasoning_by_policy": {
+"lexicographic": "cluster-worker-a and cluster-worker-b produce identical tuples across S, Q, L, and C. The tie is broken by ascending ASCII identifier ('cluster-worker-a' < 'cluster-worker-b'). Both beat cluster-worker-c on latency (25.0 vs 30.0 ms).",
+"latency_first": "L normalized latency for worker-a and worker-b is 0.50, beating worker-c at 0.60. worker-a and worker-b tie across all subsequent tuple elements, resolved by id.",
+"locality_cost_first": "C and S groups are identical across all three. L separates worker-a and worker-b (0.50) from worker-c (0.60). ID tie-breaker places worker-a first."
+}
+},
+"test_purpose": "Verify exact ranking tuple collision resolution and guarantee that input registration order does not alter deterministic ASCII identifier tie-breaking."
+},
+{
+"id": "case-06-null-cost-and-null-age-semantics",
+"scenario": "Handling optional versus required fields: unconstrained task cost allows null resource cost (with ranking penalty cost_unknown=1), whereas null age is strictly rejected by F7.",
+"task": {
+"latency_budget": 80.0,
+"max_age": 400.0,
+"max_cost": null,
+"required_telemetry": [],
+"supervision": false,
+"locality": null,
+"stochasticity_tolerance": 0.5,
+"reset_free": false
+},
+"resources": [
+{
+"id": "res-cost-null",
+"latency": 40.0,
+"drift": 0.2,
+"age": 100.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": null,
+"currency": "eur",
+"locality": "cloud",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "res-cost-known-free",
+"latency": 40.0,
+"drift": 0.2,
+"age": 100.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 0.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "res-cost-known-paid",
+"latency": 40.0,
+"drift": 0.2,
+"age": 100.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 2.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "res-age-missing",
+"latency": 30.0,
+"drift": 0.1,
+"age": null,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [
+"res-cost-known-free",
+"res-cost-known-paid",
+"res-cost-null"
+],
+"rejections": {
+"res-age-missing": {
+"stage": "feasibility",
+"failed_rules": [
+"F7"
+],
+"explanation": "age is null, failing F7 which requires non-null age <= max_age."
+}
+},
+"rankings": {
+"lexicographic": [
+"res-cost-known-free",
+"res-cost-known-paid",
+"res-cost-null"
+],
+"latency_first": [
+"res-cost-known-free",
+"res-cost-known-paid",
+"res-cost-null"
+],
+"locality_cost_first": [
+"res-cost-known-free",
+"res-cost-known-paid",
+"res-cost-null"
+]
+},
+"selected": {
+"lexicographic": "res-cost-known-free",
+"latency_first": "res-cost-known-free",
+"locality_cost_first": "res-cost-known-free"
+},
+"reasoning_by_policy": {
+"lexicographic": "S, Q, and L are identical. In C, locality_penalty is 0 (null task locality). cost_unknown is 0 for free and paid, beating null (cost_unknown=1). cost_or_0 separates 0.0 from 2.0.",
+"latency_first": "L, S, and locality_penalty are identical. cost_unknown and cost_or_0 determine the ranking order.",
+"locality_cost_first": "C group evaluates first: cost_unknown=0 places known-cost candidates ahead of null cost; cost_or_0=0.0 places free ahead of paid."
+}
+},
+"test_purpose": "Verify that null cost is admissible when task max_cost is null (with ranking penalty cost_unknown=1), whereas null age unconditionally fails feasibility rule F7."
+},
+{
+"id": "case-07-telemetry-enforcement-and-drift-tradeoff",
+"scenario": "Rigorous drift telemetry verification: missing drift fails feasibility under required telemetry, and age_supported=false is caught at admission.",
+"task": {
+"latency_budget": 60.0,
+"max_age": 300.0,
+"max_cost": 4.0,
+"required_telemetry": [
+"drift_score"
+],
+"supervision": true,
+"locality": "edge",
+"stochasticity_tolerance": 0.5,
+"reset_free": false
+},
+"resources": [
+{
+"id": "res-missing-drift",
+"latency": 20.0,
+"drift": null,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "res-age-unsupported",
+"latency": 25.0,
+"drift": 0.1,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.5,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": false,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "res-telemetry-ok-fast",
+"latency": 25.0,
+"drift": 0.3,
+"age": 100.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 2.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "res-telemetry-ok-precise",
+"latency": 45.0,
+"drift": 0.05,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [
+"res-telemetry-ok-fast",
+"res-telemetry-ok-precise"
+],
+"rejections": {
+"res-age-unsupported": {
+"stage": "admission",
+"failed_rules": [
+"A2"
+],
+"explanation": "age_supported is false, failing admission rule A2."
+},
+"res-missing-drift": {
+"stage": "feasibility",
+"failed_rules": [
+"F4"
+],
+"explanation": "drift_score is required by task but resource drift is null, failing F4."
+}
+},
+"rankings": {
+"lexicographic": [
+"res-telemetry-ok-precise",
+"res-telemetry-ok-fast"
+],
+"latency_first": [
+"res-telemetry-ok-fast",
+"res-telemetry-ok-precise"
+],
+"locality_cost_first": [
+"res-telemetry-ok-precise",
+"res-telemetry-ok-fast"
+]
+},
+"selected": {
+"lexicographic": "res-telemetry-ok-precise",
+"latency_first": "res-telemetry-ok-fast",
+"locality_cost_first": "res-telemetry-ok-precise"
+},
+"reasoning_by_policy": {
+"lexicographic": "S group evaluates first. Both have health_penalty 0. drift_or_1 gives res-telemetry-ok-precise (0.05) an advantage over res-telemetry-ok-fast (0.30).",
+"latency_first": "L group evaluates first. Normalized latency 25/60 (0.4167) of res-telemetry-ok-fast beats 45/60 (0.75) of res-telemetry-ok-precise.",
+"locality_cost_first": "C group evaluates first. Both match edge locality. cost_or_0 gives res-telemetry-ok-precise (1.0 eur) the win over res-telemetry-ok-fast (2.0 eur)."
+}
+},
+"test_purpose": "Test telemetry requirement enforcement under F4 and admission rejection under A2, contrasting drift minimization with latency minimization."
+},
+{
+"id": "case-08-modality-and-supervision-admission-rules",
+"scenario": "Multi-constraint admission barrier testing modalities (A1) and unfulfillable supervision requirements (A3) with multiple simultaneous failures.",
+"task": {
+"latency_budget": 50.0,
+"max_age": 250.0,
+"max_cost": 3.0,
+"required_telemetry": [],
+"supervision": false,
+"locality": "cloud",
+"stochasticity_tolerance": 0.8,
+"reset_free": false
+},
+"resources": [
+{
+"id": "res-spikes-modality",
+"latency": 20.0,
+"drift": 0.1,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "cloud",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"spikes"
+]
+},
+{
+"id": "res-requires-supervision",
+"latency": 15.0,
+"drift": 0.05,
+"age": 40.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 0.5,
+"currency": "eur",
+"locality": "cloud",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": true,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "res-multi-admission-fail",
+"latency": 10.0,
+"drift": 0.02,
+"age": 30.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 0.2,
+"currency": "eur",
+"locality": "cloud",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": true,
+"contract_admissible": false,
+"modalities": [
+"spikes"
+]
+},
+{
+"id": "res-autonomous-vector",
+"latency": 35.0,
+"drift": 0.12,
+"age": 80.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.5,
+"currency": "eur",
+"locality": "cloud",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [
+"res-autonomous-vector"
+],
+"rejections": {
+"res-spikes-modality": {
+"stage": "admission",
+"failed_rules": [
+"A1"
+],
+"explanation": "modalities ['spikes'] do not include digital_vector."
+},
+"res-requires-supervision": {
+"stage": "admission",
+"failed_rules": [
+"A3"
+],
+"explanation": "supervision_required is true but task supervision is false."
+},
+"res-multi-admission-fail": {
+"stage": "admission",
+"failed_rules": [
+"A1",
+"A3",
+"A4"
+],
+"explanation": "Resource fails modality requirement A1, supervision requirement A3, and contract admissibility A4."
+}
+},
+"rankings": {
+"lexicographic": [
+"res-autonomous-vector"
+],
+"latency_first": [
+"res-autonomous-vector"
+],
+"locality_cost_first": [
+"res-autonomous-vector"
+]
+},
+"selected": {
+"lexicographic": "res-autonomous-vector",
+"latency_first": "res-autonomous-vector",
+"locality_cost_first": "res-autonomous-vector"
+},
+"reasoning_by_policy": {
+"lexicographic": "Only res-autonomous-vector passes admission and feasibility; selected automatically.",
+"latency_first": "Only res-autonomous-vector passes admission and feasibility; selected automatically.",
+"locality_cost_first": "Only res-autonomous-vector passes admission and feasibility; selected automatically."
+}
+},
+"test_purpose": "Validate simultaneous multi-rule admission reporting (A1, A3, A4) and confirm that feasibility evaluation is never executed for admission rejections."
+},
+{
+"id": "case-09-health-penalty-vs-fatal-lifecycle",
+"scenario": "Differentiating soft health penalties (degraded=1, unknown=2) from hard exclusions (offline health, aborting lifecycle).",
+"task": {
+"latency_budget": 100.0,
+"max_age": 500.0,
+"max_cost": 10.0,
+"required_telemetry": [],
+"supervision": true,
+"locality": "edge",
+"stochasticity_tolerance": 0.5,
+"reset_free": false
+},
+"resources": [
+{
+"id": "node-healthy",
+"latency": 50.0,
+"drift": 0.1,
+"age": 100.0,
+"health": "ready",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 2.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "node-degraded",
+"latency": 30.0,
+"drift": 0.1,
+"age": 100.0,
+"health": "degraded",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 2.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "node-unknown",
+"latency": 20.0,
+"drift": 0.1,
+"age": 100.0,
+"health": "unknown",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 2.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "node-aborting",
+"latency": 10.0,
+"drift": 0.05,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "aborting",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "node-offline",
+"latency": 15.0,
+"drift": 0.05,
+"age": 50.0,
+"health": "offline",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [
+"node-degraded",
+"node-healthy",
+"node-unknown"
+],
+"rejections": {
+"node-aborting": {
+"stage": "feasibility",
+"failed_rules": [
+"F2"
+],
+"explanation": "Lifecycle is aborting, which fails F2."
+},
+"node-offline": {
+"stage": "feasibility",
+"failed_rules": [
+"F1"
+],
+"explanation": "Health is offline, which fails F1."
+}
+},
+"rankings": {
+"lexicographic": [
+"node-healthy",
+"node-degraded",
+"node-unknown"
+],
+"latency_first": [
+"node-unknown",
+"node-degraded",
+"node-healthy"
+],
+"locality_cost_first": [
+"node-healthy",
+"node-degraded",
+"node-unknown"
+]
+},
+"selected": {
+"lexicographic": "node-healthy",
+"latency_first": "node-unknown",
+"locality_cost_first": "node-healthy"
+},
+"reasoning_by_policy": {
+"lexicographic": "S group evaluates health_penalty first: ready/healthy=0 beats degraded=1 beats unknown=2.",
+"latency_first": "L group evaluates first: node-unknown has latency 20 ms (0.20), node-degraded 30 ms (0.30), node-healthy 50 ms (0.50).",
+"locality_cost_first": "C group is identical for all three candidates (locality_penalty 0, cost 2.0). Tie breaks to S group where health_penalty orders ready (0) < degraded (1) < unknown (2)."
+}
+},
+"test_purpose": "Demonstrate that degraded and unknown health are feasible but penalized in ranking, while offline health and aborting lifecycle trigger hard feasibility rejections."
+},
+{
+"id": "case-10-stochasticity-and-reset-penalties",
+"scenario": "Exhaustive evaluation of Q group penalty interaction (variability_penalty and reset_penalty) when tolerance < 0.25 and reset_free is true.",
+"task": {
+"latency_budget": 50.0,
+"max_age": 200.0,
+"max_cost": 5.0,
+"required_telemetry": [],
+"supervision": true,
+"locality": null,
+"stochasticity_tolerance": 0.2,
+"reset_free": true
+},
+"resources": [
+{
+"id": "worker-clean",
+"latency": 25.0,
+"drift": 0.1,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "worker-stateful-only",
+"latency": 25.0,
+"drift": 0.1,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": true,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "worker-stochastic-only",
+"latency": 25.0,
+"drift": 0.1,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": true,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "worker-stochastic-stateful",
+"latency": 25.0,
+"drift": 0.1,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": true,
+"stateful": true,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [
+"worker-clean",
+"worker-stateful-only",
+"worker-stochastic-only",
+"worker-stochastic-stateful"
+],
+"rejections": {},
+"rankings": {
+"lexicographic": [
+"worker-clean",
+"worker-stateful-only",
+"worker-stochastic-only",
+"worker-stochastic-stateful"
+],
+"latency_first": [
+"worker-clean",
+"worker-stateful-only",
+"worker-stochastic-only",
+"worker-stochastic-stateful"
+],
+"locality_cost_first": [
+"worker-clean",
+"worker-stateful-only",
+"worker-stochastic-only",
+"worker-stochastic-stateful"
+]
+},
+"selected": {
+"lexicographic": "worker-clean",
+"latency_first": "worker-clean",
+"locality_cost_first": "worker-clean"
+},
+"reasoning_by_policy": {
+"lexicographic": "S is identical across all four candidates. Q compares variability_penalty then reset_penalty: clean=[0,0], stateful-only=[0,1], stochastic-only=[1,0], both=[1,1]. [0,0] < [0,1] < [1,0] < [1,1].",
+"latency_first": "L, S, and C are identical across all candidates; Q decides the order identically to lexicographic.",
+"locality_cost_first": "C, S, and L are identical across all candidates; Q decides the order identically to lexicographic."
+}
+},
+"test_purpose": "Validate lexicographic ordering within Q: variability_penalty is compared before reset_penalty, proving [0,1] beats [1,0]."
+},
+{
+"id": "case-11-stochasticity-tolerance-exact-boundary",
+"scenario": "Testing strict inequality on stochasticity tolerance boundary: tolerance=0.25 does NOT incur variability penalty because condition is tolerance < 0.25.",
+"task": {
+"latency_budget": 50.0,
+"max_age": 200.0,
+"max_cost": 5.0,
+"required_telemetry": [],
+"supervision": true,
+"locality": "edge",
+"stochasticity_tolerance": 0.25,
+"reset_free": false
+},
+"resources": [
+{
+"id": "dev-stochastic-node",
+"latency": 20.0,
+"drift": 0.1,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": true,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "dev-deterministic-node",
+"latency": 20.0,
+"drift": 0.1,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "dev-faster-cloud",
+"latency": 10.0,
+"drift": 0.1,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 1.0,
+"currency": "eur",
+"locality": "cloud",
+"stochastic": true,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "dev-unreservable",
+"latency": 15.0,
+"drift": 0.1,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": false,
+"cost": 1.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [
+"dev-deterministic-node",
+"dev-faster-cloud",
+"dev-stochastic-node"
+],
+"rejections": {
+"dev-unreservable": {
+"stage": "feasibility",
+"failed_rules": [
+"F3"
+],
+"explanation": "reservable is false."
+}
+},
+"rankings": {
+"lexicographic": [
+"dev-faster-cloud",
+"dev-deterministic-node",
+"dev-stochastic-node"
+],
+"latency_first": [
+"dev-faster-cloud",
+"dev-deterministic-node",
+"dev-stochastic-node"
+],
+"locality_cost_first": [
+"dev-deterministic-node",
+"dev-stochastic-node",
+"dev-faster-cloud"
+]
+},
+"selected": {
+"lexicographic": "dev-faster-cloud",
+"latency_first": "dev-faster-cloud",
+"locality_cost_first": "dev-deterministic-node"
+},
+"reasoning_by_policy": {
+"lexicographic": "Since stochasticity_tolerance=0.25 is not < 0.25, variability_penalty is 0 for dev-stochastic-node and dev-faster-cloud. S and Q are equal. L gives dev-faster-cloud (0.20) the win over the 0.40 edge nodes. Between deterministic and stochastic, all values tie and ID breaks the tie.",
+"latency_first": "L places dev-faster-cloud (10 ms) first. dev-deterministic-node and dev-stochastic-node tie on all metrics and resolve by ID.",
+"locality_cost_first": "C group penalizes cloud (locality_penalty 6 vs 0). Both edge nodes beat cloud. dev-deterministic-node beats dev-stochastic-node on ID."
+}
+},
+"test_purpose": "Confirm the strict boundary check stochasticity_tolerance < 0.25: at exactly 0.25, no variability penalty is assessed on stochastic candidates."
+},
+{
+"id": "case-12-locality-penalty-tradeoff",
+"scenario": "High locality penalty (6) applied to cloud candidate against edge candidates with contrasting latency and cost profiles.",
+"task": {
+"latency_budget": 100.0,
+"max_age": 500.0,
+"max_cost": 10.0,
+"required_telemetry": [
+"drift_score"
+],
+"supervision": false,
+"locality": "edge",
+"stochasticity_tolerance": 0.5,
+"reset_free": false
+},
+"resources": [
+{
+"id": "host-edge-cheap",
+"latency": 80.0,
+"drift": 0.1,
+"age": 100.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 0.5,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "host-edge-fast",
+"latency": 30.0,
+"drift": 0.1,
+"age": 100.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 4.0,
+"currency": "eur",
+"locality": "edge",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+},
+{
+"id": "host-cloud-hyperscale",
+"latency": 10.0,
+"drift": 0.05,
+"age": 50.0,
+"health": "healthy",
+"lifecycle": "ready",
+"reservable": true,
+"cost": 0.1,
+"currency": "eur",
+"locality": "cloud",
+"stochastic": false,
+"stateful": false,
+"age_supported": true,
+"supervision_required": false,
+"contract_admissible": true,
+"modalities": [
+"digital_vector"
+]
+}
+],
+"expected": {
+"admissible_resource_ids": [
+"host-cloud-hyperscale",
+"host-edge-cheap",
+"host-edge-fast"
+],
+"rejections": {},
+"rankings": {
+"lexicographic": [
+"host-cloud-hyperscale",
+"host-edge-fast",
+"host-edge-cheap"
+],
+"latency_first": [
+"host-cloud-hyperscale",
+"host-edge-fast",
+"host-edge-cheap"
+],
+"locality_cost_first": [
+"host-edge-cheap",
+"host-edge-fast",
+"host-cloud-hyperscale"
+]
+},
+"selected": {
+"lexicographic": "host-cloud-hyperscale",
+"latency_first": "host-cloud-hyperscale",
+"locality_cost_first": "host-edge-cheap"
+},
+"reasoning_by_policy": {
+"lexicographic": "S group evaluates first. host-cloud-hyperscale has drift 0.05 vs 0.10 for the edge nodes, securing first place. Between the edge nodes, fast beats cheap on L (0.30 vs 0.80).",
+"latency_first": "L normalized latency places hyperscale (0.10) first, edge-fast (0.30) second, and edge-cheap (0.80) third.",
+"locality_cost_first": "C group evaluates first. Both edge nodes have locality_penalty 0, easily beating hyperscale (penalty 6). Between the edge nodes, host-edge-cheap has cost 0.50 vs host-edge-fast 4.00."
+}
+},
+"test_purpose": "Test that the locality penalty of 6 decisively overrides low cost and latency under locality_cost_first, while lexicographic and latency_first policies favor the cloud candidate."
+}
+],
+"coverage_summary": [
+"Evaluates zero admissible candidates in Case 1 due to multi-rule admission and feasibility exclusions.",
+"Evaluates exactly one admissible candidate in Cases 2, 4, and 8, filtering out attractive candidates with disqualifying lifecycle, admission, or boundary violations.",
+"Evaluates multiple admissible candidates with interacting trade-offs in Cases 3, 5, 6, 7, 9, 10, 11, and 12.",
+"Verifies inclusive numeric boundaries for latency (latency == latency_budget), age (age == max_age), and cost (cost == max_cost) alongside the exclusive drift boundary (drift == 0.95 fails F6) in Case 4.",
+"Verifies exact ranking ties and deterministic alphanumeric resource identifier tie-breaking in Case 5 and Case 11.",
+"Covers missing optional versus required information including null cost when max_cost is null (Case 6), null age rejection under F7 (Case 6), and null drift rejection under required telemetry (Case 7).",
+"Exhaustively validates policy divergence across lexicographic, latency_first, and locality_cost_first policies, including a complete 3-way winner split in Case 3 and distinct priority shifts in Cases 9, 11, and 12.",
+"Tests stochasticity tolerance boundary condition (tolerance < 0.25 vs tolerance == 0.25) and reset_free stateful penalty combinations in Cases 10 and 11.",
+"Covers degraded and unknown health states surviving feasibility with respective ranking penalties (1 and 2) while offline health and aborting lifecycle trigger hard feasibility exclusions in Case 9.",
+"Validates isolation of admission stage failures (A1, A2, A3, A4) preventing downstream feasibility evaluation in Cases 1, 2, 7, and 8."
+],
+"specification_questions": [
+"Ambiguity in 'admissible' terminology: The contract distinguishes the 'admission' stage (rules A1-A4) from the 'feasibility' stage (rules F1-F8), but subsequently refers to resources entering ranking as 'admissible resources' ('Rank admissible resources by ascending lexicographic tuples... Each ranking contains every admissible resource exactly once'). This dataset interprets 'admissible_resource_ids' and ranking eligibility as candidates that survived BOTH admission and feasibility, matching the rejection stages schema.",
+"Ambiguity in drift requirement rule overlap: Rule F4 states 'If drift_score is required, drift is not null', while rule F6 states 'A null drift is permitted only when drift_score is not required.' When required_telemetry includes 'drift_score' and drift is null, it is ambiguous whether the engine should report failure of F4 only, or both F4 and F6. In this dataset, Case 7 reports F4 as the primary violation.",
+"Fixed zero component in group S: The definition of group S specifies a constant 0 as its second element ([health_penalty, 0, drift_or_1, age / max_age]). While mathematically well-defined, its architectural rationale (e.g., placeholder for future confidence score or reserved capability flag) is unstated."
+]
+}

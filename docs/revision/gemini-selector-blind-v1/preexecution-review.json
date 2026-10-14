@@ -1,0 +1,463 @@
+{
+  "schema": "gemini-selector-preexecution-review-v1",
+  "production_selector_executed": false,
+  "case_count": 12,
+  "resource_count": 47,
+  "eligible_resource_declarations": 27,
+  "policy_decisions": 36,
+  "internal_consistency_issues": [],
+  "overlapping_rule_differences": [
+    {
+      "case": "case-07-telemetry-enforcement-and-drift-tradeoff",
+      "resource": "res-missing-drift",
+      "reported": [
+        "F4"
+      ],
+      "strict_literal_overlapping_rules": [
+        "F4",
+        "F6"
+      ]
+    }
+  ],
+  "rule_convention": "PROPOSED: F4 reports required drift absence; F6 reports numeric drift >=0.95. Author approval pending.",
+  "rows": [
+    {
+      "case": "case-01-all-candidates-disqualified",
+      "resources": 4,
+      "eligible": 0,
+      "selected": {
+        "lexicographic": null,
+        "latency_first": null,
+        "locality_cost_first": null
+      },
+      "rankings": {
+        "lexicographic": [],
+        "latency_first": [],
+        "locality_cost_first": []
+      },
+      "rejections": {
+        "res-spikes-only": {
+          "stage": "admission",
+          "failed_rules": [
+            "A1"
+          ]
+        },
+        "res-unsupervised-mismatch": {
+          "stage": "admission",
+          "failed_rules": [
+            "A3"
+          ]
+        },
+        "res-offline-failed": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F1",
+            "F2"
+          ]
+        },
+        "res-budget-exceeded": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F5",
+            "F8"
+          ]
+        }
+      }
+    },
+    {
+      "case": "case-02-lone-survivor-attractive-inadmissible",
+      "resources": 4,
+      "eligible": 1,
+      "selected": {
+        "lexicographic": "edge-workhorse",
+        "latency_first": "edge-workhorse",
+        "locality_cost_first": "edge-workhorse"
+      },
+      "rankings": {
+        "lexicographic": [
+          "edge-workhorse"
+        ],
+        "latency_first": [
+          "edge-workhorse"
+        ],
+        "locality_cost_first": [
+          "edge-workhorse"
+        ]
+      },
+      "rejections": {
+        "edge-blazing-inadmissible": {
+          "stage": "admission",
+          "failed_rules": [
+            "A4"
+          ]
+        },
+        "edge-aborting-lifecycle": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F2"
+          ]
+        },
+        "cloud-unreservable": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F3"
+          ]
+        }
+      }
+    },
+    {
+      "case": "case-03-three-way-policy-divergence",
+      "resources": 3,
+      "eligible": 3,
+      "selected": {
+        "lexicographic": "res-alpha-health",
+        "latency_first": "res-beta-speed",
+        "locality_cost_first": "res-gamma-local"
+      },
+      "rankings": {
+        "lexicographic": [
+          "res-alpha-health",
+          "res-beta-speed",
+          "res-gamma-local"
+        ],
+        "latency_first": [
+          "res-beta-speed",
+          "res-gamma-local",
+          "res-alpha-health"
+        ],
+        "locality_cost_first": [
+          "res-gamma-local",
+          "res-alpha-health",
+          "res-beta-speed"
+        ]
+      },
+      "rejections": {}
+    },
+    {
+      "case": "case-04-exact-feasibility-boundaries",
+      "resources": 5,
+      "eligible": 1,
+      "selected": {
+        "lexicographic": "node-exact-boundary",
+        "latency_first": "node-exact-boundary",
+        "locality_cost_first": "node-exact-boundary"
+      },
+      "rankings": {
+        "lexicographic": [
+          "node-exact-boundary"
+        ],
+        "latency_first": [
+          "node-exact-boundary"
+        ],
+        "locality_cost_first": [
+          "node-exact-boundary"
+        ]
+      },
+      "rejections": {
+        "node-drift-at-limit": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F6"
+          ]
+        },
+        "node-latency-exceeded": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F5"
+          ]
+        },
+        "node-age-exceeded": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F7"
+          ]
+        },
+        "node-cost-exceeded": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F8"
+          ]
+        }
+      }
+    },
+    {
+      "case": "case-05-exact-id-tie-breaker",
+      "resources": 3,
+      "eligible": 3,
+      "selected": {
+        "lexicographic": "cluster-worker-a",
+        "latency_first": "cluster-worker-a",
+        "locality_cost_first": "cluster-worker-a"
+      },
+      "rankings": {
+        "lexicographic": [
+          "cluster-worker-a",
+          "cluster-worker-b",
+          "cluster-worker-c"
+        ],
+        "latency_first": [
+          "cluster-worker-a",
+          "cluster-worker-b",
+          "cluster-worker-c"
+        ],
+        "locality_cost_first": [
+          "cluster-worker-a",
+          "cluster-worker-b",
+          "cluster-worker-c"
+        ]
+      },
+      "rejections": {}
+    },
+    {
+      "case": "case-06-null-cost-and-null-age-semantics",
+      "resources": 4,
+      "eligible": 3,
+      "selected": {
+        "lexicographic": "res-cost-known-free",
+        "latency_first": "res-cost-known-free",
+        "locality_cost_first": "res-cost-known-free"
+      },
+      "rankings": {
+        "lexicographic": [
+          "res-cost-known-free",
+          "res-cost-known-paid",
+          "res-cost-null"
+        ],
+        "latency_first": [
+          "res-cost-known-free",
+          "res-cost-known-paid",
+          "res-cost-null"
+        ],
+        "locality_cost_first": [
+          "res-cost-known-free",
+          "res-cost-known-paid",
+          "res-cost-null"
+        ]
+      },
+      "rejections": {
+        "res-age-missing": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F7"
+          ]
+        }
+      }
+    },
+    {
+      "case": "case-07-telemetry-enforcement-and-drift-tradeoff",
+      "resources": 4,
+      "eligible": 2,
+      "selected": {
+        "lexicographic": "res-telemetry-ok-precise",
+        "latency_first": "res-telemetry-ok-fast",
+        "locality_cost_first": "res-telemetry-ok-precise"
+      },
+      "rankings": {
+        "lexicographic": [
+          "res-telemetry-ok-precise",
+          "res-telemetry-ok-fast"
+        ],
+        "latency_first": [
+          "res-telemetry-ok-fast",
+          "res-telemetry-ok-precise"
+        ],
+        "locality_cost_first": [
+          "res-telemetry-ok-precise",
+          "res-telemetry-ok-fast"
+        ]
+      },
+      "rejections": {
+        "res-missing-drift": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F4"
+          ]
+        },
+        "res-age-unsupported": {
+          "stage": "admission",
+          "failed_rules": [
+            "A2"
+          ]
+        }
+      }
+    },
+    {
+      "case": "case-08-modality-and-supervision-admission-rules",
+      "resources": 4,
+      "eligible": 1,
+      "selected": {
+        "lexicographic": "res-autonomous-vector",
+        "latency_first": "res-autonomous-vector",
+        "locality_cost_first": "res-autonomous-vector"
+      },
+      "rankings": {
+        "lexicographic": [
+          "res-autonomous-vector"
+        ],
+        "latency_first": [
+          "res-autonomous-vector"
+        ],
+        "locality_cost_first": [
+          "res-autonomous-vector"
+        ]
+      },
+      "rejections": {
+        "res-spikes-modality": {
+          "stage": "admission",
+          "failed_rules": [
+            "A1"
+          ]
+        },
+        "res-requires-supervision": {
+          "stage": "admission",
+          "failed_rules": [
+            "A3"
+          ]
+        },
+        "res-multi-admission-fail": {
+          "stage": "admission",
+          "failed_rules": [
+            "A1",
+            "A3",
+            "A4"
+          ]
+        }
+      }
+    },
+    {
+      "case": "case-09-health-penalty-vs-fatal-lifecycle",
+      "resources": 5,
+      "eligible": 3,
+      "selected": {
+        "lexicographic": "node-healthy",
+        "latency_first": "node-unknown",
+        "locality_cost_first": "node-healthy"
+      },
+      "rankings": {
+        "lexicographic": [
+          "node-healthy",
+          "node-degraded",
+          "node-unknown"
+        ],
+        "latency_first": [
+          "node-unknown",
+          "node-degraded",
+          "node-healthy"
+        ],
+        "locality_cost_first": [
+          "node-healthy",
+          "node-degraded",
+          "node-unknown"
+        ]
+      },
+      "rejections": {
+        "node-aborting": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F2"
+          ]
+        },
+        "node-offline": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F1"
+          ]
+        }
+      }
+    },
+    {
+      "case": "case-10-stochasticity-and-reset-penalties",
+      "resources": 4,
+      "eligible": 4,
+      "selected": {
+        "lexicographic": "worker-clean",
+        "latency_first": "worker-clean",
+        "locality_cost_first": "worker-clean"
+      },
+      "rankings": {
+        "lexicographic": [
+          "worker-clean",
+          "worker-stateful-only",
+          "worker-stochastic-only",
+          "worker-stochastic-stateful"
+        ],
+        "latency_first": [
+          "worker-clean",
+          "worker-stateful-only",
+          "worker-stochastic-only",
+          "worker-stochastic-stateful"
+        ],
+        "locality_cost_first": [
+          "worker-clean",
+          "worker-stateful-only",
+          "worker-stochastic-only",
+          "worker-stochastic-stateful"
+        ]
+      },
+      "rejections": {}
+    },
+    {
+      "case": "case-11-stochasticity-tolerance-exact-boundary",
+      "resources": 4,
+      "eligible": 3,
+      "selected": {
+        "lexicographic": "dev-faster-cloud",
+        "latency_first": "dev-faster-cloud",
+        "locality_cost_first": "dev-deterministic-node"
+      },
+      "rankings": {
+        "lexicographic": [
+          "dev-faster-cloud",
+          "dev-deterministic-node",
+          "dev-stochastic-node"
+        ],
+        "latency_first": [
+          "dev-faster-cloud",
+          "dev-deterministic-node",
+          "dev-stochastic-node"
+        ],
+        "locality_cost_first": [
+          "dev-deterministic-node",
+          "dev-stochastic-node",
+          "dev-faster-cloud"
+        ]
+      },
+      "rejections": {
+        "dev-unreservable": {
+          "stage": "feasibility",
+          "failed_rules": [
+            "F3"
+          ]
+        }
+      }
+    },
+    {
+      "case": "case-12-locality-penalty-tradeoff",
+      "resources": 3,
+      "eligible": 3,
+      "selected": {
+        "lexicographic": "host-cloud-hyperscale",
+        "latency_first": "host-cloud-hyperscale",
+        "locality_cost_first": "host-edge-cheap"
+      },
+      "rankings": {
+        "lexicographic": [
+          "host-cloud-hyperscale",
+          "host-edge-fast",
+          "host-edge-cheap"
+        ],
+        "latency_first": [
+          "host-cloud-hyperscale",
+          "host-edge-fast",
+          "host-edge-cheap"
+        ],
+        "locality_cost_first": [
+          "host-edge-cheap",
+          "host-edge-fast",
+          "host-cloud-hyperscale"
+        ]
+      },
+      "rejections": {}
+    }
+  ]
+}

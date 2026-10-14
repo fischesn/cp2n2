@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from enum import Enum
+import math
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from descriptors.capability_schema import SubstrateDescriptor
 from descriptors.resource_contract import (
@@ -180,6 +181,22 @@ class AdapterInvocationResult(StrictContractModel):
         description="Backend-reported lifecycle state after invocation.",
     )
     notes: str | None = Field(default=None, description="Optional result notes.")
+
+    @field_validator("confidence", mode="before")
+    @classmethod
+    def confidence_is_a_real_number(cls, value):
+        """Do not coerce provider strings/bools into apparently valid evidence."""
+        if value is None:
+            return None
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise ValueError("confidence must be an actual finite number or null")
+        try:
+            finite = math.isfinite(float(value))
+        except (OverflowError, ValueError):
+            finite = False
+        if not finite:
+            raise ValueError("confidence must be finite")
+        return value
 
 
 def make_adapter_capability_declaration(

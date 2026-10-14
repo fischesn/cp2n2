@@ -1,0 +1,144 @@
+{
+  "schema": "ap1-ap3-evidence-index-v1",
+  "date": "2026-10-14",
+  "source_freeze": "docs/revision/ap1-ap3-source-freeze.json",
+  "source_bindings": [
+    {
+      "archive": "ap1-required-evidence-confirmatory-20261014-01",
+      "files_checked": 290,
+      "zip_entries": 290,
+      "mismatches": [],
+      "duplicate_entries": 0
+    },
+    {
+      "archive": "ap2-provider-errors-confirmatory-20261014-01",
+      "files_checked": 290,
+      "zip_entries": 290,
+      "mismatches": [],
+      "duplicate_entries": 0
+    },
+    {
+      "archive": "ap3-overhead-confirmatory-20261014-01",
+      "files_checked": 290,
+      "zip_entries": 290,
+      "mismatches": [],
+      "duplicate_entries": 0
+    }
+  ],
+  "artifacts": [
+    {
+      "path": ".cp2n2/ap1-required-evidence-confirmatory-20261014-01/freeze.json",
+      "sha256": "c560934d4e8ad4162d87880906771cd85785dc91759acac112719e1ad2241d58"
+    },
+    {
+      "path": ".cp2n2/ap1-required-evidence-confirmatory-20261014-01/manifest.json",
+      "sha256": "ac36a6517887e0ba129b37cd8e8937d144e743bb3238a0268dda61f3d407523a"
+    },
+    {
+      "path": ".cp2n2/ap1-required-evidence-confirmatory-20261014-01/verification.json",
+      "sha256": "7a7272f9ec4f9b592d6464ab42279f97a9ef956d50c5a2a910be299a32e0ef04"
+    },
+    {
+      "path": ".cp2n2/ap1-required-evidence-confirmatory-20261014-01/source-snapshot.zip",
+      "sha256": "a7a15cc8b00360f38d2f54b96f202ae485ee8b9e75f83c2971b525021ecada6b"
+    },
+    {
+      "path": ".cp2n2/ap1-required-evidence-confirmatory-20261014-01/specification.json",
+      "sha256": "c9c57a2b9d160a74e11d354d1bc65ba76d47e14e5076fa9127ccf95f07fff134"
+    },
+    {
+      "path": ".cp2n2/ap1-required-evidence-confirmatory-20261014-01/protocol.md",
+      "sha256": "f160fbcd4c341d181e76a437f697e1781157f6d12ff24f8c857e7338a1606cdf"
+    },
+    {
+      "path": ".cp2n2/ap2-provider-errors-confirmatory-20261014-01/freeze.json",
+      "sha256": "3ba29a40207019495b099304dcd7e44abbf40cb785d8211529d5dd8e984133f9"
+    },
+    {
+      "path": ".cp2n2/ap2-provider-errors-confirmatory-20261014-01/manifest.json",
+      "sha256": "745574f518a42a188b087a54f3743efa0be6f49751d03fe8bc29ca956f66277c"
+    },
+    {
+      "path": ".cp2n2/ap2-provider-errors-confirmatory-20261014-01/verification.json",
+      "sha256": "c0f6e5675a2b363a6b7e2d952f33fe44a55ea10af40e19263f8aee13b16adbec"
+    },
+    {
+      "path": ".cp2n2/ap2-provider-errors-confirmatory-20261014-01/source-snapshot.zip",
+      "sha256": "c3275570855ea9448843d92fcdc0fb8626d24f580fc430b8beefe727c87c33e2"
+    },
+    {
+      "path": ".cp2n2/ap2-provider-errors-confirmatory-20261014-01/specification.json",
+      "sha256": "553969e19b6d5566e3aa30e618c5ca18c523378ff6d0dbfc573fc7b03393d1e5"
+    },
+    {
+      "path": ".cp2n2/ap2-provider-errors-confirmatory-20261014-01/protocol.md",
+      "sha256": "7a9aeaa8f54403b8ada5d195e6e402a41d03d29ed5ec3490cf717acff01f670a"
+    },
+    {
+      "path": ".cp2n2/ap3-overhead-confirmatory-20261014-01/freeze.json",
+      "sha256": "e65382c4757337ad4679225a7298aff533a90dcdbc513c0d5ed89b385324530c"
+    },
+    {
+      "path": ".cp2n2/ap3-overhead-confirmatory-20261014-01/manifest.json",
+      "sha256": "5a884a07e32c508d6dd7ece68c75338f8f111a88e3cd33b7cac538c0ddd27bdf"
+    },
+    {
+      "path": ".cp2n2/ap3-overhead-confirmatory-20261014-01/verification.json",
+      "sha256": "e6ec41f549be39ee52c4462bf9abb6e45e865be52e1e8e2be9ca6f3bddf034ad"
+    },
+    {
+      "path": ".cp2n2/ap3-overhead-confirmatory-20261014-01/source-snapshot.zip",
+      "sha256": "df2d0b8f9728f489323ce978d89b7d5b3c38e4ec7e57834df6b0931e73722652"
+    },
+    {
+      "path": ".cp2n2/ap3-overhead-confirmatory-20261014-01/specification.json",
+      "sha256": "5ebb93cc73fc7464348a980935198c27947d6c5b58eb2736863db078a43445e3"
+    },
+    {
+      "path": ".cp2n2/ap3-overhead-confirmatory-20261014-01/protocol.md",
+      "sha256": "88f82215eb52de75ec52ed398854e4b7d6c5e6b41c784413d4a9a51ff32663c6"
+    },
+    {
+      "path": "docs/revision/ap1-ap3-source-freeze.json",
+      "sha256": "c17886444f0f60eccbf19ec925373f88ba8d9ea66df84d92f54763983e52a325"
+    }
+  ],
+  "summary": {
+    "ap1": {
+      "verified": true,
+      "ordinary_trials": 46,
+      "detector_trials": 4,
+      "ordinary_starts": 18,
+      "ordinary_commits": 18,
+      "successful_deliveries": 6,
+      "mcp_calls": 120,
+      "audit_events": 240
+    },
+    "ap2": {
+      "verified": true,
+      "trials": 18,
+      "http_calls": 96,
+      "http_statuses": [
+        200
+      ],
+      "primary_commits": 21,
+      "secondary_commits": 3
+    },
+    "ap3": {
+      "verified": true,
+      "fresh_registry_trials": 80,
+      "measured_operations": 32000,
+      "warmup_operations": 3200,
+      "all_operations_succeeded": true
+    }
+  },
+  "gemini_cases_received": false,
+  "paper_integration": "pending",
+  "post_campaign_regression": {
+    "passed": 402,
+    "seconds": 170.46,
+    "dependency_deprecation_warnings": 2,
+    "runtime_source_changed_after_freeze": false
+  },
+  "publication": "local ignored raw archives; not included in existing Zenodo DOI 10.5281/zenodo.23281161"
+}

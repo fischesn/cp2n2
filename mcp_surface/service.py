@@ -298,7 +298,13 @@ class MCPControlSurface:
         request: DiscoverResourcesInput,
     ) -> dict[str, Any]:
         resources = []
-        for contract in self.orchestrator.registry.list_resource_contracts():
+        unavailable = []
+        for resource_id in self.orchestrator.registry.list_backend_ids():
+            try:
+                contract = self.orchestrator.safe_resource_contract_for(resource_id)
+            except ControlPlaneException as exc:
+                unavailable.append({"resource_id": resource_id, "error": self._from_control_error(exc.error).model_dump(mode="json")})
+                continue
             view = self._resource_view(contract)
             if request.include_unavailable or view["lifecycle_state"] in {
                 "ready",
@@ -310,13 +316,14 @@ class MCPControlSurface:
             "resources": resources[: request.limit],
             "count": min(len(resources), request.limit),
             "available_tools_are_constrained": True,
+            "unavailable_resources": unavailable,
         }
 
     def _handle_describe_resource(
         self,
         request: DescribeResourceInput,
     ) -> dict[str, Any]:
-        contract = self.orchestrator.registry.resource_contract_for(
+        contract = self.orchestrator.safe_resource_contract_for(
             request.resource_id
         )
         return self._resource_view(contract, detailed=True)
@@ -392,9 +399,8 @@ class MCPControlSurface:
         )
         report = self.orchestrator.plan_task(task)
         candidate = report.best_candidate()
-        contract = self.orchestrator.registry.resource_contract_for(
-            request.resource_id
-        )
+        contract = self.orchestrator.safe_resource_contract_for(request.resource_id,
+            timeout_ms=task.preparation_timeout_ms, phase="prepare_assay", correlation_id=task.correlation_id)
         approval_required = self._requires_human_approval(contract)
         plan = {
             "resource_id": request.resource_id,
@@ -706,15 +712,26 @@ class MCPControlSurface:
     ) -> dict[str, Any]:
         invocation = result.invocation
         error = result.error
-        contract = self.orchestrator.registry.resource_contract_for(
-            record.resource_id
-        )
+        provider_error = None
+        try:
+            contract = self.orchestrator.safe_resource_contract_for(record.resource_id, phase="result_summary")
+            runtime_kind = str(contract.evidence.runtime_kind)
+            evidence_level = str(contract.evidence.evidence_level)
+        except ControlPlaneException as exc:
+            # Do not lose a completed/failed run merely because a metadata
+            # refresh is unavailable. Declaration metadata is not attestation.
+            declaration = self.orchestrator.registry.adapter_capability_for(record.resource_id)
+            runtime_kind = str(declaration.runtime.runtime_kind)
+            evidence_level = str(declaration.evidence_ceiling)
+            provider_error = exc.error.model_dump(mode="json")
         summary = {
             "success": result.success,
             "selected_resource_id": result.decision.selected_backend_id,
             "preset_id": record.preset_id,
-            "runtime_kind": str(contract.evidence.runtime_kind),
-            "evidence_level": str(contract.evidence.evidence_level),
+            "runtime_kind": runtime_kind,
+            "evidence_level": evidence_level,
+            "metadata_source": "adapter_declaration" if provider_error else "provider_contract",
+            "metadata_provider_error": provider_error,
             "used_fallback": result.decision.used_fallback,
             "execution_latency_ms": (
                 invocation.execution_latency_ms if invocation else None

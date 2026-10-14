@@ -1,0 +1,30 @@
+{
+  "schema": "gemini-selector-intake-manifest-v1",
+  "status": "received_and_reviewed_not_campaign_frozen",
+  "expected_outcomes_modified": false,
+  "production_selector_executed": false,
+  "raw_response_matches_attachment": true,
+  "author_approval": "pending",
+  "files": [
+    {
+      "file": "prompt-issued.txt",
+      "sha256": "c39ec76eaa703f148b0bd49e53be1981230529d4e22c3d85f543337a86a0c1cb"
+    },
+    {
+      "file": "gemini-response-original.json",
+      "sha256": "24ac85aa6f4266eef574cedbb42861931aa0907339d45b689b4669d18ef229a1"
+    },
+    {
+      "file": "provenance.json",
+      "sha256": "dd00679aa966fe97dc191c875d1eda8bc2355379c7e9f478595a5bdec309d32d"
+    },
+    {
+      "file": "preexecution-review.json",
+      "sha256": "0e5a9101137666f24253fc67a4a8627d998cfed9af6ba6275b619aedff8dee67"
+    },
+    {
+      "file": "README.md",
+      "sha256": "96821035f26c430d0b0850a0a2428187aeab9122f4ea06e211e2d4ee74654dd1"
+    }
+  ]
+}

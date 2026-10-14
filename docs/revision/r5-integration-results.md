@@ -1,5 +1,14 @@
 # R5 integration results — 10 October 2026
 
+This is the historical R5 checkpoint. Standard manuscript/response output
+paths have since been refreshed by the
+[14 October supplementary integration](supplementary-paper-integration.md).
+That new AP/Gemini raw evidence is not covered by the R5 DOI below.
+It is separately published as DOI `10.5281/zenodo.23377537`, version
+`SUPPLEMENTARY-2026-10-14`; see the
+[supplementary publication record](supplementary-zenodo-publication.md).
+The historical R5 results and verification counts below remain unchanged.
+
 **Status:** technical draft prepared; public evidence archive published on
 10 October 2026 as DOI `10.5281/zenodo.23281161`. Author review, independent
 reproduction and submission approval

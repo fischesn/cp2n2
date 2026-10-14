@@ -1,0 +1,23 @@
+{
+  "schema": "gemini-selector-author-approval-v1",
+  "author": "Stefan Fischer",
+  "approved_on": "2026-10-14",
+  "user_statement": "Ich bestätige beides",
+  "isolated_new_chat": true,
+  "cases_and_interpretations_approved": true,
+  "expected_outcomes_modified": false,
+  "raw_response_sha256": "24ac85aa6f4266eef574cedbb42861931aa0907339d45b689b4669d18ef229a1",
+  "issued_prompt_sha256": "c39ec76eaa703f148b0bd49e53be1981230529d4e22c3d85f543337a86a0c1cb",
+  "approved_review_sha256": "96821035f26c430d0b0850a0a2428187aeab9122f4ea06e211e2d4ee74654dd1",
+  "model_display_name": "Gemini Flash 3.8",
+  "reasoning_effort": "high",
+  "model_metadata_source": "author reported; provider API identifier unavailable",
+  "interpretations": {
+    "eligibility": "admission AND feasibility",
+    "F4": "required drift is missing",
+    "F6": "numeric drift >=0.95; F4/F6 duplicate absence wording is retained in original review",
+    "S_second_component": 0
+  },
+  "functional_freeze": "ap1-ap3-source-freeze.json",
+  "approval_scope": "Freeze and run selector study; no functional tuning or expectation changes, no submission or external publication."
+}

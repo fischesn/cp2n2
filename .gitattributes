@@ -9,3 +9,6 @@ evaluation/results/agent-to-pnn-*/** text eol=lf
 evaluation/results/agent-to-pnn-*/trials.csv binary
 # Reviewer-material manifests hash exact bytes, including Markdown line endings.
 docs/revision/ieee-access/** -text
+# Preserve the exact Gemini intake bytes and their checksum receipts.
+docs/revision/gemini-selector-blind-v1/** -text
+docs/revision/gemini-selector-approval.json -text

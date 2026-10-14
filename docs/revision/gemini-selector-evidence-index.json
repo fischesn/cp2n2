@@ -1,0 +1,86 @@
+{
+  "schema": "gemini-selector-evidence-index-v1",
+  "date": "2026-10-14",
+  "archive": ".cp2n2/gemini-selector-confirmatory-20261014-01",
+  "status": "first_scored_run_verified_locally",
+  "publication_status": "not_published",
+  "protocol": "docs/revision/gemini-selector-campaign-protocol.md",
+  "approval": "docs/revision/gemini-selector-approval.json",
+  "results": "docs/revision/gemini-selector-results.md",
+  "dataset": {
+    "schema_version": "gemini-selector-blind-v1",
+    "sha256": "24ac85aa6f4266eef574cedbb42861931aa0907339d45b689b4669d18ef229a1",
+    "case_count": 12,
+    "resource_description_count": 47,
+    "eligible_resource_declaration_count": 27,
+    "policy_decision_count": 36
+  },
+  "source": {
+    "base_git_commit": "bba19db333011aa5c59bc6fa56f29eede536a723",
+    "base_commit_is_evaluated_source_identity": false,
+    "snapshot_file_count": 295,
+    "prior_freeze": "docs/revision/ap1-ap3-source-freeze.json",
+    "prior_source_file_count": 290,
+    "prior_source_normalized_content_mismatches": [],
+    "live_source_check_passed": true
+  },
+  "results_summary": {
+    "expected_cells": 72,
+    "observed_cells": 72,
+    "eligible_set_matches": 72,
+    "full_ranking_matches": 72,
+    "selected_resource_matches": 72,
+    "normalized_rejection_annotation_matches": 72,
+    "all_checks_passed_cells": 72,
+    "order_invariant_pairs": 36,
+    "expected_order_pairs": 36
+  },
+  "regression": {
+    "tests_passed": 486,
+    "dependency_deprecation_warnings": 2,
+    "elapsed_seconds": 195.35
+  },
+  "artifacts": [
+    {
+      "path": ".cp2n2/gemini-selector-confirmatory-20261014-01/freeze.json",
+      "sha256": "79e62e87351882e370def03c3ce6f4d0b1edc93898feee8b623e8d0a3570f291"
+    },
+    {
+      "path": ".cp2n2/gemini-selector-confirmatory-20261014-01/manifest.json",
+      "sha256": "b24a14b6027175a501609ab3d261a41600a8a894f7cb000daf3a538e02bdd384"
+    },
+    {
+      "path": ".cp2n2/gemini-selector-confirmatory-20261014-01/verification.json",
+      "sha256": "2d76bd2071706dd21ff94146c6e3b632a6dbc2595af7da8e30fea20f1e890def"
+    },
+    {
+      "path": ".cp2n2/gemini-selector-confirmatory-20261014-01/source-snapshot.zip",
+      "sha256": "04cbaccc9544a2da8c0bc00ac1abae90f5717a4e73a353b542e13ca4a8dc7a4b"
+    },
+    {
+      "path": ".cp2n2/gemini-selector-confirmatory-20261014-01/source-hashes.json",
+      "sha256": "63a0ca4ebdd7c24245c5e4ada6d39897addfa0beb79623372e5e82038317cdf5"
+    },
+    {
+      "path": ".cp2n2/gemini-selector-confirmatory-20261014-01/outputs.json",
+      "sha256": "381491c7402d125aefbecbede09afb68436c2967c32909f320b50eec35dd8500"
+    },
+    {
+      "path": ".cp2n2/gemini-selector-confirmatory-20261014-01/protocol.md",
+      "sha256": "649a87423772d48b9556c175528ad7f3a795d65358a60eea90105ca2a2da113f"
+    },
+    {
+      "path": ".cp2n2/gemini-selector-confirmatory-20261014-01/specification.json",
+      "sha256": "98e4ddfcaee2de95592ce9c0bbc0db75eccd6d226bc7668e7484954c298333e0"
+    },
+    {
+      "path": ".cp2n2/gemini-selector-confirmatory-20261014-01/inputs/gemini-response-original.json",
+      "sha256": "24ac85aa6f4266eef574cedbb42861931aa0907339d45b689b4669d18ef229a1"
+    },
+    {
+      "path": ".cp2n2/gemini-selector-confirmatory-20261014-01/inputs/gemini-selector-approval.json",
+      "sha256": "40f19931608edb305a10b190ea84c4b034a33b048b715de395efc481b024e39a"
+    }
+  ],
+  "scope": "Twelve externally model-authored synthetic cases under a written selector contract. Policy/order cells are dependent deterministic checks, not independent workloads, external software reproduction, executing agents, MCP transport or physical PNN observations."
+}

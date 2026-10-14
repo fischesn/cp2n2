@@ -1,0 +1,221 @@
+You are independently designing synthetic test cases for a research prototype's resource selector.
+
+Your task is to create a new specification-derived evaluation dataset, including expected outcomes, using ONLY the written contract below.
+
+Do not browse, search for CP2N2, inspect repositories, consult published evaluation artifacts, or execute an implementation. Do not produce implementation code. You must not infer expected behavior from an existing program.
+
+This evaluates software selection semantics, not physical neural-network performance, physical safety, or real-world placement optimality.
+
+OBJECTIVE
+
+Create exactly 12 diverse, nontrivial cases. Normally use 3–5 candidate resources per case. Across the dataset include:
+- zero, one, and multiple admissible candidates;
+- interacting constraints;
+- attractive but inadmissible candidates;
+- exact boundary values and exact ranking ties;
+- missing optional versus required information;
+- policy trade-offs that produce different selections under different policies.
+
+Do not create twelve minor numerical variations of one scenario. Invent your own scenarios, identifiers and values. Explain why each case is useful.
+
+RESTRICTED INPUT DOMAIN
+
+All resources support the same computational task. The task requires digital_vector input. All unrepresented capabilities are fixed and supported.
+
+All resources:
+- declare drift telemetry;
+- support health and confidence reporting;
+- have the same health-sensitivity setting;
+- support reset operations;
+- differ only in the explicit fields below.
+
+Use finite JSON numbers only. Do not use NaN, infinity, numeric strings, or booleans in numeric fields. Missing values are represented by null.
+
+These cases deliberately exclude malformed numeric values; those belong to a separate validation study.
+
+Task fields, all explicitly present:
+- latency_budget: positive number, milliseconds
+- max_age: positive number, milliseconds
+- max_cost: nonnegative number or null
+- required_telemetry: [] or ["drift_score"]
+- supervision: boolean
+- locality: "edge", "cloud", or null
+- stochasticity_tolerance: number in [0,1]
+- reset_free: boolean
+
+Resource fields, all explicitly present:
+- id: unique lowercase ASCII identifier
+- latency: positive number, milliseconds
+- drift: number in [0,1] or null
+- age: nonnegative number in milliseconds or null
+- health: healthy, ready, degraded, unknown, offline, failed, or unreachable
+- lifecycle: ready, failed, unreachable, or aborting
+- reservable: boolean
+- cost: nonnegative number or null
+- currency: always "eur"
+- locality: edge or cloud
+- stochastic: boolean
+- stateful: boolean
+- age_supported: boolean
+- supervision_required: boolean
+- contract_admissible: boolean
+- modalities: either ["digital_vector"] or ["spikes"]
+
+ADMISSION RULES
+
+Reject a resource at the admission stage if any of these conditions fails:
+
+A1. Its modalities include digital_vector.
+A2. It supports observation age: age_supported is true.
+A3. If supervision_required is true, task supervision is true.
+A4. contract_admissible is true.
+
+If admission fails, report all failed admission rules. Do not evaluate feasibility for that resource.
+
+FEASIBILITY RULES
+
+For resources that pass admission, reject if any of these conditions fails:
+
+F1. Health is not offline, failed, or unreachable.
+F2. Lifecycle is not failed, unreachable, or aborting.
+F3. reservable is true.
+F4. If drift_score is required, drift is not null.
+F5. latency <= latency_budget.
+F6. If drift is numeric, drift < 0.95.
+    A null drift is permitted only when drift_score is not required.
+F7. age is not null and age <= max_age.
+F8. If max_cost is not null, cost is not null and cost <= max_cost.
+
+Report all failed feasibility rules.
+
+The latency, age and cost boundaries are inclusive.
+The drift boundary is exclusive.
+
+Degraded and unknown health do not automatically exclude a resource.
+Stochasticity, reset preferences and locality are ranking preferences, not hard exclusions.
+
+RANKING RULES
+
+Rank admissible resources by ascending lexicographic tuples.
+Compare components from left to right; the first difference decides.
+Never replace this with a weighted sum.
+
+Define these groups:
+
+S = [
+  health_penalty,
+  0,
+  drift_or_1,
+  age / max_age
+]
+
+health_penalty:
+  healthy or ready -> 0
+  degraded -> 1
+  unknown -> 2
+
+drift_or_1:
+  numeric drift -> that value
+  null -> 1
+
+Q = [
+  variability_penalty,
+  reset_penalty
+]
+
+variability_penalty is 1 exactly when:
+  stochasticity_tolerance < 0.25 AND resource stochastic is true.
+Otherwise it is 0.
+
+reset_penalty is 1 exactly when:
+  task reset_free is true AND resource stateful is true.
+Otherwise it is 0.
+
+L = [latency / latency_budget]
+
+C = [
+  locality_penalty,
+  cost_unknown,
+  cost_or_0
+]
+
+locality_penalty:
+  task locality is null, or matches resource locality -> 0
+  otherwise -> 6
+
+cost_unknown:
+  cost is null -> 1
+  otherwise -> 0
+
+cost_or_0:
+  numeric cost -> that value
+  null -> 0
+
+Evaluate these three policies:
+
+1. lexicographic:
+   concatenate S, Q, L, C, resource id
+
+2. latency_first:
+   concatenate L, S, C, Q, resource id
+
+3. locality_cost_first:
+   concatenate C, S, L, Q, resource id
+
+The final tie-breaker is ascending resource id.
+Input registration order must not change the expected result.
+
+Each ranking contains every admissible resource exactly once.
+The selected resource is the first ranked resource.
+If no resource is admissible, ranking is [] and selection is null.
+
+OUTPUT
+
+Return exactly one valid JSON object, without Markdown fences or surrounding prose:
+
+{
+  "schema_version": "gemini-selector-blind-v1",
+  "cases": [
+    {
+      "id": "...",
+      "scenario": "...",
+      "task": { ...all task fields... },
+      "resources": [ ...complete resource objects... ],
+      "expected": {
+        "admissible_resource_ids": [ ...sorted identifiers... ],
+        "rejections": {
+          "rejected-resource-id": {
+            "stage": "admission or feasibility",
+            "failed_rules": ["A1 or F1 etc."],
+            "explanation": "..."
+          }
+        },
+        "rankings": {
+          "lexicographic": [...],
+          "latency_first": [...],
+          "locality_cost_first": [...]
+        },
+        "selected": {
+          "lexicographic": "resource id or null",
+          "latency_first": "resource id or null",
+          "locality_cost_first": "resource id or null"
+        },
+        "reasoning_by_policy": {
+          "lexicographic": "...",
+          "latency_first": "...",
+          "locality_cost_first": "..."
+        }
+      },
+      "test_purpose": "..."
+    }
+  ],
+  "coverage_summary": ["..."],
+  "specification_questions": []
+}
+
+Use actual JSON null, never the string "null".
+The braces with ellipses above describe the output structure; do not include ellipses or placeholders in your answer.
+
+Before returning, check all inequalities, admission stages, ranking tuples, identifier ties and selected resources. Ensure every eligible set agrees with all three rankings.
+
+If a necessary rule is ambiguous, identify it in specification_questions rather than silently inventing behavior. Do not claim the cases have been executed or independently validated.

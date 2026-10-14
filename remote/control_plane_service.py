@@ -35,11 +35,14 @@ class ControlPlaneServiceState:
         adapter_url: str,
         profile: NetworkProfile,
         trace_path: str | Path | None,
+        secondary_adapter_url: str | None = None,
     ) -> None:
         self.profile = profile
         self.recorder = JsonlSpanRecorder(trace_path, "control-plane")
         self.orchestrator = CP2N2Orchestrator()
         self.orchestrator.register_adapter(RemoteEdgeAdapter(adapter_url))
+        if secondary_adapter_url is not None:
+            self.orchestrator.register_adapter(RemoteEdgeAdapter(secondary_adapter_url))
 
 
 class ControlPlaneHandler(BaseHTTPRequestHandler):
@@ -55,9 +58,18 @@ class ControlPlaneHandler(BaseHTTPRequestHandler):
                 {"resources": self.state.orchestrator.discover_resource_contracts()},
             )
             return
+        if self.path == "/lifecycle":
+            self._send_json(200, {"resources": [self.state.orchestrator.registry.lifecycle_store.snapshot(resource_id).model_dump(mode="json")
+                for resource_id in self.state.orchestrator.registry.list_backend_ids()]})
+            return
         self._send_json(404, {"error": f"Unknown endpoint: {self.path}"})
 
     def do_POST(self) -> None:  # noqa: N802
+        if self.path == "/reconcile":
+            payload = self._read_json_body()
+            result = self.state.orchestrator.reconcile_backend(payload["resource_id"], timeout_ms=payload.get("timeout_ms", 5_000.0))
+            self._send_json(200, result.model_dump(mode="json"))
+            return
         if self.path != "/execute":
             self._send_json(404, {"error": f"Unknown endpoint: {self.path}"})
             return
@@ -120,6 +132,7 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8766)
     parser.add_argument("--adapter-url", required=True)
+    parser.add_argument("--secondary-adapter-url")
     parser.add_argument("--profile", required=True)
     parser.add_argument("--trace-path")
     args = parser.parse_args()
@@ -129,6 +142,7 @@ def main() -> None:
         adapter_url=args.adapter_url,
         profile=profile,
         trace_path=args.trace_path,
+        secondary_adapter_url=args.secondary_adapter_url,
     )
     server = ThreadingHTTPServer((args.host, args.port), ControlPlaneHandler)
     print(

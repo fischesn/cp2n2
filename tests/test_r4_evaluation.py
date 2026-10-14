@@ -19,7 +19,18 @@ def test_selector_specification_and_independent_review():
             expected=oracle(c,policy)
             for reverse in (False,True):
                 observed=observe(c,policy,reverse=reverse)
-                assert all(expected[k]==observed[k] for k in expected),(c["id"],policy)
+                if c["id"] == "missing_telemetry-2":
+                    # The immutable v1 oracle documents the formerly permissive
+                    # required-string-drift rule. AP1 intentionally closes it;
+                    # do not rewrite the historical expectation to hide that.
+                    assert expected["eligible"] == ["a"]
+                    assert observed["eligible"] == []
+                    assert "required_telemetry_semantics" in observed["exclusions"]["a"]
+                else:
+                    for key in ("eligible", "ranking", "selected"):
+                        assert expected[key] == observed[key], (c["id"], policy, key)
+                    for resource, reasons in expected["exclusions"].items():
+                        assert set(reasons) <= set(observed["exclusions"][resource])
 
 
 def test_active_threshold_priority_and_tie_sensitivity():
@@ -27,14 +38,20 @@ def test_active_threshold_priority_and_tie_sensitivity():
     for s in sensitivity_cases():
         expected=oracle(s["case"],drift_limit=s["drift_limit"])
         observed=observe(s["case"],drift_limit=s["drift_limit"])
-        assert all(observed[k]==expected[k] for k in expected)
+        for key in ("eligible", "ranking", "selected"):
+            assert observed[key] == expected[key]
+        for resource, reasons in expected["exclusions"].items():
+            assert set(reasons) <= set(observed["exclusions"][resource])
 
 
 def test_selector_archive_and_tamper_detection(tmp_path):
     spec=specification("selection")
     root=freeze(tmp_path/"selection","selection",spec)
     report=run(root,"selection",spec)
-    assert verify(root)==report and report["verified"]
+    assert verify(root)==report
+    # A current run against the unmodified historical oracle must expose the
+    # semantic change, rather than falsely claim reproduction of v1 behavior.
+    assert report["verified"] is False
     (root/"selection.json").write_text("{}",encoding="utf-8")
     with pytest.raises(ValueError,match="checksum"): verify(root)
 

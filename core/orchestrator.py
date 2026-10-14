@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import hashlib
 import json
+from http.client import HTTPException
+from threading import Event, RLock
+from urllib.error import URLError
 from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from adapters.base_adapter import (
     AdapterInvocationResult,
@@ -23,6 +26,7 @@ from core.leases import ResourceLease
 from core.lifecycle import LifecycleSnapshot, LifecycleTransition
 from core.matcher import BackendMatcher, MatchCandidate, MatchReport
 from core.task_model import TaskRequest
+from core.telemetry_validation import TelemetryPayloadError, validate_required_observations, validate_required_values
 from core.twin_registry import TwinRegistry
 from descriptors.capability_schema import ResetMode
 from descriptors.resource_contract import (
@@ -54,6 +58,7 @@ class OrchestrationDecision(BaseModel):
     used_fallback: bool = False
     ranked_candidates: list[MatchCandidate] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)
+    provider_errors: dict[str, ControlPlaneError] = Field(default_factory=dict)
 
 
 class OrchestrationRunResult(BaseModel):
@@ -107,6 +112,9 @@ class CP2N2Orchestrator:
     ) -> None:
         self._registry = registry or TwinRegistry()
         self._matcher = matcher or BackendMatcher()
+        self._provider_failure_lock = RLock()
+        self._provider_failures: dict[str, tuple[ControlPlaneError, set[Event]]] = {}
+        self._provider_failure_generation: dict[str, int] = {}
 
     @property
     def registry(self) -> TwinRegistry:
@@ -143,6 +151,9 @@ class CP2N2Orchestrator:
 
     def plan_task(self, task: TaskRequest) -> MatchReport:
         """Run admission, feasibility, and selection for the task."""
+        return self._plan_task_with_errors(task)[0]
+
+    def _plan_task_with_errors(self, task: TaskRequest, correlation_id=None):
         descriptors = self._registry.list_descriptors()
         if task.direct_backend_id is not None:
             descriptors = [
@@ -150,16 +161,21 @@ class CP2N2Orchestrator:
                 for descriptor in descriptors
                 if descriptor.backend_id == task.direct_backend_id
             ]
-        runtime_state = self._selection_runtime_snapshot(task)
-        return self._matcher.rank_backends(
+        errors: dict[str, ControlPlaneError] = {}
+        runtime_state = self._selection_runtime_snapshot(task, errors=errors, correlation_id=correlation_id)
+        report = self._matcher.rank_backends(
             task=task,
             descriptors=descriptors,
             runtime_state=runtime_state,
         )
+        report.provider_errors = errors
+        return report, errors
 
     def _selection_runtime_snapshot(
         self,
         task: TaskRequest,
+        *, errors: dict[str, ControlPlaneError] | None = None,
+        correlation_id: str | None = None,
     ) -> dict[str, dict[str, float | int | str | bool | None]]:
         """Overlay lifecycle, lease, safety, and cost facts for A3 decisions."""
         runtime_state: dict[
@@ -167,10 +183,55 @@ class CP2N2Orchestrator:
             dict[str, float | int | str | bool | None],
         ] = {}
         for backend_id in self._registry.list_backend_ids():
+            if task.direct_backend_id is not None and backend_id != task.direct_backend_id:
+                continue
             runtime: dict[str, float | int | str | bool | None] = {}
             snapshot = self._registry.lifecycle_store.snapshot(backend_id)
             lease = self._registry.lease_store.current(backend_id)
-            contract = self._registry.resource_contract_for(backend_id)
+            runtime["control_plane_lifecycle"] = str(snapshot.state)
+            runtime["control_plane_state_version"] = snapshot.version
+            runtime["reservable"] = lease is None or (
+                task.lease_id is not None and lease.lease_id == task.lease_id and lease.owner_id == task.client_id
+            )
+            with self._provider_failure_lock:
+                quarantined = self._provider_failures.get(backend_id)
+            if quarantined is not None:
+                runtime["health_status"] = "unreachable"
+                if errors is not None:
+                    errors[backend_id] = quarantined[0].model_copy(deep=True)
+                runtime_state[backend_id] = runtime
+                continue
+            # Busy/terminal resources cannot be invoked; avoid querying their
+            # provider while another execution owns its state.
+            if (ResourceLifecycleState(snapshot.state) != ResourceLifecycleState.READY
+                    and not (task.lease_id and runtime["reservable"] and snapshot.state == "reserved")):
+                runtime_state[backend_id] = runtime
+                continue
+            completed = Event()
+            def collect_contract(resource_id=backend_id, done=completed):
+                try:
+                    return self._registry.resource_contract_for(resource_id)
+                finally:
+                    done.set()
+            outcome = run_with_timeout(collect_contract, task.preparation_timeout_ms)
+            failure = None
+            if outcome.timed_out:
+                failure = self._provider_error(backend_id, "planning", "timeout", execution_status="not_started", worker_pending=not completed.is_set())
+            elif outcome.error is not None:
+                kind = self._expected_provider_failure(outcome.error)
+                if kind is None:
+                    raise outcome.error
+                failure = self._provider_error(backend_id, "planning", kind, execution_status="not_started")
+            if failure is not None:
+                self._quarantine_provider(backend_id, failure, completed if outcome.timed_out else None, correlation_id)
+                runtime["health_status"] = "unreachable"
+                runtime["control_plane_lifecycle"] = self._registry.lifecycle_store.snapshot(backend_id).state
+                if errors is not None:
+                    errors[backend_id] = failure
+                runtime_state[backend_id] = runtime
+                continue
+            contract = outcome.value
+            assert contract is not None
             for name, observation in contract.telemetry.items():
                 value = observation.value
                 if value is None or isinstance(value, (float, int, str, bool)):
@@ -185,6 +246,7 @@ class CP2N2Orchestrator:
             )
 
             safety_reasons = self._contract_safety_violations(contract)
+            safety_reasons.extend(validate_required_observations(task, contract, phase="preconditions"))
             runtime["contract_safety_admissible"] = not safety_reasons
             runtime["contract_safety_reason"] = (
                 None if not safety_reasons else "; ".join(safety_reasons)
@@ -197,6 +259,83 @@ class CP2N2Orchestrator:
                     runtime["cost_currency"] = contract.cost.currency
             runtime_state[backend_id] = runtime
         return runtime_state
+
+    @staticmethod
+    def _expected_provider_failure(error: Exception) -> str | None:
+        """Normalize known I/O/schema failures, never arbitrary programming bugs."""
+        if isinstance(error, (TimeoutError,)):
+            return "timeout"
+        if isinstance(error, (URLError, OSError, HTTPException)):
+            return "transport"
+        if isinstance(error, (json.JSONDecodeError, ValidationError, TelemetryPayloadError)):
+            return "invalid_telemetry"
+        return None
+
+    @staticmethod
+    def _provider_error(backend_id, phase, kind, *, execution_status, worker_pending=False):
+        return ControlPlaneError(
+            code=ControlPlaneErrorCode.TELEMETRY_STALE,
+            message=f"Provider {kind} failure for '{backend_id}' during {phase}; explicit reconciliation is required.",
+            retryable=False,
+            details={"resource_id": backend_id, "phase": phase, "provider_failure": kind,
+                "execution_status": execution_status, "reconciliation_required": True,
+                "worker_pending": worker_pending},
+        )
+
+    def _quarantine_provider(self, backend_id, error, completed=None, correlation_id=None):
+        with self._provider_failure_lock:
+            prior = self._provider_failures.get(backend_id)
+            pending = set() if prior is None else {event for event in prior[1] if not event.is_set()}
+            if isinstance(completed, Event):
+                pending.add(completed)
+            elif completed is not None:
+                pending.update(completed)
+            self._provider_failures[backend_id] = (error, pending)
+            self._provider_failure_generation[backend_id] = self._provider_failure_generation.get(backend_id, 0) + 1
+        current = self._registry.lifecycle_store.snapshot(backend_id)
+        if ResourceLifecycleState(current.state) == ResourceLifecycleState.READY:
+            try:
+                self._registry.lifecycle_store.transition(backend_id, ResourceLifecycleState.UNREACHABLE,
+                    expected_version=current.version, reason=error.message, correlation_id=correlation_id)
+            except ControlPlaneException as exc:
+                if exc.error.code != ControlPlaneErrorCode.STATE_VERSION_CONFLICT:
+                    raise
+
+    def safe_resource_contract_for(self, backend_id: str, *, timeout_ms=5_000.0, phase="discovery", correlation_id=None):
+        """Bound a read-only provider phase and retain explicit quarantine.
+
+        Completion of a timed-out worker is not cancellation. Reconciliation
+        cannot clear quarantine while that read-only worker remains pending.
+        """
+        with self._provider_failure_lock:
+            prior = self._provider_failures.get(backend_id)
+        if prior is not None:
+            raise ControlPlaneException(prior[0].code, prior[0].message,
+                retryable=prior[0].retryable, details=prior[0].details)
+        completed = Event()
+        def collect():
+            try:
+                return self._registry.resource_contract_for(backend_id)
+            finally:
+                completed.set()
+        outcome = run_with_timeout(collect, timeout_ms)
+        kind = "timeout" if outcome.timed_out else (
+            self._expected_provider_failure(outcome.error) if outcome.error else None)
+        if outcome.error is not None and kind is None:
+            raise outcome.error
+        if kind is not None:
+            error = self._provider_error(backend_id, phase, kind, execution_status="not_started",
+                worker_pending=outcome.timed_out and not completed.is_set())
+            self._quarantine_provider(backend_id, error, completed if outcome.timed_out else None, correlation_id)
+            raise ControlPlaneException(error.code, error.message, details=error.details)
+        return outcome.value
+
+    @staticmethod
+    def _contract_values(contract):
+        values = {name: item.value for name, item in contract.telemetry.items()}
+        if contract.cost is not None and contract.cost.estimated_cost is not None:
+            values["estimated_cost"] = contract.cost.estimated_cost.value
+        return values
 
     @staticmethod
     def _contract_safety_violations(contract) -> list[str]:
@@ -281,11 +420,13 @@ class CP2N2Orchestrator:
         task: TaskRequest,
         correlation_id: str,
     ) -> OrchestrationRunResult:
-        report = self.plan_task(task)
+        report, provider_errors = self._plan_task_with_errors(task, correlation_id)
         decision = OrchestrationDecision(
             task_id=task.task_id,
             ranked_candidates=report.candidates,
+            provider_errors=provider_errors,
         )
+        decision.notes.extend(error.message for error in provider_errors.values())
         accepted_candidates = report.accepted_candidates()
 
         if not accepted_candidates:
@@ -305,6 +446,12 @@ class CP2N2Orchestrator:
                         f"Directed backend '{task.direct_backend_id}' is not registered."
                     ),
                 )
+            elif task.direct_backend_id in provider_errors:
+                error = provider_errors[task.direct_backend_id]
+            elif provider_errors and len(provider_errors) == len(report.candidates):
+                first = next(iter(provider_errors.values()))
+                error = first.model_copy(update={"details": {**first.details,
+                    "provider_errors": {key: value.model_dump(mode="json") for key, value in provider_errors.items()}}})
             elif any(
                 any(
                     violation.startswith("resource_reservable:")
@@ -366,7 +513,10 @@ class CP2N2Orchestrator:
             if result.success:
                 return result
             last_result = result
-            if not task.allow_fallback:
+            if (not task.allow_fallback or (result.error is not None and (
+                    result.error.code == ControlPlaneErrorCode.EXECUTION_STATUS_UNKNOWN
+                    or result.error.details.get("execution_status") == "unknown"
+                    or result.error.details.get("provider_status") in {"uncertain", "unknown"}))):
                 return result
 
         assert last_result is not None
@@ -458,44 +608,36 @@ class CP2N2Orchestrator:
                 lease=lease,
             )
 
-        telemetry_outcome = run_with_timeout(
-            adapter.collect_telemetry,
-            task.preparation_timeout_ms,
-        )
-        if telemetry_outcome.timed_out:
+        try:
+            execution_contract = self.safe_resource_contract_for(backend_id,
+                timeout_ms=task.preparation_timeout_ms, phase="preconditions", correlation_id=correlation_id)
+        except ControlPlaneException as exc:
             return self._fail_active_candidate(
                 task,
                 decision,
                 correlation_id,
                 adapter,
                 lease,
-                ControlPlaneError(
-                    code=ControlPlaneErrorCode.TELEMETRY_STALE,
-                    message=(
-                        f"Pre-execution telemetry timed out for '{backend_id}'."
-                    ),
-                    retryable=True,
-                ),
-                uncertain=True,
+                exc.error,
+                uncertain=bool(exc.error.details.get("worker_pending")),
             )
-        if telemetry_outcome.error is not None:
-            return self._fail_active_candidate(
-                task,
-                decision,
-                correlation_id,
-                adapter,
-                lease,
-                ControlPlaneError(
-                    code=ControlPlaneErrorCode.TELEMETRY_STALE,
-                    message=(
-                        f"Pre-execution telemetry failed for '{backend_id}': "
-                        f"{telemetry_outcome.error}"
-                    ),
-                    retryable=True,
-                ),
-                uncertain=True,
-            )
-        telemetry_before = telemetry_outcome.value or {}
+        except Exception:
+            # Preserve the original programming error, but do not strand its
+            # acquired lease or pretend the resource is reusable afterwards.
+            self._fail_active_candidate(task, decision, correlation_id, adapter, lease,
+                ControlPlaneError(code=ControlPlaneErrorCode.PREPARATION_FAILED,
+                    message="Unexpected precondition collection failure; invocation was not started.",
+                    details={"execution_status": "not_started", "unexpected_error": True}), uncertain=True)
+            raise
+        telemetry_before = self._contract_values(execution_contract)
+        precondition_failures = validate_required_values(task, telemetry_before, phase="preconditions")
+        precondition_failures.extend(validate_required_observations(task, execution_contract, phase="preconditions"))
+        if precondition_failures:
+            return self._fail_active_candidate(task, decision, correlation_id, adapter, lease,
+                ControlPlaneError(code=ControlPlaneErrorCode.INADMISSIBLE,
+                    message="Required pre-execution telemetry is invalid: " + "; ".join(precondition_failures),
+                    details={"failures": precondition_failures, "execution_status": "not_started"}),
+                telemetry_before=telemetry_before, validation_failures=precondition_failures)
         self._transition(
             backend_id,
             ResourceLifecycleState.PREPARING,
@@ -583,14 +725,39 @@ class CP2N2Orchestrator:
                 telemetry_before=telemetry_before,
             )
 
+        admission_completed = Event()
+        def assess_live_contract():
+            try:
+                return assess_live_contract_once()
+            finally:
+                admission_completed.set()
+        def assess_live_contract_once():
+            contract = adapter.resource_contract()
+            admission = assess_contract_admission(contract, operation="invoke")
+            failures = validate_required_observations(task, contract, phase="preconditions")
+            failures.extend(validate_required_values(task, self._contract_values(contract), phase="preconditions"))
+            # Re-evaluate task feasibility using this last live contract; a
+            # once-feasible drift/cost observation may have changed in prepare.
+            final_runtime = self._contract_values(contract)
+            final_runtime["control_plane_lifecycle"] = "preparing"
+            final_runtime["reservable"] = True  # owned lease was just validated
+            final_runtime["contract_safety_admissible"] = not self._contract_safety_violations(contract)
+            if contract.cost is not None:
+                final_runtime["cost_currency"] = contract.cost.currency
+            final_report = self._matcher.rank_backends(task, [adapter.describe()], {backend_id: final_runtime})
+            if not final_report.best_candidate():
+                failures.extend(final_report.candidates[0].admission.violations)
+                failures.extend(final_report.candidates[0].feasibility.violations)
+            if failures:
+                return ContractAdmissionResult(admissible=False, reasons=[*admission.reasons, *failures])
+            return admission
         admission_outcome = run_with_timeout(
-            lambda: assess_contract_admission(
-                adapter.resource_contract(),
-                operation="invoke",
-            ),
+            assess_live_contract,
             task.validation_timeout_ms,
         )
         if admission_outcome.timed_out:
+            self._quarantine_provider(backend_id, self._provider_error(backend_id, "admission", "timeout",
+                execution_status="not_started", worker_pending=not admission_completed.is_set()), admission_completed, correlation_id)
             return self._fail_active_candidate(
                 task,
                 decision,
@@ -607,19 +774,17 @@ class CP2N2Orchestrator:
                 uncertain=True,
             )
         if admission_outcome.error is not None:
+            kind = self._expected_provider_failure(admission_outcome.error)
+            admission_error = self._provider_error(backend_id, "admission", kind, execution_status="not_started") if kind else ControlPlaneError(
+                code=ControlPlaneErrorCode.INADMISSIBLE,
+                message=f"Contract admission failed for '{backend_id}': {admission_outcome.error}")
             return self._fail_active_candidate(
                 task,
                 decision,
                 correlation_id,
                 adapter,
                 lease,
-                ControlPlaneError(
-                    code=ControlPlaneErrorCode.INADMISSIBLE,
-                    message=(
-                        f"Contract admission failed for '{backend_id}': "
-                        f"{admission_outcome.error}"
-                    ),
-                ),
+                admission_error,
                 preparation=preparation,
                 telemetry_before=telemetry_before,
             )
@@ -644,6 +809,16 @@ class CP2N2Orchestrator:
                 telemetry_before=telemetry_before,
                 contract_admission=admission,
             )
+
+        # Live provider admission may have blocked beyond the lease TTL. The
+        # earlier pre-admission lease check cannot authorize this invocation.
+        try:
+            self._registry.lease_store.validate(lease.lease_id, backend_id, owner_id,
+                expected_version=lease.version)
+        except ControlPlaneException as exc:
+            return self._fail_active_candidate(task, decision, correlation_id, adapter, lease,
+                exc.error, preparation=preparation, telemetry_before=telemetry_before,
+                contract_admission=admission)
 
         self._transition(
             backend_id,
@@ -689,7 +864,8 @@ class CP2N2Orchestrator:
                         f"{invocation_outcome.error}"
                     ),
                     retryable=False,
-                    details={"provider_status": "uncertain"},
+                    details={"provider_status": "uncertain", "execution_status": "unknown",
+                        "resource_id": backend_id, "phase": "invoke", "automatic_retry": False},
                 ),
                 preparation=preparation,
                 telemetry_before=telemetry_before,
@@ -727,22 +903,32 @@ class CP2N2Orchestrator:
             "postcondition validation started",
         )
 
-        def validate() -> tuple[
+        validation_completed = Event()
+        def validate():
+            try:
+                return validate_once()
+            finally:
+                validation_completed.set()
+        def validate_once() -> tuple[
             dict[str, float | int | str | bool | None],
             list[str],
         ]:
-            telemetry = adapter.collect_telemetry()
+            contract = adapter.resource_contract()
+            telemetry = self._contract_values(contract)
             failures = self._validate_postconditions(
                 task,
                 invocation,
                 telemetry,
             )
+            failures.extend(validate_required_observations(task, contract, phase="postconditions"))
             if not failures:
                 failures.extend(adapter.validate_result(task, invocation))
             return telemetry, failures
 
         validation_outcome = run_with_timeout(validate, task.validation_timeout_ms)
         if validation_outcome.timed_out:
+            self._quarantine_provider(backend_id, self._provider_error(backend_id, "postconditions", "timeout",
+                execution_status="invocation_returned", worker_pending=not validation_completed.is_set()), validation_completed, correlation_id)
             return self._fail_active_candidate(
                 task,
                 decision,
@@ -763,19 +949,18 @@ class CP2N2Orchestrator:
                 contract_admission=admission,
             )
         if validation_outcome.error is not None:
+            kind = self._expected_provider_failure(validation_outcome.error)
+            validation_exception = self._provider_error(backend_id, "postconditions", kind,
+                execution_status="invocation_returned") if kind else ControlPlaneError(
+                    code=ControlPlaneErrorCode.POSTCONDITION_FAILED,
+                    message=f"Postcondition validation raised for '{backend_id}': {validation_outcome.error}")
             return self._fail_active_candidate(
                 task,
                 decision,
                 correlation_id,
                 adapter,
                 lease,
-                ControlPlaneError(
-                    code=ControlPlaneErrorCode.POSTCONDITION_FAILED,
-                    message=(
-                        f"Postcondition validation raised for '{backend_id}': "
-                        f"{validation_outcome.error}"
-                    ),
-                ),
+                validation_exception,
                 preparation=preparation,
                 invocation=invocation,
                 telemetry_before=telemetry_before,
@@ -1172,20 +1357,44 @@ class CP2N2Orchestrator:
                     retryable=True,
                 )
             adapter = self._registry.get_adapter(backend_id)
-            outcome = run_with_timeout(adapter.collect_telemetry, timeout_ms)
+            with self._provider_failure_lock:
+                prior = self._provider_failures.get(backend_id)
+                generation = self._provider_failure_generation.get(backend_id, 0)
+            if prior is not None and any(not event.is_set() for event in prior[1]):
+                raise ControlPlaneException(ControlPlaneErrorCode.RECONCILIATION_FAILED,
+                    f"Timed-out telemetry worker for '{backend_id}' is still pending; reuse remains blocked.",
+                    details={"resource_id": backend_id, "worker_pending": True, "reconciliation_required": True})
+            completed = Event()
+            def collect_reconciliation_contract():
+                try:
+                    return adapter.resource_contract()
+                finally:
+                    completed.set()
+            outcome = run_with_timeout(collect_reconciliation_contract, timeout_ms)
             if outcome.timed_out:
+                self._quarantine_provider(backend_id, self._provider_error(backend_id, "reconciliation", "timeout",
+                    execution_status="not_started", worker_pending=not completed.is_set()), completed, correlation)
                 raise ControlPlaneException(
                     ControlPlaneErrorCode.TELEMETRY_STALE,
                     f"Provider telemetry timed out for '{backend_id}'.",
                     retryable=True,
                 )
             if outcome.error is not None:
+                kind = self._expected_provider_failure(outcome.error)
+                if kind is not None:
+                    self._quarantine_provider(backend_id, self._provider_error(backend_id, "reconciliation", kind,
+                        execution_status="not_started"), None, correlation)
                 raise ControlPlaneException(
                     ControlPlaneErrorCode.RECONCILIATION_FAILED,
                     f"Provider telemetry failed for '{backend_id}': {outcome.error}",
                     retryable=True,
                 )
-            telemetry = outcome.value or {}
+            telemetry = self._contract_values(outcome.value)
+            if (telemetry.get("health_status") not in {"healthy", "ready", "degraded", "offline", "failed", "unreachable"}
+                    and telemetry.get("readiness_state") not in {"ready", "degraded", "offline", "unavailable", "failed", "unreachable"}):
+                raise ControlPlaneException(ControlPlaneErrorCode.RECONCILIATION_FAILED,
+                    f"Provider state for '{backend_id}' is incomplete or uninterpretable; reuse remains blocked.",
+                    details={"resource_id": backend_id, "reconciliation_required": True})
             target = self._provider_state_target(telemetry, current)
             if (
                 ResourceLifecycleState(current.state) in ACTIVE_STATES
@@ -1199,13 +1408,18 @@ class CP2N2Orchestrator:
                     reason="provider reconciliation after active-state uncertainty",
                     correlation_id=correlation,
                 )
-            final = self._registry.lifecycle_store.transition(
-                backend_id,
-                target,
-                expected_version=current.version,
-                reason="control-plane state reconciled with provider telemetry",
-                correlation_id=correlation,
-            )
+            with self._provider_failure_lock:
+                pending = self._provider_failures.get(backend_id)
+                if (self._provider_failure_generation.get(backend_id, 0) != generation
+                        or (pending is not None and any(not event.is_set() for event in pending[1]))):
+                    raise ControlPlaneException(ControlPlaneErrorCode.RECONCILIATION_FAILED,
+                        "Concurrent or pending provider failure prevents reconciliation; reuse remains blocked.",
+                        details={"resource_id": backend_id, "reconciliation_required": True})
+                final = self._registry.lifecycle_store.transition(
+                    backend_id, target, expected_version=current.version,
+                    reason="control-plane state reconciled with provider telemetry", correlation_id=correlation)
+                if target == ResourceLifecycleState.READY:
+                    self._provider_failures.pop(backend_id, None)
             return ControlPlaneActionResult(
                 resource_id=backend_id,
                 correlation_id=correlation,
@@ -1258,6 +1472,10 @@ class CP2N2Orchestrator:
         validation_failures: list[str] | None = None,
         uncertain: bool = False,
     ) -> OrchestrationRunResult:
+        if error.details.get("reconciliation_required"):
+            with self._provider_failure_lock:
+                prior = self._provider_failures.get(adapter.backend_id())
+            self._quarantine_provider(adapter.backend_id(), error, None if prior is None else prior[1], correlation_id)
         actions, final = self._abort_and_reconcile(
             adapter,
             lease,
@@ -1337,7 +1555,9 @@ class CP2N2Orchestrator:
         else:
             actions.append("Provider does not confirm abort support.")
 
-        if uncertain and not abort_succeeded:
+        with self._provider_failure_lock:
+            quarantined = backend_id in self._provider_failures
+        if quarantined or (uncertain and not abort_succeeded):
             target = ResourceLifecycleState.UNREACHABLE
         else:
             telemetry_outcome = run_with_timeout(
@@ -1460,6 +1680,10 @@ class CP2N2Orchestrator:
             "unreachable",
         }:
             return ResourceLifecycleState.UNREACHABLE
+        if readiness in {"running", "preparing", "validating", "aborting", "reserved"}:
+            return ResourceLifecycleState.UNREACHABLE
+        if readiness == "failed" or health == "failed":
+            return ResourceLifecycleState.FAILED
         if health in {"degraded", "warning"}:
             return ResourceLifecycleState.DEGRADED
         if readiness == "ready" or health in {"ready", "healthy"}:
@@ -1474,7 +1698,8 @@ class CP2N2Orchestrator:
         invocation: AdapterInvocationResult,
         telemetry_after: dict[str, float | int | str | bool | None],
     ) -> list[str]:
-        failures: list[str] = []
+        failures: list[str] = validate_required_values(task, telemetry_after,
+            confidence=invocation.confidence, phase="postconditions")
 
         if (
             invocation.confidence is not None

@@ -8,7 +8,9 @@ from typing import Iterable
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from core.errors import ControlPlaneError
 from core.task_model import SelectionPolicy, TaskRequest
+from core.telemetry_validation import finite_number, validate_required_values
 from descriptors.capability_schema import Locality, SubstrateDescriptor
 
 
@@ -88,6 +90,10 @@ class MatchReport(BaseModel):
     task_id: str
     policy: SelectionPolicy
     candidates: list[MatchCandidate] = Field(default_factory=list)
+    provider_errors: dict[str, ControlPlaneError] = Field(
+        default_factory=dict,
+        description="Per-resource provider failures observed during selection; never successful effects.",
+    )
 
     def accepted_candidates(self) -> list[MatchCandidate]:
         """Return admitted and feasible candidates in policy order."""
@@ -387,6 +393,7 @@ class BackendMatcher:
         age = self._number(runtime.get("age_of_information_ms"))
         estimated_cost = self._number(runtime.get("estimated_cost"))
         currency = self._normalise(runtime.get("cost_currency"), "")
+        violations.extend(validate_required_values(task, runtime))
 
         self._record(
             health not in {"offline", "failed", "unreachable"},
@@ -688,9 +695,7 @@ class BackendMatcher:
 
     @staticmethod
     def _number(value: RuntimeValue) -> float | None:
-        if isinstance(value, bool) or not isinstance(value, (int, float)):
-            return None
-        return float(value)
+        return finite_number(value)
 
     @staticmethod
     def _normalise(value: RuntimeValue, default: str) -> str:

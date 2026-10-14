@@ -1,0 +1,44 @@
+{
+  "schema": "cp2n2-supplementary-zenodo-publication-v1",
+  "published": true,
+  "record_id": 23377537,
+  "doi": "10.5281/zenodo.23377537",
+  "concept_doi": "10.5281/zenodo.19595082",
+  "url": "https://zenodo.org/records/23377537",
+  "version": "SUPPLEMENTARY-2026-10-14",
+  "archive_sha256": "4795a78131b762914f44bec844cb0798787df9ca6209faf30db9ca0d2fbf207c",
+  "old_record_files_unchanged": true,
+  "inherited_files_unchanged": true,
+  "scored_campaigns_verified": 4,
+  "evaluated_source_identity": "archived ZIPs/per-file hashes, not dirty base Git commit",
+  "uploaded_files": {
+    "cp2n2-supplementary-2026-10-14-public-evidence.zip": {
+      "bytes": 8092983,
+      "sha256": "4795a78131b762914f44bec844cb0798787df9ca6209faf30db9ca0d2fbf207c",
+      "md5": "8b3e989b3c8ade738f5204dfd6d68a65"
+    },
+    "SUPPLEMENTARY-PACKAGE-VERIFICATION.json": {
+      "bytes": 7870,
+      "sha256": "dce9a4d7eb2a1a23010fc74dd5a5aa160d7b59b4c1e90ac049ae1cb94c2e3f23",
+      "md5": "fa5061c33574835a917f4e9d0dd46792"
+    },
+    "SUPPLEMENTARY-CAMPAIGN-VERIFICATION.json": {
+      "bytes": 235670,
+      "sha256": "e2a4d1cae6f24ba307ab908ff8b2126705d0f2c60d18a392a2f59322f6c5760e",
+      "md5": "f72e70f8cccee10efb659f6706fa3fbe"
+    },
+    "SUPPLEMENTARY-ZENODO-METADATA.json": {
+      "bytes": 4615,
+      "sha256": "77a89e92ed1edb73b16f85109bf3091f70231d7ae0cc4f85c6475a0152abbdce",
+      "md5": "b4ab02c7878d77522ac6449b48e9ecb5"
+    },
+    "SUPPLEMENTARY-SHA256SUMS.txt": {
+      "bytes": 431,
+      "sha256": "15e6b932d0f10b93028eed4c1a4495570a2319c899653dc73e9d17f286c27a7c",
+      "md5": "91d5ed8928bb7b40c35f25674681e098"
+    }
+  },
+  "new_scored_observations": false,
+  "physical_substrate_observations": 0,
+  "independent_coauthor_reproduction": false
+}
