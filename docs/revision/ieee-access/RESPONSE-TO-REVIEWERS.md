@@ -4,7 +4,7 @@ Manuscript: Access-2026-43996
 
 Title: CP²N²: A Control Plane for Heterogeneous Physical Neural Networks
 
-Date: 14 October 2026
+Date: 15 October 2026
 
 Status: Technical response draft incorporating R2–R5 and the supplementary AP1–AP3/Gemini results. Both the earlier R5 evidence and the separately authorized supplementary raw archives are public under distinct version DOIs. Final co-author approval, independent co-author reproduction and the editorial scope decision remain open. Nothing has been submitted. Concern summaries below are not verbatim quotations and require final author comparison with the decision.
 
@@ -18,7 +18,9 @@ The revision adds continuous MCP-to-SDK execution, effect-observed direct enforc
 
 The executing campaign replaces the original non-executing study in the main agent results. The manuscript now also states the original 141/160 aggregate and the physical-execution class's one refusal and nineteen clarifications (1/20 conformity). We preserve that protocol and those scores unchanged. Different models, prompts and execution availability preclude a controlled comparison of the two campaigns.
 
-Clean and yellow-highlighted manuscripts share one scientific source; changes are cumulative against the confirmed original submission. Repeated background, architecture and discussion passages were condensed for readability without changing results, methods, figures, tables or scientific qualifications. Every numbered concern receives a response and an actual action or explicit scope limitation. The author list is unchanged.
+In response to the comments on presentation, readability and evaluation focus, we substantially condensed Section VI (Evaluation), from over seven pages of two-column content to approximately four (previously spanning pp. 10–18; now pp. 9–13). We removed internal commit hashes, campaign codes and source-file inventories from that section, consolidated the fault/timing and agent/enforcement tables, and organised the findings around fail-closed admission, capacity-one mutual exclusion, observed software/simulator effects and measured control costs. The shorter account preserves negative results and the distinction between separately frozen implementations. Detailed protocols, trial records, raw logs and verification tools remain accessible in the two public Zenodo evidence versions identified below. Low-single-digit execution medians do not describe every path: MCP discovery and end-to-end contention latency are reported separately.
+
+Clean and yellow-highlighted manuscripts share one scientific source; changes are cumulative against the confirmed original submission. Every numbered concern receives a response and an actual action or explicit scope limitation. The author list is unchanged.
 
 Best regards,
 
@@ -63,7 +65,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Rewrote novelty and comparison; distinguished reused mechanisms from demonstrated integration.
 
-**Location:** Introduction; Physical Neural Resource Contract; Related Work; Table `tab:coverage-comparison`.
+**Location:** `sec:introduction`; `sec:capability-model`; `sec:related-work`; `tab:coverage-comparison`.
 
 **Evidence:** R1 comparison/citation log; R2; R3-direct; AP1; AP2.
 
@@ -71,11 +73,11 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Concern:** Explain how the absence of real physical-PNN validation limits the scope and generalizability of the conclusions.
 
-**Author response:** Agreed. Evaluation uses mocks, twins, same-host services and the official SDK Simulator. These provenance categories are not cumulative evidence of physical validity. Continuous SDK execution strengthens interface integration, but supplies no biological results, device attestation or physical-safety evidence. The supplementary validation, recovery and selector campaigns likewise remain software evidence. We have not obtained physical access and do not substitute simulation for it. Real-substrate applicability remains a separate provider-approved study. This limitation prevents conclusions about calibrated substrate behavior, biological utility and physical safety; acceptance of the narrowed systems scope remains an editorial judgment.
+**Author response:** We agree that real-substrate observations are necessary to assess substrate behaviour and physical safety. The paper now positions operational governance as a prerequisite to autonomous physical deployment: assay authority, current-state admission and result validity can be specified and tested before a fragile or costly substrate is connected. Our evaluation tests that systems contribution using mocks, twins, same-host services and the official SDK Simulator. These runtime-provenance categories are not cumulative evidence of physical validity. Continuous SDK execution establishes interface integration, not biological results, device attestation or physical safety. The validation, recovery and externally authored selector campaigns likewise remain software evidence. Real-substrate applicability is a separate provider-approved study with attributable physical observations; we do not substitute simulation for it. Acceptance of this explicitly bounded systems scope remains an editorial judgment.
 
-**Author action:** Narrowed claims throughout; retained the separate physical-study gate.
+**Author action:** Positioned the governance contract as a systems contribution and prerequisite to physical deployment; retained the explicit provenance taxonomy, prototype-level evaluation/conclusion and separate physical-study gate.
 
-**Location:** Abstract; Evaluation Design and Claim Boundaries; Threats to Validity and Limitations; Conclusion; Tables `tab:evidence-levels` and `tab:claim-matrix`.
+**Location:** `sec:introduction`; `sec:bindings`; `tab:evidence-levels`; `tab:bindings-overview`; `sec:evaluation-design`; `sec:threats-validity`; `sec:conclusion`.
 
 **Evidence:** R2; AP1–AP3; Gemini; separate H1 track in the revision roadmap.
 
@@ -85,9 +87,9 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author response:** Correct. The original 160/160 field measured withheld execution, not active/physical safety, and is no longer the main agent result. The replacement separates conformity, allowed opportunities, calls, starts, commits and checked deliveries. Six of eight allowed opportunities complete; two stale calls reach admission and are blocked. Direct tests send invalid requests even if a model would refuse them. AP1 additionally uses a fixture whose preparation does not reject invalid telemetry: 28 invalid preconditions produce no starts/commits, six valid controls execute and deliver, and twelve invalid post-execution results retain their legitimate commits but withhold successful delivery. Four separate faulty detector controls are detected. This distinguishes prevention from result withholding and avoids crediting the provider's own checks to the gateway. Zero observed forbidden effects remains bounded software evidence, not a physical-safety probability.
 
-**Author action:** Removed the old safe-action claim/main tables; added executing-agent and effect-observed enforcement results, with separate precondition, commit and delivery denominators.
+**Author action:** Replaced the old main agent tables with executing-agent and effect-observed enforcement results, using separate precondition, commit and delivery denominators; the consolidated table and evaluation interpretation retain those distinctions.
 
-**Location:** Abstract; Agent-to-PNN Protocol and Results; Discussion; Tables `tab:executing-agent` and `tab:supplementary-enforcement`.
+**Location:** `sec:contract-results`; `sec:agent-campaign`; `sec:discussion`; `tab:agent-enforcement`.
 
 **Evidence:** R3-direct; R3-live; AP1; unchanged historical campaign.
 
@@ -97,11 +99,11 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Concern:** None of the physical-substrate bindings executes its corresponding real substrate. Add physical or hardware-in-the-loop validation, or keep the claims at prototype level.
 
-**Author response:** We agree that a real backend would materially strengthen substrate applicability. We take the explicitly narrowed prototype route offered in the comment: no physical PNN or hardware-in-the-loop experiment was performed. Observations are labelled by actual runtime provenance. The abstract/conclusion reject inference of physical safety, biological validity or universal portability. Continuous MCP-to-SDK execution is software integration, not Cortical Cloud/CL1 execution. Adding more mocks, externally authored cases or loopback failures cannot close that physical-validation gap. A physical study requires provider access, approved presets and attributable device observations; it is not included in this revision.
+**Author response:** We agree that a real backend would materially strengthen substrate applicability. We take the explicitly narrowed prototype route offered in the comment: no physical PNN or hardware-in-the-loop experiment was performed. The provenance tables identify the runtime actually executed; the evaluation and conclusion distinguish contract/interface portability from physical or biological validity. Continuous MCP-to-SDK execution is software integration, not Cortical Cloud/CL1 execution. More mocks, externally authored cases or loopback failures cannot close that physical-validation gap. A physical study requires provider access, approved presets and attributable device observations; it is a separately scoped next milestone, not an experiment claimed by this revision.
 
 **Author action:** Restricted claims and kept the physical module disabled.
 
-**Location:** Abstract; Implementation and Adapter Integration; Evaluation Design and Claim Boundaries; Threats to Validity and Limitations; Conclusion.
+**Location:** `sec:bindings`; `tab:evidence-levels`; `tab:bindings-overview`; `sec:evaluation-design`; `sec:threats-validity`; `sec:conclusion`.
 
 **Evidence:** R2; R3-live; H1 evidence gate.
 
@@ -113,7 +115,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Replaced binary comparison and clarified reused/new responsibilities.
 
-**Location:** Introduction; Related Work; Table `tab:coverage-comparison`.
+**Location:** `sec:introduction`; `sec:related-work`; `tab:coverage-comparison`.
 
 **Evidence:** R1 comparison/citation log, including source versions.
 
@@ -121,11 +123,11 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Concern:** The seven selector tasks and four holdout cases are too curated. Use a larger independently specified workload with conflicts, multiple admissible resources, partial telemetry, lifecycle costs, ties, unavailable resources, and ambiguity.
 
-**Author response:** We agree that the original seven curated tasks did not establish general matching accuracy. The first revision adds 64 synthetic cases in 16 families: 28 empty, 22 singleton and 14 multi-resource admissible sets, with 640 policy/order outputs and 38 active sensitivity comparisons. Because that suite remained implementation-team-authored, we then obtained twelve cases from an unchanged first response in an isolated Gemini chat without the paper, repository or previous results. The author-reported generator was Gemini Flash 3.8 with high effort; Stefan Fischer approved the cases and documented interpretations before scoring. Their 47 candidates cover conflicting constraints, partial telemetry, fatal lifecycle/unavailability, multiple eligible resources, reset/stochasticity preferences, ties and policy trade-offs. Three policies and original/reversed order yield 72/72 matches for eligible sets, full rankings, selected resources and normalized rejection annotations; all 36 order pairs are invariant. All 290 functional/source hashes were frozen before receipt and remained unchanged. One overlapping missing-drift rule interpretation is disclosed and was approved before execution; it changes neither exclusion nor ranking. This strengthens external case authorship, not independent human reproduction, representative workload sampling or guaranteed ground truth. Ambiguous natural-language intent is tested separately in the agent campaign; these selector cases use an explicit restricted contract. AP1 fixes malformed required numeric evidence separately, without changing or rescoring the historical R4 oracle.
+**Author response:** We agree that the original seven curated tasks did not establish general matching accuracy. The revision adds 64 synthetic cases in 16 families: 28 empty, 22 singleton and 14 multi-resource admissible sets, with 640 policy/order outputs and 38 active sensitivity comparisons. Because that suite remained implementation-team-authored, we obtained twelve additional cases from an unchanged first response in an isolated Gemini chat without the paper, repository or previous results. The author-reported generator was Gemini Flash 3.8 with high effort; Stefan Fischer approved the cases and documented interpretations before scoring. Their 47 candidates cover conflicting constraints, partial telemetry, lifecycle/unavailability, multiple eligible resources, reset/stochasticity preferences, ties and policy trade-offs. Three policies and original/reversed order yield 72/72 matches for eligible sets, full rankings, choices and rejection annotations; all 36 order pairs agree. Functional source and expectations were frozen before receipt and were not changed for these cases. An overlapping missing-drift interpretation, approved before execution, changes neither exclusion nor ranking. The concise selector paragraph now synthesises both suites: hard eligibility precedes soft ranking, candidate order is immaterial, and changed thresholds follow their specified boundaries rather than being required to preserve eligibility. Complete matrices, original prompts/responses, approvals and verification records remain public. External model authorship reduces shared case-design dependence but is not independent human reproduction, representative workload sampling or guaranteed ground truth. Natural-language ambiguity is tested separately by the executing agent; the selector suites use explicit contracts. AP1 fixes malformed required numeric evidence separately without rescoring the historical oracle.
 
-**Author action:** Added the external case-authorship protocol, untouched response/prompt, pre-run approval, input-only bridge, frozen source/input hashes and first-run case-level outcomes; retained authored-suite sensitivity and narrowed independence/generalization claims.
+**Author action:** Added externally authored frozen cases and first-run outcomes; condensed both selector suites to one paragraph while retaining their distinct provenance, active sensitivity and limits. Kept the complete matrices, untouched prompt/response, pre-run approval and source/input hashes in the public evidence archives.
 
-**Location:** RQ1: Contract, Safe Admission, and Portability, including Externally Authored Selector Cases; Threats to Validity and Limitations; Data Availability.
+**Location:** `sec:contract-results` (selector paragraph at `sec:external-selector`); `sec:threats-validity`; Data Availability. Full case-level matrices and prompts: the two version DOIs in the Evidence key.
 
 **Evidence:** R4-selection; r4-oracle-approval.md; Gemini protocol, immutable intake, author approval, first-run outputs and evidence index; AP1. The supplementary raw archives are public under DOI 10.5281/zenodo.23377537, distinct from the earlier R5 DOI.
 
@@ -137,7 +139,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Added multi-resource contention/expiry tests and bounded scheduler/access-mode interpretations.
 
-**Location:** RQ2: Concurrency, Faults, and Recovery; Discussion; Threats to Validity and Limitations.
+**Location:** `sec:concurrency-results`; `fig:rq2-distributed`; `sec:discussion`; `sec:threats-validity`.
 
 **Evidence:** R4-contention.
 
@@ -145,11 +147,11 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Concern:** Same-host application-layer faults, one topology/seed, and three repetitions provide limited distributed-systems realism. Include network-level faults and crash/restart cases.
 
-**Author response:** We agree that application-layer synthetic responses alone were insufficient. Seven actual HTTP/TCP conditions, three times each, use proxies that delay, close and drop replies rather than fabricate status codes. A Linux-container extension separates provider, provider proxy, controller and client proxy into four fresh containers on one bridge network in each of 21 trials: 57 attempts, 18 commits, no overlaps. All three restart probes duplicate commits and 18 early attempts return generic HTTP 500; those historical observations remain unchanged. We then implemented structured per-resource provider failures, quarantine, bounded reads and explicit reconciliation. AP2 runs six conditions three times using separate production controller/provider/TCP-proxy processes: all 18 effect/recovery patterns verify, with 96 HTTP 200 responses carrying structured semantic results and no generic HTTP 500. A healthy alternative remains usable; after a lost invocation reply the primary commits once, with no automatic retry or secondary invocation, and same-key replay remains uncertain. A distinct new task is permitted only after explicit recovery. This addresses the identified error-reporting/recovery weakness, not restart durability. It remains one-host byte-stream evidence; multi-host partitions, packet-level netem, clock skew, database inconsistency and replicated control-plane failures are not tested.
+**Author response:** We agree that application-layer synthetic responses alone were insufficient. Seven actual HTTP/TCP conditions, three times each, use proxies that delay, close and drop replies rather than fabricate status codes. A Linux-container extension separates provider, provider proxy, controller and client proxy into four fresh containers on one bridge network in each of 21 trials: 57 attempts, 18 commits, no overlaps. All three restart probes duplicate commits and 18 early attempts return generic HTTP 500; those historical observations remain unchanged. We then implemented structured per-resource provider failures, quarantine, bounded reads and explicit reconciliation. AP2 runs six conditions three times using separate production controller/provider/TCP-proxy processes: all 18 effect/recovery patterns verify, with 96 HTTP 200 responses carrying structured semantic results and no generic HTTP 500. A healthy alternative remains usable; after a lost invocation reply the primary commits once, with no automatic retry or secondary invocation, and same-key replay remains uncertain. A distinct new task is permitted only after explicit recovery. This addresses error reporting and recovery within one controller lifetime, not restart durability. The revised architecture separates the validated contract/state semantics from production replication infrastructure. A consensus-backed store such as etcd can support durable ownership, but Raft/etcd alone cannot establish whether an uncertain provider operation committed: durable request identity, provider fencing and effect reconciliation are also required. This remains one-host byte-stream evidence; multi-host partitions, packet-level netem, clock skew, database inconsistency and replicated-controller failures are not tested.
 
 **Author action:** Added transport/container experiments and a separately frozen provider-error/recovery implementation study; distinguished historical failures, corrected behavior and untested distributed guarantees.
 
-**Location:** RQ2: Concurrency, Faults, and Recovery; Threats to Validity and Limitations.
+**Location:** `sec:lifecycle`; `sec:concurrency-results`; `tab:control-results`; `sec:threats-validity`.
 
 **Evidence:** R4-transport; R4-container; AP2 protocol v2, process/HTTP/TCP records, provider effect ledgers and verification. The retained v1 development report records a pre-scoring timeout-classification correction; effect/recovery expectations did not change.
 
@@ -157,11 +159,11 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Concern:** In-process state does not establish atomic leases with replicated controllers, crashes, persistence races, or partitions. Distinguish current semantics and test persistent competing controllers.
 
-**Author response:** Correct. Lease/lifecycle state is in memory within one controller. Same-controller retries use retained request state, but all three restart probes repeat provider commits after that state is lost. AP2 improves single-controller quarantine and explicit recovery; it does not restore lost ownership, provide device-side fencing or fix restart duplicates. Persistent competing controllers would require a transactional state/ownership design and a different failure model, not a stronger interpretation of the current mutex or token. We have not implemented that architecture or claimed distributed atomicity. The revised paper reports the negative controls and confines atomic acquisition to the single-controller critical section.
+**Author response:** We agree that single-process acquisition cannot establish atomic ownership across replicated controllers. The prototype specifies and tests lifecycle transitions, lease ownership and uncertain-completion handling within one controller lifetime. Same-controller retries use retained request state; all three restart probes per topology repeat provider commits after that state is lost. AP2 improves quarantine and explicit recovery but does not restore lost ownership, supply device-side fencing or remove those restart duplicates. Persistent replication is a separate production infrastructure obligation, not evidence supplied by an in-memory mutex. A transactional/consensus-backed store could implement durable ownership, but safe recovery additionally needs durable request identities, provider-side fencing or equivalent exclusion, and reconciliation of effects after unknown completion; naming Raft or etcd does not supply those semantics. We have not implemented or evaluated persistent competing controllers. The revised architecture and compact fault table state both the validated single-controller contract and this outstanding distributed-execution obligation.
 
-**Author action:** Clarified the in-process boundary; added restart negative controls; removed durable/replicated guarantees.
+**Author action:** Separated the validated state/lease contract from persistent replicated implementation; retained the restart negative controls and specified the missing identity, fencing and reconciliation obligations without claiming they are implemented.
 
-**Location:** Lifecycle Protocol, Leases, Recovery, and Error Semantics; RQ2: Concurrency, Faults, and Recovery; Threats to Validity and Limitations.
+**Location:** `sec:lifecycle`; `sec:concurrency-results`; `tab:control-results`; `sec:threats-validity`.
 
 **Evidence:** R4-transport; R4-container; AP2's recovery boundary within one controller lifetime.
 
@@ -173,7 +175,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Added direct effect-observed enforcement, a provider-preparation-independent required-evidence fixture, post-commit result-corruption cases and separate planner/effect/delivery metrics.
 
-**Location:** Agent-to-PNN Protocol and Results; Discussion; Tables `tab:executing-agent` and `tab:supplementary-enforcement`.
+**Location:** `sec:contract-results`; `sec:agent-campaign`; `tab:agent-enforcement`; `sec:discussion`.
 
 **Evidence:** R3-direct; R3-live; AP1 effect ledgers, MCP/audit bindings and detector verification.
 
@@ -185,7 +187,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Added the exact historical aggregate, refusal/clarification counts and class-specific interpretation to the manuscript; retained the unchanged archive and reported every new deviation separately.
 
-**Location:** Agent-to-PNN Protocol and Results; Discussion; Table `tab:executing-agent`.
+**Location:** `sec:agent-campaign` (historical-campaign paragraph and all eight new deviations); `tab:agent-enforcement`; `sec:discussion`.
 
 **Evidence:** Historical campaign; R3-live per-case records.
 
@@ -197,7 +199,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Added fixed pressure/injection and benign multilingual executing cases with provenance; corrected the distinction between fixed context, adaptive dialogue and compromised descriptor authority.
 
-**Location:** Agent-to-PNN Protocol and Results; Threats to Validity and Limitations.
+**Location:** `sec:agent-campaign`; `sec:threats-validity`.
 
 **Evidence:** R3-live; excluded capability probe; protocol-change record.
 
@@ -209,7 +211,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Implemented task-required semantic validation and original-age preservation; added same-property conflict and cached-expiry tests; narrowed replay/physical-truth wording and retained compromised-provider counterexamples.
 
-**Location:** Threat Model and Trust Boundaries; Physical Neural Resource Contract; Agent-to-PNN Protocol and Results; Threats to Validity and Limitations; Table `tab:supplementary-enforcement`.
+**Location:** `sec:threat-model`; `sec:capability-model`; `sec:contract-results`; `tab:agent-enforcement`; `sec:threats-validity`.
 
 **Evidence:** AP1; historical R3-direct/R4-selection; R1 binding-contract/invariant document.
 
@@ -221,7 +223,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Added rule sensitivity and strict task-required result-confidence validation; distinguished declared calibration validity from empirical physical calibration.
 
-**Location:** Physical Neural Resource Contract; RQ1: Contract, Safe Admission, and Portability; Agent-to-PNN Protocol and Results; Threats to Validity and Limitations; Table `tab:supplementary-enforcement`.
+**Location:** `sec:capability-model`; `sec:contract-results`; `tab:agent-enforcement`; `sec:threats-validity`.
 
 **Evidence:** R4-selection; AP1; R2 native reconstruction; H1 physical gate.
 
@@ -233,7 +235,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Added explicit contracts and bounded transition exploration with abstraction limits.
 
-**Location:** Physical Neural Resource Contract; Lifecycle Protocol, Leases, Recovery, and Error Semantics; Agent-to-PNN Protocol and Results; Threats to Validity and Limitations.
+**Location:** `sec:capability-model`; `sec:lifecycle`; `sec:agent-campaign`; `sec:threats-validity`.
 
 **Evidence:** R3-state; R3-direct; AP1; AP2; R1 binding-contract/invariant document.
 
@@ -243,9 +245,9 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author response:** We agree that the original short runs did not support tail-latency conclusions. R4 adds ten fresh-registry trials, 20 warm-ups and 200 measurements per paired path, totaling 16,000 measured operations and 1,600 warm-ups. After the AP1/AP2 changes, AP3 measures the updated source separately under no intentionally added load and one owned duty-cycled CPU worker: 80 fresh-registry trials, 32,000 measured operations and 3,200 warm-ups, all successful. Each condition/configuration again has ten trials; statistics report the median of trial medians and median of trial p95 values with 2,000 bootstrap resamples of trial summaries, not pooled dependent calls. Updated controlled-execution medians are 3.43–4.12 ms without intentionally added load and 4.00–4.56 ms with the worker; MCP memory-discovery medians are 14.45 and 14.56 ms. Measured worker utilization is approximately 29–37% of one core, not its declared 60% duty setting or whole-host saturation. Raw process/system CPU endpoints, library/host versions and cleanup are retained; several short direct blocks have CPU-clock-resolution artifacts. Intervals overlap, and execution targets bench-0 explicitly: varying registered resource count is not general selector scaling. The p95 interval describes the median of trial p95 values, not a population tail guarantee. No p99, second physical environment or cross-host generalization is claimed; affinity/power/background OS work remain uncontrolled. New and historical timings are kept distinct rather than pooled or attributed to the wrong source.
 
-**Author action:** Replaced short headline timings with repeated trials and uncertainty-qualified statistics; added updated-source load/CPU measurements, both conditions' intervals, archived raw endpoints and explicit tail/scaling/environment limits.
+**Author action:** Replaced short headline timings with repeated trials and uncertainty-qualified statistics; added updated-source load/CPU measurements and both conditions' intervals. Consolidated earlier paired increments and updated controlled-path totals in one table without pooling checkpoints; retained complete raw endpoints, methods and tail/scaling/environment limits in the public archives.
 
-**Location:** RQ2: Control-Plane Overhead; Discussion; Threats to Validity and Limitations; Tables `tab:revision-overhead` and `tab:supplementary-overhead`.
+**Location:** `sec:overhead-results`; `tab:control-results`; `sec:discussion`; `sec:threats-validity`.
 
 **Evidence:** R4-overhead method/environment records and immutable intervals; AP3 protocol, raw timing/CPU endpoints, full condition tables and offline verification.
 
@@ -257,7 +259,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Expanded directly related interfaces/middleware; recorded each suggested title, DOI, access limit and individual relevance decision, with the unavailable contract paper left open for reassessment if primary text is supplied.
 
-**Location:** Related Work; Table `tab:coverage-comparison`.
+**Location:** `sec:related-work`; `tab:coverage-comparison`.
 
 **Evidence:** R1 comparison/citation log, six-reference assessment table.
 
@@ -269,7 +271,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Added available provenance, prospective freezes and complete first-run archives; distinguished same-host/offline reproduction from independent execution, historical unavailable data from retained new responses, and the two separately identified public evidence versions.
 
-**Location:** Agent-to-PNN Protocol and Results; Threats to Validity and Limitations; Data Availability.
+**Location:** `sec:agent-campaign`; `sec:threats-validity`; Data Availability; full provenance records at both version DOIs in the Evidence key.
 
 **Evidence:** R3-live; R5-reproduction/publication; revision baseline record; AP1–AP3 and Gemini evidence indexes, immutable input/source receipts and offline verification.
 
@@ -283,7 +285,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Replaced old main agent tables with executing/direct/control results and distinct denominators.
 
-**Location:** Agent-to-PNN Protocol and Results; Discussion; Tables `tab:executing-agent` and `tab:supplementary-enforcement`.
+**Location:** `sec:contract-results`; `sec:agent-campaign`; `tab:agent-enforcement`; `sec:discussion`.
 
 **Evidence:** R3-direct; R3-reference; R3-live; AP1.
 
@@ -295,7 +297,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Implemented/measured the continuous path, recovery and native reconstruction; retained the historical separate-trace boundary.
 
-**Location:** BioPattern Gate Application Workflow; Cortical Labs E3 Case Study; Discussion; Table `tab:biopattern-e3-trace`.
+**Location:** `sec:sample-workflow`; `sec:e3-biopattern`; `tab:biopattern-e3-trace`; `fig:biopattern-e3-replay`; `sec:discussion`.
 
 **Evidence:** R2 per-trial manifests, recordings and reconstruction reports.
 
@@ -307,7 +309,7 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Author action:** Expanded binding contracts and tested common identity/result checks, strict required-evidence semantics, optional-field controls and continuous SDK postconditions; retained the distinction between declared ranges and physical calibration.
 
-**Location:** Physical Neural Resource Contract; Implementation and Adapter Integration; Cortical Labs E3 Case Study; Tables `tab:binding-contracts` and `tab:supplementary-enforcement`.
+**Location:** `sec:capability-model`; `tab:binding-contracts`; `sec:bindings`; `sec:e3-biopattern`; `sec:contract-results`; `tab:agent-enforcement`.
 
 **Evidence:** R2; R3-direct; AP1; R1 binding-contract/invariant document.
 
@@ -315,11 +317,11 @@ Their byte-preserved raw archives are published as version SUPPLEMENTARY-2026-10
 
 **Concern:** The 7/7 versus 6/7 comparison needs decisive case-level explanations. Weighted-heuristic perturbations do not establish robustness of the lexicographic policy.
 
-**Author response:** We agree that the original one-case difference needed explanation and did not establish robustness. In the archived seven-case comparison, static-priority and seeded random-admissible choose remote-edge-backend instead of edge-backend for edge_low_latency; constraint-based chooses edge-backend instead of remote-edge-backend for remote_fog_monitoring. All three handle the drifted-primary, stale-chemical and missing-supervision cases correctly: those are not the decisive failures. The differences reflect the benchmark's specified placement preference among eligible choices, not an observed physical-utility advantage. We no longer use weighted-policy perturbations to support lexicographic robustness. R4 instead supplies 64 cases, five policies, two orders and 38 changes to active limits/priorities/ties; all 640 outputs conform, with principal-choice agreements of 29/36 latency-first, 33/36 locality/cost, 29/36 static and 27/36 seeded random over nonempty cases. The separately Gemini-authored suite adds twelve frozen cases, with five policy-divergent cases and 72/72 eligible-set/ranking/selection/annotation matches under three policies and two orders. Neither agreement score establishes placement optimality, general workload accuracy or physical performance. External model authorship and pre-run author approval improve the workload's provenance, not independent human reproduction or representative sampling.
+**Author response:** We agree that the original one-case difference needed explanation and did not establish robustness. In the archived seven-case comparison, static-priority and seeded random-admissible choose remote-edge-backend instead of edge-backend for edge_low_latency; constraint-based chooses edge-backend instead of remote-edge-backend for remote_fog_monitoring. All three handle the drifted-primary, stale-chemical and missing-supervision cases correctly: those are not the decisive failures. The differences reflect the benchmark's specified placement preference among eligible choices, not observed physical utility. We no longer use weighted-policy perturbations to support lexicographic robustness. The larger authored suite instead supplies 64 cases, five policies, two orders and 38 changes to active limits/priorities/ties; all 640 outputs conform, with principal-choice agreements of 29/36 latency-first, 33/36 locality/cost, 29/36 static and 27/36 seeded random over nonempty cases. The separate Gemini-authored suite adds twelve frozen cases, including five policy-divergent cases, with 72/72 eligible-set/ranking/choice/annotation matches under three policies and two orders. The main text now reports both suites in one paragraph to make the systems finding clear: hard constraints precede soft preferences and decisions are candidate-order invariant, while threshold changes may correctly alter eligibility. Detailed comparisons, decisive case/resource choices, prompts and full outputs remain in the public archives and are summarised here. Neither policy agreement nor external model authorship establishes placement optimality, general workload accuracy, physical performance or independent human reproduction.
 
-**Author action:** Added the actual historical decisive case/resource choices, active lexicographic sensitivity and externally authored frozen cases; removed unused-weight robustness and general superiority interpretations.
+**Author action:** Added active lexicographic sensitivity and externally authored frozen cases; condensed their manuscript account without dropping historical counterexamples or full public matrices. Removed unused-weight robustness and general-superiority interpretations and distinguished order invariance from expected threshold-dependent changes.
 
-**Location:** RQ1: Contract, Safe Admission, and Portability, including Externally Authored Selector Cases; Threats to Validity and Limitations.
+**Location:** `sec:contract-results` (selector paragraph at `sec:external-selector`); `sec:threats-validity`; Data Availability. Historical decisive choices and full matrices: the archived selector records identified below.
 
 **Evidence:** Historical matching_baselines_results.csv; R4-selection; r4-oracle-approval.md; Gemini original cases, first-run matrix and evidence index.
 

@@ -5,28 +5,28 @@
   "canonical_response": "Paper repository: IEEE-ACCESS-RESPONSE-TO-REVIEWERS.md",
   "files": {
     "cp2n2-response-to-reviewers.docx": {
-      "bytes": 31598,
-      "sha256": "399026b2c4da690a36c6f65433ea0b2b2b48302cc0212ec83f3123518dd33a76"
+      "bytes": 32521,
+      "sha256": "3ebd941b84841de8f68edca6662bdfadc021ceda532ed84b733b746e7ec05ff7"
     },
     "cp2n2-response-to-reviewers.pdf": {
-      "bytes": 334964,
-      "sha256": "40dcf07275e5273bef4be060c97e420feff8482e0de900021152ca86bd259f95"
+      "bytes": 344039,
+      "sha256": "8992d92bf9c1d67d61df280e588fb0a2951715ed785e11ba30a8422f4286ff77"
     },
     "cp2n2-resubmission-checklist.docx": {
       "bytes": 117236,
-      "sha256": "466b4e57d1b4387d006b54992a3621bb6793ac6d1a9b30b40860c93ba26c5427"
+      "sha256": "7af0280e64a01ce6bd5952ec7431a1725030f21f98d36b6a5384b46b034b0140"
     },
     "cp2n2-resubmission-checklist.pdf": {
-      "bytes": 229291,
-      "sha256": "a8333610341bb1e5d835a03b7c6c704fc5ad4a7219a7f4da0ee755646e87c662"
+      "bytes": 227926,
+      "sha256": "f01567eaacc6c30c3ec2020253d79746110058ff1c690155b06b28ef00e94c52"
     },
     "RESPONSE-TO-REVIEWERS.md": {
-      "bytes": 45130,
-      "sha256": "7104536511d6726757a939ec3eded39c6481c4a7d53e1cf3714d534dc7b1e4ac"
+      "bytes": 48039,
+      "sha256": "b8a40b7cb4be0a8cf4fb7df6a768532273b26055e75ef4f7b8c3017b54a3f089"
     },
     "RESUBMISSION-CHECKLIST-STATUS.md": {
-      "bytes": 5594,
-      "sha256": "8d4fc6d6ef955c81ba8c7c03ca947e5dbe85c4a11a6bf18d0d26fd9d1af515da"
+      "bytes": 5995,
+      "sha256": "23209cc1a9fd88c381011ffb7e1759be25cf2e4035113e63fc6fbbd2a61ae39d"
     }
   }
 }

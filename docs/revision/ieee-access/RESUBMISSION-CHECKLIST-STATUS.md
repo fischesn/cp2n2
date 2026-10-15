@@ -2,7 +2,7 @@
 
 **Manuscript:** Access-2026-43996 — CP²N²
 
-**Updated:** 14 October 2026
+**Updated:** 15 October 2026
 
 **Status:** working revision; not author-approved or submitted.
 
@@ -18,11 +18,11 @@ checked; it does not mean that the authors have approved or uploaded it.
 | 3. Check mathematical typography | Technical builds pass; notation is present in the revised manuscript. | Authors confirm IEEE rules for italic variables, roman labels/units, number–unit spacing, multiplication signs and vectors. |
 | 4. Check references | Biber builds pass without unresolved citations; IEEE bibliography style is used. | Final author check of reference details, relevance and citation order. |
 | 5. Include videos in peer review, if any | No video is planned for the current package. | Not applicable unless a video is added; then include it in review and respect the 100 MB limit. |
-| 6. Supply response to reviewers | All 22 responses incorporate AP1–AP3/Gemini, with partial fulfillment and remaining limitations explicit. Markdown plus a 13-page Word/PDF response use the supplied official template. | After approval, upload as **Author's Response Files**. |
-| 7. Highlight all changes | A cumulative yellow-marked 20-page journal PDF includes the supplementary changes and editorial compaction against the confirmed original submission. Deleted/replaced material is explained in the response. | Final comparison against the original, including grammar changes; upload as **Highlighted PDF**. |
+| 6. Supply response to reviewers | All 22 responses incorporate AP1–AP3/Gemini and the new evaluation structure, with partial fulfillment and remaining limitations explicit. Markdown plus a 14-page Word/PDF response use the supplied official template; section, figure and table locators use the final clean build. | After approval, upload as **Author's Response Files**. |
+| 7. Highlight all changes | A cumulative yellow-marked 16-page journal PDF includes the supplementary changes and systems-focused editorial condensation against the confirmed original submission. Deleted/replaced material is explained in the response. | Final comparison against the original, including grammar changes; upload as **Highlighted PDF**. |
 | 8. Supply supplementary ZIP, if used | R5 evidence version `R5-2026-10-10` remains public under DOI `10.5281/zenodo.23281161`, with disclosed budget-object/log removal and unchanged scientific payloads. AP1–AP3/Gemini raw evidence is separately public as `SUPPLEMENTARY-2026-10-14` under DOI `10.5281/zenodo.23377537`, with byte-preserved archives, four archived campaign verifiers and full anonymous-download hash checks passed. | The journal supplementary-file decision remains open. If supplied, use the corresponding verified public ZIPs, not the private R5 candidate, and include them in peer review. |
 | 9. Supply editable manuscript with author biographies/photos | A matching clean LaTeX source ZIP is prepared; all three biographies/photos are included. | After approval, upload as **Main Manuscript**. |
-| 10. Supply double-column, single-spaced manuscript PDF | The matching clean 20-page IEEE Access PDF is prepared without smaller fonts or margins. | After approval, upload as **Main Manuscript – PDF**. |
+| 10. Supply double-column, single-spaced manuscript PDF | The matching clean 16-page IEEE Access PDF is prepared without smaller fonts or margins. | After approval, upload as **Main Manuscript – PDF**. |
 
 The manuscript artifacts are generated in the paper repository under
 `output/pdf/` and `submission-package/ieee-access/`. The response and official
@@ -43,9 +43,9 @@ software repository. See the reviewer-material README for source ownership.
   independent co-author reproduction.
 - The distinct supplementary DOI is cited in both manuscript views and the
   reviewer response. Matching clean/marked journal, neutral arXiv and response
-  exports are rebuilt after shortening, including all 85 output pages,
+  exports are rebuilt after condensation, including all 72 output pages,
   source/PDF bindings and template fidelity. This is not final author approval.
-- The 20-page journal avoids the over-20-page pre-submission EIC permission
+- The 16-page journal avoids the over-20-page pre-submission EIC permission
   inquiry described in the current [IEEE Access submission guidelines](https://ieeeaccess.ieee.org/authors/submission-guidelines/).
 - Resolve the submission route: the editor has not yet answered the scope
   question about a revision without real-substrate execution.
@@ -60,3 +60,8 @@ ten official checklist boxes complete.
 The author subsequently authorized commit/push and meaning-preserving journal
 shortening on 14 October. Neither request approves submission or completes
 the remaining author checks.
+
+The 15 October request authorizes the systems-focused editorial revision and
+synchronized reviewer material, not commit/push or submission. The abstract
+is deliberately unchanged; its physical-side-effects wording remains a final
+author-review item against the E0–E3 evidence scope.
